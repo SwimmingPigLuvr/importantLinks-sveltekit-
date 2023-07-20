@@ -1,0 +1,16 @@
+make sure that theme is saved to firestore
+make sure that the html is using the user's saved theme as the theme, 
+not the selected theme
+
+if no theme saved or if not logged in => default theme
+
+let user create their own theme
+just create a color picker for primary, secondary...
+
+let user change username
+
+
+center links
+let user upload custom links
+
+finish video series
