@@ -14,3 +14,70 @@ center links
 let user upload custom links
 
 finish video series
+
+
+
+set link icons to images
+
+figure out best way to integrate custom themes:
+font choices, colors, etc, stored on a users database
+
+
+appearance:
+
+Profile:
+div 
+    PFP: pick an image / remove
+    profile title: (default is @username)
+    Bio:
+    div
+    + Add Social Icons
+    /div
+/div
+
+Themes
+div
+    grid of themes to choose from
+/div
+
+Custom
+
+Backgrounds
+div
+    grid of backgrounds to choose
+    div
+        color picker
+    /div
+/div
+
+buttons
+div
+    grid of link button options
+    button color picker
+    font color picker
+    shadow color picker
+/div
+
+Fonts
+font picker
+color picker
+
+_____________
+
+should i build the ui then figure out how to connect these variables to the backend?
+yes i think so
+should be hard. just like i created a way to save the users links. should be the same
+they can be saved as:
+lightTheme
+darkTheme
+
+userTheme:
+    userbg
+    userButton
+    userButtonColor
+    userButtonFont
+    userButtonFontColor
+    userButtonShadow: true/false
+    userButtonShadowColor
+    
+

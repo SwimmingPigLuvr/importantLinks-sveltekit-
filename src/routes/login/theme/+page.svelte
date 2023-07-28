@@ -21,12 +21,6 @@
         '🍋 lemonade'
     ];
   
-    onMount(() => {
-        if (typeof window !== 'undefined' && $userData?.theme) {
-            document.documentElement.setAttribute('data-theme', $userData.theme);
-        }
-    });
-  
     async function saveTheme() {
       console.log("saving theme", chosenTheme);
   

@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { user } from "$lib/firebase";
+    import { user } from "$lib/firebase"; 
 </script>
 
 {#if $user}
     <slot />
+   
 {:else}
     <p class="text-error">
         please login to view this page

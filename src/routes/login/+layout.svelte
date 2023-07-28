@@ -28,7 +28,7 @@
 </nav>
 
 <AnimatedRoute>
-  <main class="card w-3/4 max-w-[27rem] bg-accent text-accent-content mx-auto">
+  <main class="card w-3/4 max-w-[27rem] bg-primary text-accent-content mx-auto">
     <div class="card-body items-center text-center">
       <slot />
     </div>

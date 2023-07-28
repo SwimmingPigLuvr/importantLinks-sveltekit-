@@ -47,7 +47,7 @@
         username,
         photoURL: $user?.photoURL ?? null,
         published: true,
-        bio: 'milady in control',
+        bio: 'asdfj jasdfjasdfjasdf ajasdjfasdjadsfj',
         links: [
             {
                 title: 'test nft link',

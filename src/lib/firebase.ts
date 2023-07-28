@@ -78,6 +78,8 @@ export function docStore<T>(
   };
 }
 
+
+
 interface LinkData {
   title: string,
   url: string,
@@ -89,7 +91,6 @@ interface UserData {
   bio: string;
   photoURL: string;
   links: LinkData[];
-  theme: string;
 }
 
 

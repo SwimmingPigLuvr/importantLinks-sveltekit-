@@ -3,6 +3,9 @@
   import type { PageData } from "./$types";
 
   export let data: PageData;
+
+  
+
 </script>
 
 <svelte:head>
@@ -23,23 +26,28 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<main class="prose text-center mx-auto mt-8">
-  <h1 class="text-[3rem] m-auto">
-    @{data.username}
-  </h1>
+<main class="text-center">
 
+  <!-- PFP -->
   <img 
     src={data.photoURL ?? "/sonic.jpeg"}
     alt="photoURL"
-    width="256"
-    class="mx-auto"
+    class="mx-auto mt-16 mb-4 h-20 w-20"
   />
+  
+  <!-- USERNAME -->
+  <h1 class="text-[1.5rem] m-auto font-gin">
+    @{data.username}
+  </h1>
 
-  <p class="text-xl my-8">{data.bio ?? "no bio"}</p>
-  <ul class="list-none">
+  <!-- BIO -->
+  <p class="text-[1rem] p-2 font-gin">{data.bio ?? "no bio"}</p>
+
+  <!-- LINKS -->
+  <ul class="list-none mt-4">
     {#each data.links as item }
-      <li class="m-auto">
-        <UserLink {...item} />
+      <li class="m-auto p-2">
+        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} />
       </li>
     {/each}
   </ul>
@@ -48,3 +56,6 @@
 
 
 </main>
+
+<!-- give user option to upload icons for each link -->
+<!-- add social links below -->

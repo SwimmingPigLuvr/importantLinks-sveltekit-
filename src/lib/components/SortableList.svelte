@@ -68,7 +68,7 @@
                 on:dragover|preventDefault={onDragOver}
                 on:dragleave={onDragLeave}
                 on:drop|preventDefault={onDrop}
-                animate:flip={{ duration: 1000, easing: backIn }}
+                animate:flip={{ duration: 300, easing: backIn }}
             >
                 <slot {item} {index} />
             </li>

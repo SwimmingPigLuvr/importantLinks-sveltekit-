@@ -25,12 +25,6 @@ export const load = (async ({ params }) => {
         throw error(403, `the profile of @${data.username} is not public`);
     }
 
-    
-
-
-
-
-
     return {
         username: data.username,
         photoURL: data.photoURL,
