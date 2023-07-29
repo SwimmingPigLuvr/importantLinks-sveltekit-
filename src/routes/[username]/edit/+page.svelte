@@ -5,7 +5,11 @@
   import { db, user, userData, storage } from "$lib/firebase";
   import { arrayRemove, arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+  import { onMount } from "svelte";
+  import { backIn, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
   import { writable } from "svelte/store";
+  import { fade, fly, slide } from "svelte/transition";
+
 
   const formDefaults = {
 
@@ -18,10 +22,16 @@
 
   let files: FileList;
   let showForm = false;
-  let showIconForm = false;
   let uploadSuccess = false;
   let uploading = false;
   let previewURL: string;
+
+  let showDragMessage = false;
+
+  onMount (() => {
+    showDragMessage = true;
+  });
+
   
   $: urlIsValid = $formData.url.match(/^(ftp|http|https):\/\/[^ "]+$/);
   $: titleIsValid = $formData.title.length < 20 && $formData.title.length > 0;
@@ -83,6 +93,20 @@
 </script>
 
 <main class="max-w-xl mx-auto ">
+
+<!-- messages -->
+
+{#if showDragMessage}
+<div 
+  in:slide={{ delay: 1000, duration: 500, easing: backOut}}
+  out:slide={{ duration: 500, easing: backIn }} 
+  class="group z-20 flex absolute space-x-3 top-20 w-36 right-10 px-4 bg-sky-400 rounded-lg">
+  <button on:click={() => showDragMessage = false} class="btn-xs btn-circle border-white border-[0.1rem] bg-black invisible group-hover:visible absolute -right-3 -top-3">X</button>
+  <p class="text-6xl py-2">!</p>
+  <p class="text-xs my-auto py-2">Drag and drop links to change order</p>
+</div>
+{/if}
+
   {#if $userData?.username == $page.params.username}
     <h1 class="mx-2 text-2xl font-input-mono font-bold mt-8 mb-4 text-center">
       Edit Profile
@@ -94,50 +118,71 @@
       on:sort={sortList}
       let:item>
 
-      <div class="group relative">
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div 
+        class="group relative">
         <UserLink iconURL={item.iconURL} title={item.title} url={item.url} />
+      
+      <!-- delete button -->
         <button
-          on:click={() => deleteLink(item)}
-          class="btn-xs btn-error invisible group-hover:visible transition-all absolute -right-6 bottom-10"
-          >Delete</button>
+          on:click|preventDefault={e => deleteLink(item)}
+          class="btn-xs btn-error invisible group-hover:visible transition-all absolute -right-2 top-2">
+          <p class="text-white">Delete</p>
+        </button>
       </div>
     </SortableList>
 
     {#if showForm}
       <form 
+        in:slide={{ duration: 700, easing: cubicInOut}}
+        out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-base-200 p-6 w-full mx-auto rounded-xl"
+        class="bg-base-300 p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <img 
-          src={previewURL}
-          alt="iconURL"
-          width="128"
-          height="128"
-          class="mx-auto"
-        />
-        <input
-          name="iconURL"
-          type="file"
-          class="input input-sm"
-          accept="image/png, image/jpeg, image/gif, image/webp"
-          bind:files
-        />
-        <input 
+        <!-- icon upload -->
+        <div class="space-y-3 flex flex-col">
+          <label  for="url">Enter URL</label>
+          <input 
+            name="url"
+            type="text"
+            placeholder="URL"
+            class="input input-sm w-full"
+            bind:value={$formData.url}
+          />
+          <label  for="title">Title</label>
+          <input 
           name="title"
           type="text"
           placeholder="Title"
           class="input input-sm"
           bind:value={$formData.title}
         />
-        <input 
-          name="url"
-          type="text"
-          placeholder="URL"
-          class="input input-sm"
-          bind:value={$formData.url}
-        />
+        </div>
+        <label for="icon">Thumbnail</label>
+        <div class="flex">
+          <img 
+            src={previewURL ? previewURL : "/icons/custom.png"}
+            alt="default"
+            width="128"
+            height="128"
+            class="mx-auto"
+          />
+          <input
+            on:input={() => {
+              const file = files[0];
+              previewURL = URL.createObjectURL(file);
+            }}
+            name="iconURL"
+            type="file"
+            class="input input-sm"
+            accept="image/png, image/jpeg, image/gif, image/webp"
+            bind:files
+          />
+      </div>
+        
+        
         <div class="my-4">
             {#if !titleIsValid}
               <p class="text-error text-xs">invalid title</p>

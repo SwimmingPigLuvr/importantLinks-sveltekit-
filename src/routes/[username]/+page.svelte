@@ -1,10 +1,8 @@
 <script lang="ts">
   import UserLink from "$lib/components/UserLink.svelte";
   import type { PageData } from "./$types";
-
   export let data: PageData;
 
-  
 
 </script>
 
@@ -45,7 +43,7 @@
 
   <!-- LINKS -->
   <ul class="list-none mt-4">
-    {#each data.links as item }
+    {#each data.links as item (item.id) }
       <li class="m-auto p-2">
         <UserLink iconURL={item.iconURL} title={item.title} url={item.url} />
       </li>

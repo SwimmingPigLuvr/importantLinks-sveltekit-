@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import { flip } from "svelte/animate";
-  import { backIn, backInOut, backOut } from "svelte/easing";
-  import { fade } from "svelte/transition";
+    import { createEventDispatcher } from "svelte";
+    import { flip } from "svelte/animate";
+    import { cubicInOut } from "svelte/easing";
+    
+
 
     export let list: any[];
     let isOver: string | boolean = false;
@@ -59,7 +60,7 @@
     <ul class="list-none p-0 flex flex-col items-center">
         {#each list as item, index (item.id)}
             <li
-                class="border-2 border-dashed border-transparent p-2 transition-all max-w-md w-full"
+                class="border-2 border-dashed border-transparent p-2 transition-all max-w-2xl w-full"
                 class:over={item.id === isOver}
                 data-index={index}
                 data-id={item.id}
@@ -68,7 +69,7 @@
                 on:dragover|preventDefault={onDragOver}
                 on:dragleave={onDragLeave}
                 on:drop|preventDefault={onDrop}
-                animate:flip={{ duration: 300, easing: backIn }}
+                animate:flip={{ duration: 500, easing: cubicInOut }}
             >
                 <slot {item} {index} />
             </li>
@@ -80,6 +81,6 @@
 
 <style>
     .over {
-        @apply border-slate-400 scale-105;
+        @apply border-secondary-focus scale-x-125;
     }
 </style>
