@@ -2,7 +2,6 @@
     import AuthCheck from "$lib/components/AuthCheck.svelte";
     import { db, user, userData } from "$lib/firebase";
     import { doc, writeBatch } from "firebase/firestore";
-    import { onMount } from 'svelte';
   
     let chosenTheme = '';
     const themes = [
@@ -72,4 +71,11 @@
                 {chosenTheme}
         </p>
     {/if}
+        <a href="/{$userData?.username}" class="absolute -bottom-64 bg-secondary px-10 py-6 rounded-xl hover:bg-info transform transition-all duration-500 ease-in-out">
+            <p class="font-ellograph mb-2">View Profile</p>
+            <img src="{$userData?.photoURL}" alt="profile" class="w-[120px] m-auto mb-">
+            <button class="btn btn-accent">@{$userData?.username}</button>
+        </a>
   </AuthCheck> 
+
+

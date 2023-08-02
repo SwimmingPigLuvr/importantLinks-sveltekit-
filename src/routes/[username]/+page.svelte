@@ -1,7 +1,17 @@
 <script lang="ts">
+  import AuthCheck from "$lib/components/AuthCheck.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
+  import { onMount } from "svelte";
   import type { PageData } from "./$types";
+  import { setTheme } from "$lib/theme";
   export let data: PageData;
+
+
+  onMount(() => {
+    if (data && data.theme) {
+      setTheme(data.theme);
+    }
+  });
 
 
 </script>
@@ -24,7 +34,7 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<main class="text-center">
+<main class="text-center text-primary-focus">
 
   <!-- PFP -->
   <img 
@@ -50,6 +60,11 @@
     {/each}
   </ul>
 
+  <AuthCheck>
+
+    <a href="{data.username}/edit" class="btn w-20 fixed top-4 right-4">Edit</a>
+    
+  </AuthCheck>
 
 
 

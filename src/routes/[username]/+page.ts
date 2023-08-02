@@ -2,8 +2,11 @@ import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 import type { PageLoad } from './$types';
 import { db } from '$lib/firebase';
 import { error } from '@sveltejs/kit';
+import { setTheme } from '$lib/theme';
 
 export const load = (async ({ params }) => {
+
+   
 
     const collectionRef = collection(db, 'users');
 
@@ -23,6 +26,10 @@ export const load = (async ({ params }) => {
 
     if (!data.published) {
         throw error(403, `the profile of @${data.username} is not public`);
+    } 
+    
+    if (data && data.theme) {
+        setTheme(data.theme);
     }
 
     return {

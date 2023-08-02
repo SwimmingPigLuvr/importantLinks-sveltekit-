@@ -81,3 +81,65 @@ userTheme:
     userButtonShadowColor
     
 
+
+
+
+TODO 7/29
+
+think about architecture of the appearance settings
+
+user should be able to amke changes everywhere after one click
+
+they select primary, secondary, accent colors
+
+fonts
+
+then whereever those fonts are used the database is called to bring it in.
+
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+
+8.01.23
+
+theme. let's first make sure that i can save the users theme then also call the users theme whereever neccessary
+[username] & [username]/edit art the only ones so far.
+let's see what it takes to make it load as fast as possible that way someone looking at your link site doesn't have to wait for the page to load
+
+the theme picker works!
+now i need to go back to all of my link styles and make sure that they follow the daisy ui
+names: primary, secondary etc...
+
+then once that is done i can create a page that lets the user pick each style individually. 
+this will create a new theme and save it to the database: userTheme.
+
+the prebuilt themes just use the name to determin styles becasue they are already built out
+the userTheme will have to save each user selection
+
+does this mean i will have to make a call from my database to the tailwind config file?
+also each selection will have to trigger the corresponding css/tailwind classes to be defined
+
+list of customizations
+bg
+font, font color
+button color, button corners,
+
+
+aubust 02
+
+UX choice:
+finish login, choose theme, go to profile page/link page
+
+more ux:
+choose themes:
+list the same themes from before.
+this time with previews:
+preview is a smartphone shaped div 
+with a background 
+and 3 horizontal divs to resemble links
+
+changes are saved as they are clicked.
+database makes realtime updates
