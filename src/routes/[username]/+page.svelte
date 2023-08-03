@@ -34,7 +34,7 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<main class="text-center text-primary-focus">
+<main data-theme={data.theme} class="text-center text-primary-focus">
 
   <!-- PFP -->
   <img 

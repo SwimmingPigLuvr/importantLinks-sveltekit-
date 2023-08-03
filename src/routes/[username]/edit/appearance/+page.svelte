@@ -1,7 +1,12 @@
 <script lang="ts">
+  import LivePreview from "$lib/components/LivePreview.svelte";
+  import UserLink from "$lib/components/UserLink.svelte";
+  import { userData } from "$lib/firebase";
   import { setTheme } from "$lib/theme";
   import { backIn, backOut } from "svelte/easing";
   import { slide } from "svelte/transition";
+
+  let links = $userData?.links || [];
 
   let showColorPicker = false;
   
@@ -11,44 +16,58 @@
   
   let chosenTheme = '';
   const themes = [
-      'methyleneBlue',
       'red',
       'retro',
       'garden',
-      'black',
+      'forest',
       'luxury',
       'aqua',
       'night',
       'coffee',
+      'methyleneBlue',
       'acid',
-      'forest',
+      'black',
       'cyberpunk',
       'lemonade'
   ];
 
 </script>
 
+<LivePreview />
+
 <main class="flex flex-col">
 
-<div class="flex flex-col my-20">
+  
+
+<div class="flex flex-col my-20 items-center md:max-w-[62%]">
 
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem]">Themes</h2>
-  <div class="bg-secondary max-w-xl m-auto mx-6 p-6 flex flex-col rounded-2xl">
+  <div class="bg-secondary m-auto mx-6 p-6 flex flex-col rounded-2xl">
     <!-- themes -->
-    <div class="flex flex-wrap justify-between">
+    <div class="flex flex-wrap justify-between space-x-1">
       {#each themes as theme}
       <div>
 
         <button 
         on:click|preventDefault={() => setTheme(theme)} 
-        class="btn bg-primary border-none w-[150px] h-[230px] {theme} flex flex-col"
+        class="btn bg-primary border-none w-[180px] h-[285px] {theme} flex flex-col justify-start py-4"
         class:btn-secondary={theme === chosenTheme}
         data-theme={theme}>
+        <div class="flex flex-col items-center">
+
+          <!-- pfp -->
+          <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+          <!-- Username -->
+          <p class="text-[0.5rem]">@{$userData?.username}</p>
+          <!-- bio -->
+          <p class="text-[0.33rem]">{$userData?.bio}</p>
+        </div>
+          <!-- links -->
           <div class="bg-secondary w-full h-4"></div>
           <div class="bg-secondary w-full h-4"></div>
           <div class="bg-secondary w-full h-4"></div>
         </button>
-      <h3 class="font-input-mono text-center text-xs mb-4 mt-1">{theme}</h3>
+      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2" data-theme={theme}>{theme}</h3>
       </div>
       {/each}
     </div>
