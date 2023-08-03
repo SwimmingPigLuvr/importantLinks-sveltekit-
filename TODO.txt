@@ -143,3 +143,9 @@ and 3 horizontal divs to resemble links
 
 changes are saved as they are clicked.
 database makes realtime updates
+
+8.03
+
+make an appearance page.
+
+linktrees ui is great so i will use that as my wireframe

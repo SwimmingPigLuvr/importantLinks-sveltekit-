@@ -11,39 +11,48 @@
   
   let chosenTheme = '';
   const themes = [
-      '💙 methyleneBlue',
-      '🟥 red',
-      '📼 retro',
-      '🪴 garden',
-      '⚫️ black',
-      '🤑 luxury',
-      '🌊 aqua',
-      '🌃 night',
-      '☕️ coffee',
-      '🧪 acid',
-      '🌲 forest',
-      '🤖 cyberpunk',
-      '🍋 lemonade'
+      'methyleneBlue',
+      'red',
+      'retro',
+      'garden',
+      'black',
+      'luxury',
+      'aqua',
+      'night',
+      'coffee',
+      'acid',
+      'forest',
+      'cyberpunk',
+      'lemonade'
   ];
 
 </script>
 
 <main class="flex flex-col">
 
-<div class="flex flex-col">
+<div class="flex flex-col my-20">
 
-  <div class="bg-secondary max-w-xl m-auto p-4 flex flex-col">
-    <h2>Choose Theme</h2>
+    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem]">Themes</h2>
+  <div class="bg-secondary max-w-xl m-auto mx-6 p-6 flex flex-col rounded-2xl">
     <!-- themes -->
-    <div>
+    <div class="flex flex-wrap justify-between">
       {#each themes as theme}
+      <div>
+
         <button 
         on:click|preventDefault={() => setTheme(theme)} 
-        class="btn m-1"
-        class:btn-secondary={theme === chosenTheme}>
-        {theme}</button>
+        class="btn bg-primary border-none w-[150px] h-[230px] {theme} flex flex-col"
+        class:btn-secondary={theme === chosenTheme}
+        data-theme={theme}>
+          <div class="bg-secondary w-full h-4"></div>
+          <div class="bg-secondary w-full h-4"></div>
+          <div class="bg-secondary w-full h-4"></div>
+        </button>
+      <h3 class="font-input-mono text-center text-xs mb-4 mt-1">{theme}</h3>
+      </div>
       {/each}
     </div>
+  </div>
     <!-- backgrounds -->
     <h2 class="text-info">Background</h2>
     <!-- choose color -->
@@ -372,7 +381,6 @@
     <div>
       <label for="Image">Upload Background</label>
     </div>
-  </div>
 
   <!-- buttons -->
   <div>
