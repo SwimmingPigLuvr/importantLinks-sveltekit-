@@ -31,31 +31,49 @@
 
 <script>
     import { userData } from "$lib/firebase";
+    import { onMount } from "svelte";
     import UserLink from "./UserLink.svelte";
+    import { fly } from "svelte/transition";
+    import { backOut } from "svelte/easing";
+    let mounted = false;
+
+    onMount(() => {
+            mounted = true;
+            console.log('mounted');
+        }
+    );
 
     let links = $userData?.links || [];
+    let userFont = 'input-mono';
+
+
+
 </script>
 
-
+{#if mounted}
 <!-- preview -->
-<div class="hidden md:flex bg-blue-300 w-[38%] fixed right-0 justify-center items-center h-screen">
+<div 
+    class="hidden md:flex bg-blue-300 w-[38%] fixed right-0 justify-center items-center h-screen">
     <!-- phone div -->
-    <div style="width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;" class="border-black bg-primary flex flex-col justify-start p-4 border-8 rounded-3xl space-y-2">
+    <div 
+        in:fly={{ y: 100, duration: 1000, easing: backOut }}
+        style="width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;" 
+        class="border-black bg-primary flex flex-col justify-start border-[0.75rem] rounded-[33px] overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
 
-      <div class="flex flex-col items-center">
+      <div class="flex flex-col items-center mt-8 mb-4">
         <!-- pfp -->
-        <img class="min-w-[38px] min-h-[38px] max-h-[60px] max-w-[60px]"  src="{$userData?.photoURL}" alt="pfp">
+        <img class="min-w-[38px] min-h-[38px] max-h-[88px] max-w-[88px]"  src="{$userData?.photoURL}" alt="pfp">
         <!-- Username -->
-        <p class="text-[1rem]">@{$userData?.username}</p>
+        <p class="text-[1rem] font-{userFont}">@{$userData?.username}</p>
         <!-- bio -->
-        <p class="text-[0.75rem]">{$userData?.bio}</p>
+        <p class="text-[0.75rem] font-{userFont}">{$userData?.bio}</p>
       </div>
         <!-- links -->
         <ul>
           {#each links as link}
-            <li class="m-auto p-2 w-full">
+            <li class="m-auto py-[0.33rem]">
               <UserLink iconURL={link.iconURL} title={link.title} url={link.url} previewMode={true} />
             </li>
           {/each}
@@ -65,3 +83,4 @@
     </div>
   </div>
   <!-- preview end -->
+  {/if}

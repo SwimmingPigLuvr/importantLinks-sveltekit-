@@ -227,7 +227,7 @@
     {/if}
   {/if}
 
-<a href="/[{$userData?.username}]/edit/appearance" class="btn btn-accent fixed top-4 right-4 ">appearance</a>
+<a href="/{$userData?.username}/edit/appearance" class="btn btn-accent fixed top-4 right-4 ">appearance</a>
   
 
 </main>

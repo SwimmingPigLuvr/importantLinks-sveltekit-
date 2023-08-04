@@ -1,6 +1,6 @@
 <script lang="ts">
   import ColorPicker from "$lib/components/ColorPicker.svelte";
-import LivePreview from "$lib/components/LivePreview.svelte";
+  import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { userData } from "$lib/firebase";
   import { setTheme } from "$lib/theme";
@@ -84,13 +84,15 @@ import LivePreview from "$lib/components/LivePreview.svelte";
       {/each}
     </div>
   </div>
+<div class="my-4">
 
-  <h2 class="mx-2 p-2 font-input-mono text-[1.5rem]">Custom Appearance</h2>
-  <div id="custom" class="m-auto mb-6 px-6">
+  <h2 id="custom" class="m-2 p-2 font-input-mono text-[1.5rem]">Custom Appearance</h2>
+  <div class="m-auto mb-6 px-6">
     <p class="font-input-mono">Completely customize your swimmingPig profile. 
       Change your background with colors, gradients and images. 
       Choose a button style, change the typeface and more.</p>
   </div>
+</div>
 
 
     <!-- backgrounds -->
