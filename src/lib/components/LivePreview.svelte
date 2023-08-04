@@ -56,7 +56,7 @@
         <ul>
           {#each links as link}
             <li class="m-auto p-2 w-full">
-              <UserLink iconURL={link.icon} title={link.title} url={link.url} previewMode={true} />
+              <UserLink iconURL={link.iconURL} title={link.title} url={link.url} previewMode={true} />
             </li>
           {/each}
         </ul>

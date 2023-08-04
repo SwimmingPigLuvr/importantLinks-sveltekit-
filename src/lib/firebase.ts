@@ -81,6 +81,7 @@ export function docStore<T>(
 
 
 interface LinkData {
+  [x: string]: string | undefined;
   title: string,
   url: string,
   icon: string,
