@@ -92,6 +92,17 @@ interface UserData {
   bio: string;
   photoURL: string;
   links: LinkData[];
+  theme: UserTheme;
+}
+
+interface UserTheme {
+  background: string;
+  buttonStyle: string;
+  buttonColor: string;
+  buttonFont: string;
+  buttonFontColor: string;
+  font: string;
+  fontColor: string;
 }
 
 

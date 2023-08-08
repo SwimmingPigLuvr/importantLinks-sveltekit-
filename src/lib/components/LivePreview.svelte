@@ -34,7 +34,7 @@
     import { onMount } from "svelte";
     import UserLink from "./UserLink.svelte";
     import { fly } from "svelte/transition";
-    import { backOut } from "svelte/easing";
+    import { backIn, backInOut, backOut, cubicInOut } from "svelte/easing";
     let mounted = false;
 
     onMount(() => {
@@ -56,7 +56,7 @@
     class="hidden md:flex bg-blue-300 w-[38%] fixed right-0 justify-center items-center h-screen">
     <!-- phone div -->
     <div 
-        in:fly={{ y: 100, duration: 1000, easing: backOut }}
+        in:fly={{ y: 50, x: -50, duration: 1000, easing: backOut }}
         style="width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;" 
         class="border-black bg-primary flex flex-col justify-start border-[0.75rem] rounded-[33px] overflow-auto">
         <div style="padding-top: 205%; position: relative;">

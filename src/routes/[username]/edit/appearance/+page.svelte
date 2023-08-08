@@ -1,12 +1,70 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import ColorPicker from "$lib/components/ColorPicker.svelte";
+  import Fonts from "$lib/components/Fonts.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
-  import { userData } from "$lib/firebase";
+  import { db, user, userData, storage } from "$lib/firebase";
   import { setTheme } from "$lib/theme";
+  import { doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { flip } from "svelte/animate";
   import { backIn, backOut } from "svelte/easing";
-  import { slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
+
+  let chosenButtonStyle = '';
+
+  async function saveButtonStyle() {
+    console.log('saving button style: ', chosenButtonStyle);
+
+    const batch = writeBatch(db);
+
+    // update buttonStyle
+    batch.set(doc(db, "users", $user!.uid), {
+      theme: {
+        buttonStyle: chosenButtonStyle
+      }
+    }, { merge: true });
+
+    await batch.commit();
+    chosenButtonStyle = '';
+  }
+
+  const handleButtonSelect = (selectedButton: string) => {
+    chosenButtonStyle = selectedButton;
+    saveButtonStyle();
+  }
+
+  // button options
+enum ButtonShape {
+  SQUARE = "square",
+  ROUND = "round",
+  CIRCLE = "circle",
+}
+
+interface ButtonProps {
+  shape: ButtonShape;
+}
+
+function Button(props: ButtonProps) {
+  // implement?
+  console.log(props.shape);
+}
+
+const myButton = Button({ shape: ButtonShape.SQUARE });
+
+// button options
+
+  let fontDropdown = false;
+
+  function toggleFontDropdown() {
+    fontDropdown = !fontDropdown;
+    console.log('font drop down: ', fontDropdown);
+  };
+
+  let bgColor = '';
+  let currentColorSelection = null;
+
+
 
   let buttonColor = 'white';
   let buttonFontColor = 'black';
@@ -16,10 +74,23 @@
 
   let links = $userData?.links || [];
 
+  let colorPickerHover = false;
   let showColorPicker = false;
   
   function toggleShowColorPicker() {
+    if (showGradientPicker) {
+      showGradientPicker = false;
+    }
     showColorPicker = !showColorPicker;
+  }
+
+  let showGradientPicker = false;
+
+  function toggleShowGradientPicker() {
+    if (showColorPicker) {
+      showColorPicker = false;
+    }
+    showGradientPicker = !showGradientPicker;
   }
   
   let chosenTheme = '';
@@ -39,6 +110,20 @@
       'lemonade'
   ];
 
+
+  // img upload
+  let files: FileList;
+  let showForm = false;
+  let uploadSuccess = false;
+  let uploading = false;
+  let previewURL: string;
+
+  async function uploadBackground(e: SubmitEvent) {
+    const userRef = doc(db, "users/appearance", $user!.uid)
+  }
+
+
+
 </script>
 
 <LivePreview />
@@ -50,19 +135,23 @@
 <div id="top" class="flex flex-col my-20  md:max-w-[62%]">
 <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Themes</h2>
 
-  <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
+  <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
     <!-- themes -->
-    <div class="flex flex-wrap justify-between space-x-1">
+    <div class="flex overflow-auto space-x-2">
       <!-- custom -->
-      <a href="#custom" class="btn bg-white border-dashed border-2 border-black min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
+      <div>
+
+      <a href="#custom" class="btn bg-white border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
         <p class="max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="font-gin">Create </span><span class="font-totally-gothic">Custom </span><span class="font-typewriter">Theme </span></p>
       </a>
+      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
+      </div>
       {#each themes as theme}
-      <div>
+      <div class="">
 
         <button 
         on:click|preventDefault={() => setTheme(theme)} 
-        class="btn bg-primary border-none min-w-[150px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4"
+        class="btn bg-primary border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4"
         class:btn-secondary={theme === chosenTheme}
         data-theme={theme}>
         <div class="flex flex-col items-center">
@@ -99,39 +188,55 @@
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Background</h2>
 
 
-    <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col items-center rounded-2xl">
-    <div class="flex flex-wrap justify-between space-x-4">
+    <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
+    <div class="flex overflow-auto space-x-2">
 
 
     <!-- solid color -->
     <div>
-      <button on:click={toggleShowColorPicker} class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
+      <button 
+        on:click={() => toggleShowColorPicker()} 
+        class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Solid Color</h3>
     </div>
-      
+
+
+
+
+
     <!-- gradient -->
       
     <div>
-      <button class="btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><div class="overlay btn w-[100%] h-[100%]"></div></button>
+      <button on:click={() => toggleShowGradientPicker()} class="btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><div class="overlay btn w-[100%] h-[100%]"></div></button>
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
     </div>
+
+
+
+
+
+
 
     <!-- image -->
 
     <div>
-      <button on:click={toggleShowColorPicker} class="filter grayscale hover:grayscale-0 btn border-none w-[150px] min-h-[300px] flex flex-col justify-start py-4">
+      <button class="filter grayscale hover:grayscale-0 btn border-none w-[150px] min-h-[300px] flex flex-col justify-start py-4">
         <img src="{$userData?.photoURL}" alt="pfp" class="w-[100%] h-[100%]">
       </button>
-      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Image</h3>
+      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Upload Image</h3>
     </div>
 
 
-    <!-- color picker -->
-    {#if showColorPicker}
-        <ColorPicker />
-      {/if}
+    
     </div>
-    <!-- end of color picker -->
+
+    {#if showColorPicker && !showGradientPicker}
+      <ColorPicker />
+    {/if}
+    {#if showGradientPicker && !showColorPicker}
+      <ColorPicker gradientMode={true} />
+    {/if}
+
   </div>
 
 
@@ -141,36 +246,39 @@
           <!-- fill -->
           <h3 class="font-input-mono text-white my-2">Fill</h3>
         <div class="flex flex-wrap justify-between">
-          <button class="btn bg-primary w-[230px] rounded-none border-none  mb-4"></button>
-          <button class="btn border-none bg-primary w-[230px] mb-4"></button>
-          <button class="btn bg-primary border-none rounded-full w-[230px] mb-4"></button>
+          <!-- square -->
+          <button on:click|preventDefault={() => handleButtonSelect('squareFill')} class="btn bg-primary w-full rounded-none border-none  mb-4"></button>
+          <!-- round -->
+          <button on:click|preventDefault={() => handleButtonSelect('roundFill')} class="btn border-none bg-primary w-full mb-4"></button>
+          <!-- circle -->
+          <button on:click|preventDefault={() => handleButtonSelect('circleFill')} class="btn bg-primary border-none rounded-full w-full mb-4"></button>
         </div>
             
           <!-- outline -->
           <h3 class="font-input-mono text-white my-2">Outline</h3>
         <div class="flex flex-wrap justify-between">
-          <button class="btn bg-opacity-0 border-primary border-2 w-[230px] rounded-none mb-4"></button>
-          <button class="btn bg-opacity-0 border-primary border-2 w-[230px] mb-4"></button>
-          <button class="btn bg-opacity-0 border-primary border-2 w-[230px] rounded-full mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('squareOutline')} class="btn bg-opacity-0 border-primary border-2 w-full rounded-none mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('roundOutline')} class="btn bg-opacity-0 border-primary border-2 w-full mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('circleOutline')} class="btn bg-opacity-0 border-primary border-2 w-full rounded-full mb-4"></button>
         </div>
 
           <!-- shadow -->
           <h3 class="font-input-mono text-white my-2">Shadow</h3>
         <div class="flex flex-wrap justify-between">
-          <button class="btn shadow-md shadow-primary bg-opacity-0 border-none w-[230px] rounded-none mb-4"></button>
-          <button class="btn shadow-md shadow-primary bg-opacity-0 border-none w-[230px] mb-4"></button>
-          <button class="btn shadow-md rounded-full shadow-primary bg-opacity-0 border-none w-[230px] mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('squareShadow')} class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full rounded-none mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('roundShadow')}  class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('circleShadow')} class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full mb-4 rounded-full"></button>
         </div>
             
   <!-- colors -->
-  <div>
+  <div class="flex justify-start space-x-8">
     <div>
-      <h3 class="font-input-mono text-white my-2">Button Color</h3>
-      <div class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
+      <h3 class="font-input-mono text-white my-2 text-xs">Button Color</h3>
+      <div class="w-40 h-10 bg-{buttonColor} rounded-md"></div>
     </div>
     <div>
-      <h3 class="font-input-mono text-white my-2">Button Font Color</h3>
-      <div class="w-10 h-10 bg-{buttonFontColor} rounded-md"></div>
+      <h3 class="font-input-mono text-white my-2 text-xs">Button Font Color</h3>
+      <div class="w-40 h-10 bg-{buttonFontColor} rounded-md"></div>
     </div>
   </div>
   
@@ -181,9 +289,16 @@
       <!-- fonts -->
       <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Font</h2>
       <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
-        
+        {#if fontDropdown}
+      <!-- svelte-ignore missing-declaration -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div id="fonts" class="mt-8">
+          <Fonts />
+        </div>
+      {/if}
         <h3 class="font-input-mono text-white my-2">Font</h3>
-        <button class="btn group border-neutral-200 shadow shadow-neutral-200 bg-white h-20 flex items-center justify-start space-x-4">
+        <button on:click|preventDefault={() => toggleFontDropdown()} class="btn group border-neutral-200 shadow shadow-neutral-200 bg-white h-20 flex items-center justify-start space-x-4">
           <div class="bg-neutral-200 w-12 h-12 rounded-sm items-center justify-center flex">
             <p class="m-auto font-{currentFont} text-black text-[1.5rem]">Aa</p>
           </div>
@@ -192,8 +307,13 @@
  
       <h3 class="font-input-mono text-white my-2">Font Color</h3>
       <div class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
-    </div>
+      
     <div>
+    </div> 
+    
+
+
+     
     
  
 </div>
@@ -205,33 +325,7 @@
 </main>
 
 <style>
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(1, 2fr);
-    gap: 0;
-  }
-
-  .cell {
-    width: 1rem;
-    height: 2rem;
-    position: relative;
-  }
-
-  .cell::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgb(0, 0, 0);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .cell:hover::after {
-      opacity: 1;
-  }
+  
 
   .gradient-transition {
     background: linear-gradient(180deg, #f0f9ff, #0c4a6e);
@@ -256,3 +350,8 @@
 
   
   </style>
+
+
+<!-- in order to figure out how to save the styles instantly 
+  i should look at how the save theme button saves the theme instantly -->
+  
