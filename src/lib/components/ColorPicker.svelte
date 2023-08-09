@@ -27,6 +27,9 @@
 <!-- finish video series -->
 <!-- host site -->
 
+<!-- create link back to profile from the mini preview -->
+<!-- think of domain name -->
+
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
@@ -45,6 +48,8 @@
     let gradientColor2 = '';
     let firstColorSelected = false;
 
+    let currentBackgroundHover = false;
+
 
 
     $: gradientClass = `bg-gradient-to-b from-${gradientColor1} to-${gradientColor2}`;
@@ -54,7 +59,7 @@
 
     let chosenValue = '';
 
-    async function saveChoice() {
+    async function saveChoice(deletion = false) {
 
       console.log("saving choice: ", mode);
 
@@ -64,9 +69,33 @@
         customTheme: {}
       };
 
+      if (deletion) {
+        switch(mode) {
+          case 'background':
+            dataToSave = { customTheme: { background: null }};
+            break;
+          case 'gradient':
+            dataToSave = { customTheme: { gradient: null }};
+            break;
+          case 'buttonColor':
+            dataToSave = { customTheme: { buttonColor: null }};
+            break;
+          case 'buttonFontColor':
+            dataToSave = { customTheme: { buttonFontColor: null }};
+            break;
+          case 'fontColor':
+            dataToSave = { customTheme: { fontColor: null }};
+            break;
+          default:
+            console.error('unknown mode:', mode);
+            return;
+    }
+      }
+
       switch(mode) {
         case 'background':
           dataToSave = { customTheme: { background: chosenValue }};
+          currentBackground = chosenValue;
           break;
         case 'gradient':
           dataToSave = { customTheme: { gradient: chosenValue }};
@@ -98,6 +127,10 @@
     chosenValue = selectedValue;
     saveChoice();
   };
+
+  const handleDelete = () => {
+    saveChoice(true);
+  }
 
 </script>
 
@@ -444,13 +477,29 @@
         {:else}
         <!-- preview -->
         <div class="flex w-full justify-around">
-          <div class="flex flex-col justify-start items-center space-y-4">
 
+          <!-- current BG -->
+          <div class="flex flex-col justify-start items-center space-y-4">
             <p class="font-input-mono text-secondary-content text-[0.75rem]">Current Background</p>
-            <div class="w-40 h-16 rounded-xl shadow-md bg-{currentBackground}"></div>
+            <div 
+              on:mouseenter={() => currentBackgroundHover = true} 
+              on:mouseleave={() => currentBackgroundHover = false} 
+              class="w-40 h-16 rounded-xl shadow-md bg-{currentBackground} relative">
+              {#if currentBackgroundHover}
+              <!-- delete button -->
+                <button on:click={handleDelete()} class="bg-info absolute -top-4 -right-2 p-2">
+                  <p class="text-xs text-info-content">Delete</p>
+                </button>
+              {/if}
+            </div>
             <p class="font-input-mono text-secondary-content text-[1rem]">{currentBackground}</p>
+            
+            
           </div>
 
+          
+
+          <!-- new BG -->
           <div class="flex flex-col justify-end items-center space-y-4">
             <p class="font-input-mono text-secondary-content text-[0.75rem]">New Background</p>
             <div class="w-40 h-16 rounded-xl shadow-md bg-{color}"></div>
