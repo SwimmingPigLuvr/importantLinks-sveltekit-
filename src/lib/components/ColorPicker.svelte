@@ -32,7 +32,7 @@
 
       // update the bg property inside the theme object
       batch.set(doc(db, "users", $user!.uid), {
-        theme: {
+        customTheme: {
           background: chosenBackground
         }
       }, { merge: true });
@@ -61,7 +61,7 @@
         }
 
         // create name from choices
-        chosenBackground = `from-${gradientColor1} to-${gradientColor2}`;
+        chosenBackground = `${gradientColor1} ${gradientColor2}`;
         saveBackground();
 
         // reset gradientMode & gradientColors

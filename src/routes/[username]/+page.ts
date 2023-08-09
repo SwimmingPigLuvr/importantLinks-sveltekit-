@@ -38,5 +38,6 @@ export const load = (async ({ params }) => {
         bio: data.bio,
         links: data.links ?? [],
         theme: data.theme,
+        customTheme: data.customTheme
     }
 }) satisfies PageLoad;

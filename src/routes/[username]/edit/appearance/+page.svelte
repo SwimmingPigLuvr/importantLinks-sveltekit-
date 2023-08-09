@@ -11,6 +11,26 @@
   import { backIn, backOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
 
+  let chosenTheme = '';
+
+  async function saveTheme() {
+    console.log('saving theme: ', chosenTheme);
+
+    const batch = writeBatch(db);
+    batch.set(doc(db, "users", $user!.uid), {
+      theme: chosenTheme
+    }, { merge: true });
+
+    await batch.commit();
+    chosenTheme = '';
+  }
+
+  const handleThemeSelect = (selectedTheme: string) => {
+    chosenTheme = selectedTheme;
+    saveTheme();
+    setTheme(selectedTheme);
+  }
+
   let chosenButtonStyle = '';
 
   async function saveButtonStyle() {
@@ -20,7 +40,7 @@
 
     // update buttonStyle
     batch.set(doc(db, "users", $user!.uid), {
-      theme: {
+      customTheme: {
         buttonStyle: chosenButtonStyle
       }
     }, { merge: true });
@@ -93,7 +113,6 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
     showGradientPicker = !showGradientPicker;
   }
   
-  let chosenTheme = '';
   const themes = [
       'red',
       'retro',
@@ -150,7 +169,7 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
       <div class="">
 
         <button 
-        on:click|preventDefault={() => setTheme(theme)} 
+        on:click|preventDefault={() => handleThemeSelect(theme)} 
         class="btn bg-primary border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4"
         class:btn-secondary={theme === chosenTheme}
         data-theme={theme}>

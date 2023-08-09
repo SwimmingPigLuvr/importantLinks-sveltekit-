@@ -32,7 +32,7 @@
 
         // update font in db
         batch.set(doc(db, "users", $user!.uid), {
-            theme: {
+            customTheme: {
                 font: chosenFont
             }
         }, { merge: true });

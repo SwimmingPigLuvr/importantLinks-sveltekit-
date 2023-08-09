@@ -6,6 +6,8 @@
   import { setTheme } from "$lib/theme";
   export let data: PageData;
 
+  let custom1 = '';
+  let custom2 = '';
 
   onMount(() => {
     if (data && data.theme) {
@@ -13,6 +15,16 @@
     }
   });
 
+  let customBG = data.customTheme.background;
+
+  if(customBG.includes(' ')) {
+    let splits = customBG.split(' ');
+    custom1 = splits[0];
+    custom2 = splits[1];
+  }
+
+  let customButton = data.customTheme.buttonStyle;
+  let customFont = data.customTheme.font;
 
 </script>
 
@@ -34,7 +46,9 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<main data-theme={data.theme} class="text-center text-primary-focus">
+<main 
+  
+class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[100vw] text-center text-primary-focus`}>
 
   <!-- PFP -->
   <img 
@@ -55,7 +69,7 @@
   <ul class="list-none mt-4">
     {#each data.links as item (item.id) }
       <li class="m-auto p-2">
-        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} />
+        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} buttonStyle={customButton} />
       </li>
     {/each}
   </ul>
