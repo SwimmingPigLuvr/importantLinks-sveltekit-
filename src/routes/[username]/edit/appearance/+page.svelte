@@ -11,6 +11,9 @@
   import { backIn, backOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
 
+  let mode = '';
+
+  // save theme
   let chosenTheme = '';
 
   async function saveTheme() {
@@ -30,7 +33,10 @@
     saveTheme();
     setTheme(selectedTheme);
   }
+  // save theme
 
+
+  // save button style
   let chosenButtonStyle = '';
 
   async function saveButtonStyle() {
@@ -53,26 +59,13 @@
     chosenButtonStyle = selectedButton;
     saveButtonStyle();
   }
+  // save button style
 
-  // button options
-enum ButtonShape {
-  SQUARE = "square",
-  ROUND = "round",
-  CIRCLE = "circle",
-}
+  // save button color
+  
+  // save button color
 
-interface ButtonProps {
-  shape: ButtonShape;
-}
 
-function Button(props: ButtonProps) {
-  // implement?
-  console.log(props.shape);
-}
-
-const myButton = Button({ shape: ButtonShape.SQUARE });
-
-// button options
 
   let fontDropdown = false;
 
@@ -96,6 +89,8 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
 
   let colorPickerHover = false;
   let showColorPicker = false;
+  let showGradientPicker = false;
+  let showButtonColorPicker = false;
   
   function toggleShowColorPicker() {
     if (showGradientPicker) {
@@ -104,13 +99,16 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
     showColorPicker = !showColorPicker;
   }
 
-  let showGradientPicker = false;
 
   function toggleShowGradientPicker() {
     if (showColorPicker) {
       showColorPicker = false;
     }
     showGradientPicker = !showGradientPicker;
+  }
+
+  function toggleShowButtonColorPicker() {
+    showButtonColorPicker = !showButtonColorPicker;
   }
   
   const themes = [
@@ -226,7 +224,7 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
     <!-- gradient -->
       
     <div>
-      <button on:click={() => toggleShowGradientPicker()} class="btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><div class="overlay btn w-[100%] h-[100%]"></div></button>
+      <button class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
     </div>
 
@@ -250,10 +248,10 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
     </div>
 
     {#if showColorPicker && !showGradientPicker}
-      <ColorPicker />
+      <ColorPicker mode={'background'}/>
     {/if}
     {#if showGradientPicker && !showColorPicker}
-      <ColorPicker gradientMode={true} />
+      <ColorPicker mode={'gradient'} />
     {/if}
 
   </div>
@@ -293,13 +291,21 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
   <div class="flex justify-start space-x-8">
     <div>
       <h3 class="font-input-mono text-white my-2 text-xs">Button Color</h3>
-      <div class="w-40 h-10 bg-{buttonColor} rounded-md"></div>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} class="btn w-40 h-10 bg-{buttonColor} rounded-md"></div>
     </div>
     <div>
       <h3 class="font-input-mono text-white my-2 text-xs">Button Font Color</h3>
-      <div class="w-40 h-10 bg-{buttonFontColor} rounded-md"></div>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonFontColor'}} class="btn w-40 h-10 bg-{buttonFontColor} rounded-md"></div>
     </div>
+
   </div>
+    {#if showButtonColorPicker}
+      <ColorPicker mode={mode}/>
+    {/if}
   
       
       </div>
@@ -362,7 +368,10 @@ const myButton = Button({ shape: ButtonShape.SQUARE });
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(0deg, #f0f9ff, #0c4a6e);
+    background-image: url('/photos/disclaimer.jpeg');
+    background-size: contain;  /* This will make the image cover the entire div */
+    background-position: center;  /* This will center the image */
+    background-repeat: repeat;  /* This will prevent the image from repeating if it's too small for the container */
     opacity: 0;
     transition: opacity 1s ease-out;
 }

@@ -4,6 +4,30 @@
 
 <!-- that way applying them is as easy as changing themes -->
 
+
+<!-- 8.9.23 -->
+<!-- heres what the next steps are -->
+
+<!-- add a delete button for custom options -->
+<!-- delete bg, delete button color, etc.. -->
+<!-- that way it will defaul back to the theme options -->
+
+<!-- edit ui based on colorpicker mode! -->
+<!-- titles should reflect the correct mode currentl in -->
+
+<!-- create uniformity throughout pages! -->
+<!-- this include edit, login, appearance, and the little mini phone preview -->
+
+<!-- figure out how to use the buttonColor to style the borders and shadows -->
+<!-- figure out how to do the contradsted border -->
+
+<!-- figure out button font color -->
+<!-- figure out font color -->
+
+<!-- finish video series -->
+<!-- host site -->
+
+
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { backIn, backOut, cubicIn, cubicInOut } from "svelte/easing";
@@ -11,8 +35,10 @@
   
   import { db, user, userData } from "$lib/firebase";
   import { doc, writeBatch } from "firebase/firestore";
+    
+    export let mode = '';
 
-  const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
     let color = '';
     let gradientColor1 = '';
@@ -23,56 +49,55 @@
 
     $: gradientClass = `bg-gradient-to-b from-${gradientColor1} to-${gradientColor2}`;
 
+    let currentBackground = '';
     let chosenBackground = '';
 
-    async function saveBackground() {
-      console.log("saving background: ", chosenBackground);
+    let chosenValue = '';
+
+    async function saveChoice() {
+
+      console.log("saving choice: ", mode);
 
       const batch = writeBatch(db);
 
+      let dataToSave = {
+        customTheme: {}
+      };
+
+      switch(mode) {
+        case 'background':
+          dataToSave = { customTheme: { background: chosenValue }};
+          break;
+        case 'gradient':
+          dataToSave = { customTheme: { gradient: chosenValue }};
+          break;
+        case 'buttonColor':
+          dataToSave = { customTheme: { buttonColor: chosenValue }};
+          break;
+        case 'buttonFontColor':
+          dataToSave = { customTheme: { buttonFontColor: chosenValue }};
+          break;
+        case 'fontColor':
+          dataToSave = { customTheme: { fontColor: chosenValue }};
+          break;
+        default: 
+          console.error('unknown mode:', mode);
+          return;
+      }
+
       // update the bg property inside the theme object
-      batch.set(doc(db, "users", $user!.uid), {
-        customTheme: {
-          background: chosenBackground
-        }
-      }, { merge: true });
+      batch.set(doc(db, "users", $user!.uid), dataToSave, { merge: true });
 
       await batch.commit();
-      chosenBackground = '';
+
+      chosenValue = '';
     }
 
-    export let gradientMode = false;
 
-    const handleColorSelect = (selectedColor: string) => {
-      if (gradientMode) {
-        // implement gradient choices
-        // choice 1 = gradientColor1
-        // choice 2 = gradientColor2
-        // chosenBackground = "from-{gradientColor1} to-{gradientColor2}"; 
-
-        if (!gradientColor1) {
-          gradientColor1 = selectedColor;
-          return; // only the first choice is made, so we do not save just yet
-        }
-
-        // choose next color
-        if (gradientColor1 && !gradientColor2) {
-          gradientColor2 = selectedColor;
-        }
-
-        // create name from choices
-        chosenBackground = `${gradientColor1} ${gradientColor2}`;
-        saveBackground();
-
-        // reset gradientMode & gradientColors
-        gradientMode = false;
-        gradientColor1 = '';
-        gradientColor2 = '';
-      } else {
-        chosenBackground = selectedColor;
-        saveBackground();
-      }
-    };
+  const handleColorSelect = (selectedValue: string) => {
+    chosenValue = selectedValue;
+    saveChoice();
+  };
 
 </script>
 
@@ -83,7 +108,7 @@
     out:slide={{ duration: 1000, easing: cubicInOut }}
     class="mt-10 z-50 pb-4 mx-auto flex flex-col space-y-4">
 
-    {#if !gradientMode}
+    {#if mode !== 'gradient'}
       <h3 class="font-input-mono">Choose Background Color</h3>
     {:else}
       <h3 class="font-input-mono">Choose Background Gradient</h3>
@@ -409,18 +434,29 @@
 
 
 <!-- current color -->
-    <div class="w-full flex justify-end items-end space-x-8 p-3">
+    <div class="w-full flex items-end space-x-8 p-3">
         <!-- gradient picker -->
-        {#if gradientMode}
+        {#if mode === 'gradient'}
             <div class="{gradientClass} w-40 h-16 rounded-xl shadow-md "></div>
             <div class="w-40 h-16 rounded-xl shadow-md  bg-{gradientColor1}"></div>
             <div class="w-40 h-16 rounded-xl shadow-md  bg-{gradientColor2}"></div>
             <p class="font-input-mono text-{color} text-center text-[1rem]">{gradientColor1} to {gradientColor2}</p>
         {:else}
         <!-- preview -->
-            <p class="font-input-mono text-{color} text-[2rem]">{color}</p>
-            <div class="w-20 h-16 rounded-xl shadow-md bg-{color}">
-            </div>
+        <div class="flex w-full justify-around">
+          <div class="flex flex-col justify-start items-center space-y-4">
+
+            <p class="font-input-mono text-secondary-content text-[0.75rem]">Current Background</p>
+            <div class="w-40 h-16 rounded-xl shadow-md bg-{currentBackground}"></div>
+            <p class="font-input-mono text-secondary-content text-[1rem]">{currentBackground}</p>
+          </div>
+
+          <div class="flex flex-col justify-end items-center space-y-4">
+            <p class="font-input-mono text-secondary-content text-[0.75rem]">New Background</p>
+            <div class="w-40 h-16 rounded-xl shadow-md bg-{color}"></div>
+            <p class="font-input-mono text-secondary-content text-[1rem]">{color}</p>
+          </div>
+        </div>
         {/if}
     </div>
 

@@ -5,7 +5,14 @@
     export let url = 'foo';
     export let title = 'some cool title';
     export let previewMode = false;
+    export let font = '';
     export let buttonStyle: keyof typeof buttonStyles;
+    export let buttonColor: string;
+    export let buttonFontColor: string;
+
+
+    let bgColorClass = 'bg-' + buttonFontColor;
+    let textColorClass = 'text-' + buttonFontColor;
 
     
     let buttonRadius = '';
@@ -82,12 +89,12 @@
 </script>
 
 <a 
-  href="{url}" class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} hover:translate-x-1 hover:translate-y-1 stack text-center bg-secondary flex justify-between items-center no-underline relative">
+  href="{url}" class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} {outline? 'border-2 border-{buttonColor} shadow-none bg-opacity-0' : shadow? 'shadow-md shadow-{buttonColor} border-transparent bg-opacity-0' : fill? 'bg-{buttonColor} border-transparent shadow-none' : '' }   hover:translate-x-1 hover:translate-y-1 stack text-center bg-{buttonColor} flex justify-between items-center no-underline relative">
     <img 
       
       src={iconURL} 
       alt={icon} 
-      class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 rounded-full">
+      class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
     <span 
-      class="{previewMode ? 'text-[1rem]' : 'text-[2rem]'} absolute text-accent-content font-elven text-center">{title}</span>
+      class="{previewMode ? 'text-[1rem]' : 'text-[1.5rem]'} absolute {textColorClass} font-{font} text-center">{title}</span>
 </a>

@@ -23,8 +23,11 @@
     custom2 = splits[1];
   }
 
-  let customButton = data.customTheme.buttonStyle;
+  let customButtonStyle = data.customTheme.buttonStyle;
+  let customButtonColor = data.customTheme.buttonColor;
+  let customButtonFontColor = data.customTheme.buttonFontColor;
   let customFont = data.customTheme.font;
+  let customFontColor = data.customTheme.fontColor;
 
 </script>
 
@@ -48,7 +51,7 @@
 
 <main 
   
-class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[100vw] text-center text-primary-focus`}>
+class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[100vw] text-center text-${customButtonFontColor}`}>
 
   <!-- PFP -->
   <img 
@@ -58,18 +61,18 @@ class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[1
   />
   
   <!-- USERNAME -->
-  <h1 class="text-[1.5rem] m-auto font-gin">
+  <h1 class="text-[1.5rem] m-auto font-{customFont}">
     @{data.username}
   </h1>
 
   <!-- BIO -->
-  <p class="text-[1rem] p-2 font-gin">{data.bio ?? "no bio"}</p>
+  <p class="text-[1rem] p-2 font-{customFont}">{data.bio ?? "no bio"}</p>
 
   <!-- LINKS -->
   <ul class="list-none mt-4">
     {#each data.links as item (item.id) }
       <li class="m-auto p-2">
-        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} buttonStyle={customButton} />
+        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} buttonStyle={customButtonStyle} font={customFont} buttonColor={customButtonColor} buttonFontColor={customButtonFontColor} />
       </li>
     {/each}
   </ul>

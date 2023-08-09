@@ -1,4 +1,4 @@
-<div class="text-center text-[3rem] text-primary-content bg-primary  p-[3rem]">
+<div class="text-center text-[3rem] bg-primary  p-[3rem]">
     <h1 class="">Welcome to </h1>
     <input 
         type="text" 
