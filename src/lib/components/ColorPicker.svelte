@@ -35,9 +35,9 @@
   import { createEventDispatcher } from "svelte";
   import { backIn, backOut, cubicIn, cubicInOut } from "svelte/easing";
   import { fade, fly, slide } from "svelte/transition";
-  
+  import type { DataToSave, CustomTheme } from "$lib/firebase";
   import { db, user, userData } from "$lib/firebase";
-  import { doc, writeBatch } from "firebase/firestore";
+  import { doc, writeBatch, deleteField, updateDoc } from "firebase/firestore";
     
     export let mode = '';
 
@@ -49,6 +49,10 @@
     let firstColorSelected = false;
 
     let currentBackgroundHover = false;
+
+    let dataToSave: DataToSave = {
+      customTheme: {}
+    };
 
 
 
@@ -63,34 +67,46 @@
 
       console.log("saving choice: ", mode);
 
+      const userRef = doc(db, "users", $user!.uid);
+
+
       const batch = writeBatch(db);
 
-      let dataToSave = {
-        customTheme: {}
+      let dataToSave: { customTheme: CustomTheme } = {
+        customTheme: {
+          background: undefined,
+          gradient: undefined,
+          buttonColor: undefined,
+          buttonFontColor: undefined,
+          fontColor: undefined,
+        }
       };
 
       if (deletion) {
+        let dataToDelete: Record<string, any> = {};
+
         switch(mode) {
           case 'background':
-            dataToSave = { customTheme: { background: null }};
+            dataToDelete['customTheme.background'] = deleteField();
             break;
           case 'gradient':
-            dataToSave = { customTheme: { gradient: null }};
+            dataToDelete['customTheme.gradient'] = deleteField();
             break;
           case 'buttonColor':
-            dataToSave = { customTheme: { buttonColor: null }};
+            dataToDelete['customTheme.buttonColor'] = deleteField();
             break;
           case 'buttonFontColor':
-            dataToSave = { customTheme: { buttonFontColor: null }};
+            dataToDelete['customTheme.buttonFontColor'] = deleteField();
             break;
           case 'fontColor':
-            dataToSave = { customTheme: { fontColor: null }};
+            dataToDelete['customTheme.fontColor'] = deleteField();
             break;
-          default:
-            console.error('unknown mode:', mode);
-            return;
-    }
-      }
+            // Handle other cases similarly
+          }
+
+        await updateDoc(userRef, dataToDelete);
+      } else {
+
 
       switch(mode) {
         case 'background':
@@ -121,6 +137,7 @@
 
       chosenValue = '';
     }
+  }
 
 
   const handleColorSelect = (selectedValue: string) => {
@@ -481,13 +498,14 @@
           <!-- current BG -->
           <div class="flex flex-col justify-start items-center space-y-4">
             <p class="font-input-mono text-secondary-content text-[0.75rem]">Current Background</p>
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div 
               on:mouseenter={() => currentBackgroundHover = true} 
               on:mouseleave={() => currentBackgroundHover = false} 
               class="w-40 h-16 rounded-xl shadow-md bg-{currentBackground} relative">
               {#if currentBackgroundHover}
               <!-- delete button -->
-                <button on:click={handleDelete()} class="bg-info absolute -top-4 -right-2 p-2">
+                <button on:click={handleDelete} class="bg-info absolute -top-4 -right-2 p-2">
                   <p class="text-xs text-info-content">Delete</p>
                 </button>
               {/if}

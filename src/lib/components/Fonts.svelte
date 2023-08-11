@@ -5,8 +5,11 @@
   import { doc, writeBatch } from "firebase/firestore";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { slide } from "svelte/transition";
+  import ColorPicker from "./ColorPicker.svelte";
+
 
     let chosenFont = '';
+    let chosenColor = '';
 
     let fonts = [
         'gin',
@@ -43,6 +46,26 @@
 
     const handleFontSelect = (selectedFont: string) => {
         chosenFont = selectedFont;
+        saveFont();
+    }
+
+    async function saveFontColor() {
+        console.log('saving font color: ', chosenColor);
+
+        const batch = writeBatch(db);
+
+        batch.set(doc(db, "users", $user!.uid), {
+            customTheme: {
+                fontColor: chosenColor
+            }
+        }, { merge: true });
+
+        await batch.commit();
+        chosenFont = '';
+    }
+
+    const handleColorSelect = (selectedColor: string) => {
+        chosenColor = selectedColor;
         saveFont();
     }
 </script>

@@ -91,6 +91,7 @@
   let showColorPicker = false;
   let showGradientPicker = false;
   let showButtonColorPicker = false;
+  let showFontColorPicker = false;
   
   function toggleShowColorPicker() {
     if (showGradientPicker) {
@@ -313,6 +314,7 @@
 
       <!-- fonts -->
       <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Font</h2>
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
         {#if fontDropdown}
       <!-- svelte-ignore missing-declaration -->
@@ -331,10 +333,15 @@
         </button>
  
       <h3 class="font-input-mono text-white my-2">Font Color</h3>
-      <div class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div on:click={() => {toggleShowButtonColorPicker(); mode = 'fontColor'}} class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
       
     <div>
+
     </div> 
+    {#if showFontColorPicker}
+      <ColorPicker mode={mode}/>
+    {/if}
     
 
 

@@ -88,8 +88,16 @@
   
 </script>
 
+     <!-- if fill then bg-{buttonColor ? {buttonColor} : 'secondary'}, -->
 <a 
-  href="{url}" class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} {outline? 'border-2 border-{buttonColor} shadow-none bg-opacity-0' : shadow? 'shadow-md shadow-{buttonColor} border-transparent bg-opacity-0' : fill? 'bg-{buttonColor} border-transparent shadow-none' : '' }   hover:translate-x-1 hover:translate-y-1 stack text-center bg-{buttonColor} flex justify-between items-center no-underline relative">
+  href="{url}" 
+    class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto 
+     {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-2  
+     {fill ? `bg-${buttonColor ? buttonColor : 'secondary'}` : 'bg-opacity-0'}
+     {outline ? `border-${buttonColor ? buttonColor : 'secondary'}` : 'border-transparent'}
+     {shadow ? `shadow-xl shadow-${buttonColor ? buttonColor : 'secondary'}` : 'shadow-none'}
+     hover:translate-x-1 hover:translate-y-1 stack text-center 
+     flex justify-between items-center no-underline relative">
     <img 
       
       src={iconURL} 

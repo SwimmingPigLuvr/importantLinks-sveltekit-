@@ -92,17 +92,22 @@ interface UserData {
   bio: string;
   photoURL: string;
   links: LinkData[];
-  theme: UserTheme;
+  theme: CustomTheme;
 }
 
-interface UserTheme {
-  background: string;
-  buttonStyle: string;
-  buttonColor: string;
-  buttonFont: string;
-  buttonFontColor: string;
-  font: string;
-  fontColor: string;
+export interface CustomTheme {
+  background?: string;
+  buttonStyle?: string;
+  buttonColor?: string;
+  buttonFont?: string;
+  buttonFontColor?: string;
+  font?: string;
+  fontColor?: string;
+  [key: string]: string | undefined;
+}
+
+export interface DataToSave {
+  customTheme: CustomTheme;
 }
 
 
@@ -113,3 +118,5 @@ export const userData: Readable<UserData | null> = derived(user, ($user, set) =>
     set(null); 
   }
 });  
+
+export const userTheme: Readable<CustomTheme | null> = derived(userData, $userData => $userData?.theme || null);
