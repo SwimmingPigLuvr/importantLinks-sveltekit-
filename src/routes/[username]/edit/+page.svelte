@@ -9,6 +9,13 @@
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
+  import { buttonStyles, setTheme, getCustomStyles } from "$lib/theme";
+  import type { PageData } from "./$types";
+
+  export let data: PageData;
+  const { customButtonStyle, customButtonColor, customButtonFontColor, customFont } = getCustomStyles(data);
+
+
 
 
   const formDefaults = {
@@ -129,8 +136,14 @@
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div 
         class="group relative">
-        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} />
-      
+        <UserLink 
+        iconURL={item.iconURL} 
+        title={item.title} 
+        url={item.url} 
+        buttonStyle={customButtonStyle} 
+        font={customFont} buttonColor={customButtonColor} 
+        buttonFontColor={customButtonFontColor} 
+      />      
       <!-- delete button -->
         <button
           on:click|preventDefault={e => deleteLink(item)}

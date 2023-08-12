@@ -3,8 +3,13 @@
   import UserLink from "$lib/components/UserLink.svelte";
   import { onMount } from "svelte";
   import type { PageData } from "./$types";
-  import { setTheme } from "$lib/theme";
+  import { buttonStyles, setTheme, getCustomStyles } from "$lib/theme";
+
+  
+
+
   export let data: PageData;
+  const { customButtonStyle, customButtonColor, customButtonFontColor, customFont } = getCustomStyles(data);
 
   let custom1 = '';
   let custom2 = '';
@@ -22,12 +27,8 @@
     custom1 = splits[0];
     custom2 = splits[1];
   }
-
-  let customButtonStyle = data.customTheme.buttonStyle;
-  let customButtonColor = data.customTheme.buttonColor;
-  let customButtonFontColor = data.customTheme.buttonFontColor;
-  let customFont = data.customTheme.font;
-  let customFontColor = data.customTheme.fontColor;
+  
+  // let customFontColor = data.customTheme.fontColor;
 
 </script>
 
@@ -72,7 +73,14 @@ class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[1
   <ul class="list-none mt-4">
     {#each data.links as item (item.id) }
       <li class="m-auto p-2">
-        <UserLink iconURL={item.iconURL} title={item.title} url={item.url} buttonStyle={customButtonStyle} font={customFont} buttonColor={customButtonColor} buttonFontColor={customButtonFontColor} />
+        <UserLink 
+          iconURL={item.iconURL} 
+          title={item.title} 
+          url={item.url} 
+          buttonStyle={customButtonStyle} 
+          font={customFont} buttonColor={customButtonColor} 
+          buttonFontColor={customButtonFontColor} 
+        />
       </li>
     {/each}
   </ul>
