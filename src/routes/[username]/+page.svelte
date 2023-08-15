@@ -3,16 +3,15 @@
   import UserLink from "$lib/components/UserLink.svelte";
   import { onMount } from "svelte";
   import type { PageData } from "./$types";
-  import { buttonStyles, setTheme, getCustomStyles } from "$lib/theme";
-
-  
-
+  import { setTheme, getCustomStyles, themeStore } from "$lib/theme";
+  import Footer from "$lib/components/Footer.svelte";
 
   export let data: PageData;
-  const { customButtonStyle, customButtonColor, customButtonFontColor, customFont } = getCustomStyles(data);
+  const customStyles = getCustomStyles(data);
 
-  let custom1 = '';
-  let custom2 = '';
+  themeStore.set(customStyles);
+
+  const { customBackground, customButtonStyle, customButtonColor, customButtonFontColor, customFont } = $themeStore;
 
   onMount(() => {
     if (data && data.theme) {
@@ -20,15 +19,7 @@
     }
   });
 
-  let customBG = data.customTheme.background;
-
-  if(customBG.includes(' ')) {
-    let splits = customBG.split(' ');
-    custom1 = splits[0];
-    custom2 = splits[1];
-  }
-  
-  // let customFontColor = data.customTheme.fontColor;
+  let customBG = data?.customTheme?.background;
 
 </script>
 
@@ -52,7 +43,7 @@
 
 <main 
   
-class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[100vw] text-center text-${customButtonFontColor}`}>
+class={`bg-${customBG ? customBG : 'primary'} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center text-${customButtonFontColor}`}>
 
   <!-- PFP -->
   <img 
@@ -67,10 +58,14 @@ class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[1
   </h1>
 
   <!-- BIO -->
-  <p class="text-[1rem] p-2 font-{customFont}">{data.bio ?? "no bio"}</p>
+  <p 
+    class={`text-[1rem] p-2 font-${customFont} bg-${customBG}`}
+  >
+    {data.bio ?? "no bio"}
+  </p>
 
   <!-- LINKS -->
-  <ul class="list-none mt-4">
+  <ul class="list-none mt-4 mb-60">
     {#each data.links as item (item.id) }
       <li class="m-auto p-2">
         <UserLink 
@@ -91,9 +86,10 @@ class={`bg-${customBG} font-${customFont} -z-20 h-screen fixed top-0 left-0 w-[1
     
   </AuthCheck>
 
-
+<Footer></Footer>
 
 </main>
+
 
 <!-- give user option to upload icons for each link -->
 <!-- add social links below -->

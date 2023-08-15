@@ -87,14 +87,6 @@ interface LinkData {
   icon: string,
 }
 
-interface UserData {
-  username: string;
-  bio: string;
-  photoURL: string;
-  links: LinkData[];
-  theme: CustomTheme;
-}
-
 export interface CustomTheme {
   background?: string;
   buttonStyle?: string;
@@ -105,6 +97,16 @@ export interface CustomTheme {
   fontColor?: string;
   [key: string]: string | undefined;
 }
+
+interface UserData {
+  username: string;
+  bio: string;
+  photoURL: string;
+  links: LinkData[];
+  theme: CustomTheme;
+}
+
+
 
 export interface DataToSave {
   customTheme: CustomTheme;

@@ -1,25 +1,37 @@
 <script lang="ts">
   import { buttonStyles } from "$lib/theme";
+  import { onMount } from "svelte";
 
-    export let iconURL = 'ha';
-    export let icon = 'default';
+    export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
+    export let iconURLalt = 'ha';
     export let url = 'foo';
     export let title = 'some cool title';
     export let previewMode = false;
-    export let font = '';
     export let buttonStyle: keyof typeof buttonStyles;
     export let buttonColor: string;
-    export let buttonFontColor: string;
+    export let font: string = 'font-elven';
+    export let buttonFontColor: string = '';
+    let tests = `${buttonFontColor} ${font}`;
 
+    export let testColor: string = '';
 
-    let bgColorClass = 'bg-' + buttonFontColor;
-    let textColorClass = 'text-' + buttonFontColor;
+    
+    let textColorClass = ``; // or whatever color you want
+
+  $: fullColor = previewMode ? 'text-[1rem]' : 'text-[1.5rem]';
+  $: classes = `${fullColor} absolute ${textColorClass} font-${font} text-center`;
+
+  onMount(() => {
+    console.log('testColor: ', testColor);
+  })
+
 
     
     let buttonRadius = '';
     let fill = false;
     let outline = false;
     let shadow = false;
+
 
     
 
@@ -47,8 +59,9 @@
     <img 
       
       src={iconURL} 
-      alt={icon} 
+      alt={iconURLalt} 
       class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
     <span 
-      class="{previewMode ? 'text-[1rem]' : 'text-[1.5rem]'} absolute {textColorClass} font-{font} text-center">{title}</span>
+      class={classes}>{title}</span>
 </a>
+

@@ -35,7 +35,10 @@
     import UserLink from "./UserLink.svelte";
     import { fly } from "svelte/transition";
     import { backIn, backInOut, backOut, cubicInOut } from "svelte/easing";
+    import { themeStore } from "$lib/theme";
     let mounted = false;
+
+    const { customBackground, customButtonColor, customButtonStyle, customFont, customButtonFontColor } = $themeStore;
 
     onMount(() => {
             mounted = true;
@@ -44,16 +47,19 @@
     );
 
     let links = $userData?.links || [];
-    let userFont = 'input-mono';
 
 
 
 </script>
 
+
+
 {#if mounted}
 <!-- preview -->
 <div 
-    class="hidden md:flex bg-blue-300 w-[38%] fixed right-0 justify-center items-center h-screen">
+
+    class={`bg-${customBackground ? customBackground : 'secondary'} hidden md:flex bg-blue-300 w-[38%] fixed right-0 justify-center items-center h-screen`}
+    >
     <!-- phone div -->
     <div 
         in:fly={{ y: 50, x: -50, duration: 1000, easing: backOut }}
@@ -62,19 +68,21 @@
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
 
-      <div class="flex flex-col items-center mt-8 mb-4">
+      <div 
+      class:bg={customBackground}
+      class="flex flex-col items-center mt-8 mb-4 font-{customFont}">
         <!-- pfp -->
         <img class="min-w-[38px] min-h-[38px] max-h-[88px] max-w-[88px]"  src="{$userData?.photoURL}" alt="pfp">
         <!-- Username -->
-        <p class="text-[1rem] font-{userFont}">@{$userData?.username}</p>
+        <p class="text-[1rem]">@{$userData?.username}</p>
         <!-- bio -->
-        <p class="text-[0.75rem] font-{userFont}">{$userData?.bio}</p>
+        <p class="text-[0.75rem]">{$userData?.bio}</p>
       </div>
         <!-- links -->
         <ul>
           {#each links as link}
             <li class="m-auto py-[0.33rem]">
-              <UserLink iconURL={link.iconURL} title={link.title} url={link.url} previewMode={true} />
+              <UserLink iconURL={link.iconURL} title={link.title} url={link.url} previewMode={true} buttonStyle={customButtonStyle} buttonColor={customButtonColor} buttonFontColor={customButtonFontColor} />
             </li>
           {/each}
         </ul>

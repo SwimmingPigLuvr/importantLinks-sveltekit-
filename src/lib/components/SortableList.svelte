@@ -57,10 +57,10 @@
 </script>
 
 {#if list?.length}
-    <ul class="list-none p-0 flex flex-col items-center">
+    <ul class="list-none mt-4 flex flex-col items-center">
         {#each list as item, index (item.id)}
             <li
-                class="border-2 border-dashed border-transparent p-2 transition-all max-w-2xl w-full"
+                class="border-2 border-dashed border-transparent py-2 transition-all max-w-2xl w-full"
                 class:over={item.id === isOver}
                 data-index={index}
                 data-id={item.id}

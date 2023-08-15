@@ -33,11 +33,12 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { backIn, backOut, cubicIn, cubicInOut } from "svelte/easing";
-  import { fade, fly, slide } from "svelte/transition";
+  import { cubicInOut } from "svelte/easing";
+  import { slide } from "svelte/transition";
   import type { DataToSave, CustomTheme } from "$lib/firebase";
-  import { db, user, userData } from "$lib/firebase";
+  import { db, user } from "$lib/firebase";
   import { doc, writeBatch, deleteField, updateDoc } from "firebase/firestore";
+
     
     export let mode = '';
 
@@ -158,11 +159,7 @@
     out:slide={{ duration: 1000, easing: cubicInOut }}
     class="mt-10 z-50 pb-4 mx-auto flex flex-col space-y-4">
 
-    {#if mode !== 'gradient'}
-      <h3 class="font-input-mono">Choose Background Color</h3>
-    {:else}
-      <h3 class="font-input-mono">Choose Background Gradient</h3>
-    {/if}
+    <h3 class="font-input-mono">Choose {mode}</h3>
 
 
 <!-- colors -->
@@ -497,7 +494,7 @@
 
           <!-- current BG -->
           <div class="flex flex-col justify-start items-center space-y-4">
-            <p class="font-input-mono text-secondary-content text-[0.75rem]">Current Background</p>
+            <p class="font-input-mono text-secondary-content text-[0.75rem]">Current {mode}</p>
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div 
               on:mouseenter={() => currentBackgroundHover = true} 
@@ -519,7 +516,7 @@
 
           <!-- new BG -->
           <div class="flex flex-col justify-end items-center space-y-4">
-            <p class="font-input-mono text-secondary-content text-[0.75rem]">New Background</p>
+            <p class="font-input-mono text-secondary-content text-[0.75rem]">New {mode}</p>
             <div class="w-40 h-16 rounded-xl shadow-md bg-{color}"></div>
             <p class="font-input-mono text-secondary-content text-[1rem]">{color}</p>
           </div>

@@ -9,13 +9,45 @@
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
-  import { buttonStyles, setTheme, getCustomStyles } from "$lib/theme";
-  import type { PageData } from "./$types";
+  import { themeStore } from "$lib/theme";
+  import AuthCheck from "$lib/components/AuthCheck.svelte";
+  import Footer from "$lib/components/Footer.svelte";
 
-  export let data: PageData;
-  const { customButtonStyle, customButtonColor, customButtonFontColor, customFont } = getCustomStyles(data);
+  let editingBio = false;
+
+  function saveBio() {
+    const userRef = doc(db, "users", $user!.uid);
+
+    updateDoc(userRef, {bio: bio });
+
+    editingBio = false;
+  }
+
+  function editBio() {
+    editingBio = true;
+  }
+
+  let username: string | undefined;
+
+  $: if ($userData) {
+    username = $userData.username;
+  }
+
+  let bio: string | undefined;
+
+  $: if ($userData) {
+    bio = $userData.bio;
+  }
+
+  let photoURL: string | undefined;
+
+  $: if ($userData) {
+    photoURL = $userData.photoURL;
+  }
 
 
+
+  const { customBackground, customButtonStyle, customButtonColor, customButtonFontColor, customFont } = $themeStore;
 
 
   const formDefaults = {
@@ -107,7 +139,11 @@
 
 </script>
 
-<main class="max-w-xl mx-auto">
+<AuthCheck>
+
+
+<main 
+class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center text-${customButtonFontColor}`}>
 
 <!-- messages -->
 
@@ -115,7 +151,7 @@
 <div 
   in:slide={{ delay: 1000, duration: 500, easing: backOut}}
   out:slide={{ duration: 500, easing: backIn }} 
-  class="group z-20 flex absolute space-x-3 top-20 w-36 left-40  px-4 bg-sky-400 rounded-lg">
+  class="group z-20 flex absolute space-x-3 top-20 w-36 left-40  px-4 bg-sky-400 rounded-lg bg-{customBackground}">
   <button on:click={() => showDragMessage = false} class="btn-xs btn-circle border-white border-[0.1rem] bg-black invisible group-hover:visible absolute -right-3 -top-3">X</button>
   <p class="text-6xl py-2">!</p>
   <p class="text-xs my-auto py-2">Drag and drop links to change order</p>
@@ -123,9 +159,41 @@
 {/if}
 
   {#if $userData?.username == $page.params.username}
-    <h1 class="mx-2 text-2xl font-input-mono font-bold mt-8 mb-4 text-center">
+    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-input-mono font-bold text-center">
       Edit Profile
     </h1>
+
+        <!-- PFP -->
+      <img 
+      src={photoURL ?? "/sonic.jpeg"}
+      alt="photoURL"
+      class="mx-auto mt-16 mb-4 h-20 w-20"
+    />
+
+    <!-- USERNAME -->
+    <h1 class="text-[1.5rem] m-auto text-center font-{customFont}">
+      @{username}
+    </h1>
+
+    <!-- BIO -->
+    {#if editingBio}
+    <div class="flex flex-col p-2 space-y-4">
+
+  <input
+    type="text"
+    class="input input-sm max-w-lg m-auto"
+    bind:value={bio}
+    placeholder="Enter your bio"
+  />
+  <div>
+    <button on:click={saveBio} class="btn btn-success">Save</button>
+    <button on:click={() => (editingBio = false)} class="btn btn-error">Cancel</button>
+  </div>
+    </div>
+{:else}
+  <p class="text-[1rem] p-2 font-{customFont? customFont : 'elven'} text-center">{bio ?? "no bio"}</p>
+  <button on:click={editBio} class="btn btn-outline">Edit Bio</button>
+{/if}
 
     <!-- insert sortable list here -->
     <SortableList
@@ -158,7 +226,7 @@
         in:slide={{ duration: 700, easing: cubicInOut}}
         out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-base-300 p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col"
+        class="bg-base-300 p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -244,6 +312,10 @@
   
 
 </main>
+
+<Footer></Footer>
+
+</AuthCheck>
 
 
 

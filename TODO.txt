@@ -149,3 +149,24 @@ database makes realtime updates
 make an appearance page.
 
 linktrees ui is great so i will use that as my wireframe
+
+
+
+august 15 todo
+
+✅fix edit profile h1 height on edit page so that when user clicks edit the pfp stays in the same place
+🤔change the bottom margin of the bio for the same reason
+
+make bio and pfp editable from edit page
+
+edit page doesn't use customBG
+edit page loses theme completely
+
+appearance page loses theme and links after reload
+
+buttonFontColor is something to fix
+
+footer covers content
+
+finished
+✅ --cant scroll links. they just deadend--

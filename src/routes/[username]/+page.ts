@@ -32,6 +32,16 @@ export const load = (async ({ params }) => {
         setTheme(data.theme);
     }
 
+    const userData = {
+        username: data.username,
+        photoURL: data.photoURL,
+        bio: data.bio,
+        links: data.links ?? [],
+        theme: data.theme,
+        customTheme: data.customTheme,
+    };
+
+
     return {
         username: data.username,
         photoURL: data.photoURL,
