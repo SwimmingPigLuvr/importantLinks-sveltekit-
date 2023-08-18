@@ -113,7 +113,7 @@
     // upload icon
     uploadSuccess = false;
     uploading = true;
-    let url = '';
+    let url = '/icons/custom.png';
 
     try {
       const file = files[0];
