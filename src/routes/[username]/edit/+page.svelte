@@ -6,13 +6,40 @@
   import { arrayRemove, arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { onMount } from "svelte";
-  import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { writable } from "svelte/store";
-  import { slide } from "svelte/transition";
-  import { themeStore } from "$lib/theme";
   import AuthCheck from "$lib/components/AuthCheck.svelte";
+  import { fade, fly, slide } from "svelte/transition";
+  import { backIn, backOut, cubicInOut } from "svelte/easing";
+  import { themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
 
+  // show modal for uploading to keep everything clean and separated
+
+  let showChangePfpModal = false;
+
+
+
+    async function upload(e: any) {
+        uploadSuccess = false;
+        uploading = true;
+
+        try {
+            const file = e.target.files[0];
+            previewURL = URL.createObjectURL(file);
+            const storageRef = ref(storage, `users/${$user!.uid}/profile.png`);
+            const result = await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(result.ref);
+
+            await updateDoc(doc(db, "users", $user!.uid), { photoURL: url });
+            uploadSuccess = true;
+        } catch (error) {
+            console.error('an error occurred while attempting to upload the file: ', error);
+        } finally {
+            uploading = false;
+        }
+    }
+
+  let showChangePfp = false;
   let editingBio = false;
 
   function saveBio() {
@@ -25,6 +52,7 @@
 
   function editBio() {
     editingBio = true;
+    console.log('editingBio: ', editingBio);
   }
 
   let username: string | undefined;
@@ -35,7 +63,7 @@
 
   let bio: string | undefined;
 
-  $: if ($userData) {
+  $: if ($userData && !editingBio) {
     bio = $userData.bio;
   }
 
@@ -46,8 +74,11 @@
   }
 
 
+  let { customBackground, customButtonStyle, customButtonColor, customButtonFontColor, customFont } = $themeStore;
 
-  const { customBackground, customButtonStyle, customButtonColor, customButtonFontColor, customFont } = $themeStore;
+  $: if ($themeStore) {
+    customBackground = $themeStore.customBackground;
+  }
 
 
   const formDefaults = {
@@ -65,10 +96,10 @@
   let uploading = false;
   let previewURL: string;
 
-  let showDragMessage = false;
+  let showDndMessage = false;
 
   onMount (() => {
-    showDragMessage = true;
+    showDndMessage = true;
   });
 
   
@@ -111,12 +142,7 @@
     showForm = false;
   }
 
-  async function deleteLink(item: any) {
-    const userRef = doc(db, "users", $user!.uid);
-    await updateDoc(userRef, {
-      links: arrayRemove(item),
-    });
-  }
+  
 
   function cancelLink() {
     formData.set(formDefaults);
@@ -147,28 +173,70 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
 
 <!-- messages -->
 
-{#if showDragMessage}
-<div 
-  in:slide={{ delay: 1000, duration: 500, easing: backOut}}
-  out:slide={{ duration: 500, easing: backIn }} 
-  class="group z-20 flex absolute space-x-3 top-20 w-36 left-40  px-4 bg-sky-400 rounded-lg bg-{customBackground}">
-  <button on:click={() => showDragMessage = false} class="btn-xs btn-circle border-white border-[0.1rem] bg-black invisible group-hover:visible absolute -right-3 -top-3">X</button>
-  <p class="text-6xl py-2">!</p>
-  <p class="text-xs my-auto py-2">Drag and drop links to change order</p>
-</div>
-{/if}
 
   {#if $userData?.username == $page.params.username}
-    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-input-mono font-bold text-center">
+    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-{customFont} font-bold text-center">
       Edit Profile
     </h1>
 
         <!-- PFP -->
+    
+    <div class="mx-auto  mt-16 mb-4 flex justify-center max-w-sm relative">
+        {#if showChangePfp}
+          <div 
+            in:fly={{ y: 10, delay: 500, duration: 500, easing: backOut }}
+            out:fly={{ y: 10, duration: 500, easing: backIn }}
+            class="z-20 btn-info bg-opacity-25 absolute -top-10 right-1/2 translate-x-1/2 border-2 ">
+
+            <p class="text-secondary-content p-2 px-4">Change PFP</p>
+          </div>
+        {/if}
+        <button
+          on:mouseenter={() => showChangePfp = true}
+          on:mouseleave={() => showChangePfp = false}
+          on:click={() => showChangePfpModal = true}
+          on:keydown={() => showChangePfpModal = true}
+          on:keyup={() => showChangePfpModal = false}
+          on:blur={() => showChangePfpModal = false}
+        >
       <img 
-      src={photoURL ?? "/sonic.jpeg"}
-      alt="photoURL"
-      class="mx-auto mt-16 mb-4 h-20 w-20"
-    />
+        
+        src={photoURL ?? "/sonic.jpeg"}
+        alt="photoURL"
+        class={`mx-auto h-20 w-20 duration-500 transform transition-all ease-[backOut] ${showChangePfp ? 'scale-x-[3] scale-y-75' : 'border-transparent'}`}
+      />
+
+        </button>
+
+        {#if showChangePfpModal}
+
+          <div 
+            class="m-auto fixed top-40 left-1/2 -translate-x-1/2 bg-white card-body">
+
+          <input
+
+                on:change|stopPropagation={upload}
+                name="photoURL"
+                type="file"
+                class="file-input file-input-bordered w-full max-w-xs"
+                accept="image/png, image/jpeg, image/gif, image/webp"
+            />
+            {#if uploading}
+                <p class="text-info-content mt-6">uploading...</p>
+                <progress class="progress progress-secondary w-56 mt-2 m-auto" />
+            {/if}
+            {#if uploadSuccess}
+                <div class="bg-success rounded-md p-2 mt-6 w-3/4 m-auto">
+                    <p class="text-success-content">uploaded successfully</p>
+                </div>
+            {/if}
+          </div>
+
+      
+        
+        {/if}
+    </div>
+
 
     <!-- USERNAME -->
     <h1 class="text-[1.5rem] m-auto text-center font-{customFont}">
@@ -179,20 +247,30 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
     {#if editingBio}
     <div class="flex flex-col p-2 space-y-4">
 
-  <input
-    type="text"
-    class="input input-sm max-w-lg m-auto"
-    bind:value={bio}
-    placeholder="Enter your bio"
-  />
-  <div>
-    <button on:click={saveBio} class="btn btn-success">Save</button>
-    <button on:click={() => (editingBio = false)} class="btn btn-error">Cancel</button>
-  </div>
+      <input
+        type="text"
+        class="input max-w-lg m-auto text-center"
+        bind:value={bio}
+        placeholder="Enter your bio"
+      />
+      <div>
+        <button on:click={saveBio} class="btn btn-success">Save</button>
+        <button on:click={() => (editingBio = false)} class="btn btn-error">Cancel</button>
+      </div>
     </div>
 {:else}
-  <p class="text-[1rem] p-2 font-{customFont? customFont : 'elven'} text-center">{bio ?? "no bio"}</p>
+  <p class="text-[1rem] p-5 font-{customFont? customFont : 'elven'} text-center">{bio ?? "no bio"}</p>
   <button on:click={editBio} class="btn btn-outline">Edit Bio</button>
+{/if}
+
+{#if showDndMessage}
+<div 
+  in:slide={{ delay: 1000, duration: 500, easing: backOut}}
+  out:slide={{ duration: 500, easing: backIn }} 
+  class="group z-20 w-[75%] flex absolute top-80 left-1/2 -translate-x-1/2  px-4 btn-info border-2 bg-opacity-25">
+  <button on:click={() => showDndMessage = false} class="btn-xs btn-circle border-primary border-2 bg-info-content invisible group-hover:visible absolute -right-3 -top-3 text-primary">X</button>
+  <p class="text-md text-secondary-content text-center mx-auto my-auto py-2">Drag and drop links to change order!</p>
+</div>
 {/if}
 
     <!-- insert sortable list here -->
@@ -212,15 +290,14 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
         font={customFont} buttonColor={customButtonColor} 
         buttonFontColor={customButtonFontColor} 
       />      
-      <!-- delete button -->
-        <button
-          on:click|preventDefault={e => deleteLink(item)}
-          class="btn-xs btn-error invisible group-hover:visible transition-all absolute -right-2 top-2">
-          <p class="text-white">Delete</p>
-        </button>
+  
+
       </div>
     </SortableList>
 
+
+
+    <!-- add link form -->
     {#if showForm}
       <form 
         in:slide={{ duration: 700, easing: cubicInOut}}
@@ -310,13 +387,15 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
 
 <a href="/{$userData?.username}/edit/appearance" class="btn btn-accent fixed top-4 right-4 ">appearance</a>
   
-
+<div class="bg-{customBackground ? customBackground : 'white'} w-20 h-3 fixed bottom-10 right-10">asdfasdf</div>
 </main>
 
 <Footer></Footer>
 
 </AuthCheck>
 
+<!-- cool message style -->
+<!-- btn-info bg-opacity-25 border-2 text-secondary-content -->
 
 
 

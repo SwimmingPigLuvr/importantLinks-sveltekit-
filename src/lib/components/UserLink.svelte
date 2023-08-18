@@ -49,7 +49,7 @@
      <!-- if fill then bg-{buttonColor ? {buttonColor} : 'secondary'}, -->
 <a 
   href="{url}" 
-    class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto 
+    class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto max-w-[94%] 
      {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-2  
      {fill ? `bg-${buttonColor ? buttonColor : 'secondary'}` : 'bg-opacity-0'}
      {outline ? `border-${buttonColor ? buttonColor : 'secondary'}` : 'border-transparent'}

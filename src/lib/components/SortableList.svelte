@@ -1,9 +1,20 @@
 <script lang="ts">
+    import { db, user } from "$lib/firebase";
+    import { arrayRemove, doc, updateDoc } from "firebase/firestore";
+
     import { createEventDispatcher } from "svelte";
     import { flip } from "svelte/animate";
-    import { cubicInOut } from "svelte/easing";
-    
+    import { backIn, backInOut, backOut, cubicInOut } from "svelte/easing";
+  import { fly, slide } from "svelte/transition";
 
+    let showDelete: boolean[] = [];
+    
+    async function deleteLink(item: any) {
+        const userRef = doc(db, "users", $user!.uid);
+        await updateDoc(userRef, {
+        links: arrayRemove(item),
+        });
+    }
 
     export let list: any[];
     let isOver: string | boolean = false;
@@ -60,17 +71,29 @@
     <ul class="list-none mt-4 flex flex-col items-center">
         {#each list as item, index (item.id)}
             <li
-                class="border-2 border-dashed border-transparent py-2 transition-all max-w-2xl w-full"
+                class="relative border-2 border-dashed border-transparent py-2 transition-all max-w-2xl w-full"
                 class:over={item.id === isOver}
                 data-index={index}
                 data-id={item.id}
                 draggable="true"
+                on:mouseenter={() => showDelete[index] = true}
+                on:mouseleave={() => showDelete[index] = false}
                 on:dragstart={onDragStart}
                 on:dragover|preventDefault={onDragOver}
                 on:dragleave={onDragLeave}
                 on:drop|preventDefault={onDrop}
                 animate:flip={{ duration: 500, easing: cubicInOut }}
             >
+      {#if showDelete[index]}
+      <!-- delete button -->
+        <button
+            in:fly={{ x: 10, duration: 500, easing: backOut }}
+            out:fly={{ x: 10, duration: 500, easing: backIn }}
+          on:click|preventDefault={e => deleteLink(item)}
+          class="z-50 absolute btn-warning btn-circle right-0 top-0">
+            <img src="/icons/trash.jpeg" alt="trash" class="w-full h-full rounded-full invert-0 hover:invert">
+        </button>
+      {/if}
                 <slot {item} {index} />
             </li>
         {/each}

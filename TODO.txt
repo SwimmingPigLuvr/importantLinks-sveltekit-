@@ -157,6 +157,8 @@ august 15 todo
 ✅fix edit profile h1 height on edit page so that when user clicks edit the pfp stays in the same place
 🤔change the bottom margin of the bio for the same reason
 
+username page has worse defualt bg than edit page
+
 make bio and pfp editable from edit page
 
 edit page doesn't use customBG
@@ -168,5 +170,26 @@ buttonFontColor is something to fix
 
 footer covers content
 
+live preview needs to be reactive to instant changes
+
+
 finished
 ✅ --cant scroll links. they just deadend--
+
+
+audust 17
+
+ideas
+
+anymessage shjouldnt be annoyingh at all! thats the opposite of helpful
+should have a nerd emoji giving tips
+
+have remilio giving anouncements. anything with more authority really
+
+still have to figure out how to stop propogation on the links on the edit page!
+
+the button needs to be redesigned anyways so 
+i think that it should just take up the whole right side of the link. 
+maybe square shaped and a little trash emoji
+
+adding delete button to the sortable list component so that i can use the index to determine the exact link to delete
