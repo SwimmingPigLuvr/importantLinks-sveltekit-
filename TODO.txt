@@ -174,7 +174,6 @@ live preview needs to be reactive to instant changes
 
 
 finished
-✅ --cant scroll links. they just deadend--
 
 
 audust 17
@@ -192,4 +191,24 @@ the button needs to be redesigned anyways so
 i think that it should just take up the whole right side of the link. 
 maybe square shaped and a little trash emoji
 
-adding delete button to the sortable list component so that i can use the index to determine the exact link to delete
+
+
+friday august 18 755 am
+
+add loading animations
+
+new idea: complete customization. users can have links be any kind of shape or size
+
+destroyed tasks
+✅dnd Message shouldn't be so wide
+
+✅adding delete button to the sortable list component 
+✅so that i can use the index to determine the exact link to delete
+
+✅ --cant scroll links. they just deadend--
+
+
+focused tasks
+links load in 1 at a time. 
+i used to know how to do this idk where the solution went 
+but its al ot more simpler that the ones ive been seeeing

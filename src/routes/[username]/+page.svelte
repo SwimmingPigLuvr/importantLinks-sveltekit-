@@ -5,9 +5,12 @@
   import type { PageData } from "./$types";
   import { setTheme, getCustomStyles, themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
+  import { fly } from "svelte/transition";
+  import { backIn, backOut } from "svelte/easing";
 
   export let data: PageData;
   const customStyles = getCustomStyles(data);
+  let mounted = false;
 
   themeStore.set(customStyles);
 
@@ -17,6 +20,7 @@
     if (data && data.theme) {
       setTheme(data.theme);
     }
+    mounted = true;
   });
 
   let customBG = data?.customTheme?.background;
@@ -64,10 +68,13 @@ class={`bg-${customBG ? customBG : 'primary'} font-${customFont} -z-20 h-screen 
     {data.bio ?? "no bio"}
   </p>
 
+  {#if mounted}
   <!-- LINKS -->
   <ul class="list-none mt-4 mb-60">
     {#each data.links as item (item.id) }
-      <li class="m-auto p-2">
+      <li 
+      in:fly={{ y: -10, duration: 200, easing: backOut, delay: (item.id * 300)}}
+      class="m-auto p-2">
         <UserLink 
           iconURL={item.iconURL} 
           title={item.title} 
@@ -79,6 +86,7 @@ class={`bg-${customBG ? customBG : 'primary'} font-${customFont} -z-20 h-screen 
       </li>
     {/each}
   </ul>
+  {/if}
 
   <AuthCheck>
 

@@ -5,7 +5,7 @@
     import { createEventDispatcher } from "svelte";
     import { flip } from "svelte/animate";
     import { backIn, backInOut, backOut, cubicInOut } from "svelte/easing";
-  import { fly, slide } from "svelte/transition";
+  import { blur, fly, slide } from "svelte/transition";
 
     let showDelete: boolean[] = [];
     
@@ -87,11 +87,12 @@
       {#if showDelete[index]}
       <!-- delete button -->
         <button
-            in:fly={{ x: 10, duration: 500, easing: backOut }}
+            in:blur={{ duration: 1000, easing: backOut, amount: 100 }}
             out:fly={{ x: 10, duration: 500, easing: backIn }}
           on:click|preventDefault={e => deleteLink(item)}
-          class="z-50 absolute btn-warning btn-circle right-0 top-0">
-            <img src="/icons/trash.jpeg" alt="trash" class="w-full h-full rounded-full invert-0 hover:invert">
+          class="z-50 absolute right-0 top-0">
+            <img src="/icons/trashCat.jpeg" alt="trash" class="h-10 w-10 rounded-full filter saturate-200 contrast-100 -hue-rotate-90 hover:scale-110">
+            delete
         </button>
       {/if}
                 <slot {item} {index} />
@@ -104,6 +105,6 @@
 
 <style>
     .over {
-        @apply border-secondary-focus scale-x-125;
+        @apply border-accent scale-x-125 transition-all duration-100 transform ease-[backOut];
     }
 </style>

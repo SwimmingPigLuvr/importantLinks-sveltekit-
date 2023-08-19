@@ -8,8 +8,8 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import AuthCheck from "$lib/components/AuthCheck.svelte";
-  import { fade, fly, slide } from "svelte/transition";
-  import { backIn, backOut, cubicInOut } from "svelte/easing";
+  import { fade, fly, slide, blur } from "svelte/transition";
+  import { backIn, backInOut, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
   import { themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
 
@@ -171,7 +171,6 @@
 <main 
 class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center text-${customButtonFontColor}`}>
 
-<!-- messages -->
 
 
   {#if $userData?.username == $page.params.username}
@@ -184,8 +183,8 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
     <div class="mx-auto  mt-16 mb-4 flex justify-center max-w-sm relative">
         {#if showChangePfp}
           <div 
-            in:fly={{ y: 10, delay: 500, duration: 500, easing: backOut }}
-            out:fly={{ y: 10, duration: 500, easing: backIn }}
+            in:fly={{ y: 10, duration: 500, easing: backIn }}
+            out:blur={{ duration: 3000, easing: cubicOut, amount: 100 }}
             class="z-20 btn-info bg-opacity-25 absolute -top-10 right-1/2 translate-x-1/2 border-2 ">
 
             <p class="text-secondary-content p-2 px-4">Change PFP</p>
@@ -266,10 +265,11 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
 {#if showDndMessage}
 <div 
   in:slide={{ delay: 1000, duration: 500, easing: backOut}}
-  out:slide={{ duration: 500, easing: backIn }} 
-  class="group z-20 w-[75%] flex absolute top-80 left-1/2 -translate-x-1/2  px-4 btn-info border-2 bg-opacity-25">
+  out:blur={{ duration: 500, easing: cubicOut, amount: 100 }} 
+  class="group py-2 z-20 w-[80%] md:max-w-[60%] lg:max-w-[40%] flex justify-center absolute top-56 left-1/2 -translate-x-1/2 px-4 btn-warning hover:border-info border-2 bg-opacity-75">
   <button on:click={() => showDndMessage = false} class="btn-xs btn-circle border-primary border-2 bg-info-content invisible group-hover:visible absolute -right-3 -top-3 text-primary">X</button>
-  <p class="text-md text-secondary-content text-center mx-auto my-auto py-2">Drag and drop links to change order!</p>
+  <p>☝️🤓</p>
+  <p class="text-xs text-secondary-content text-center mx-auto my-auto">Drag and drop links to change order!</p>
 </div>
 {/if}
 
@@ -387,7 +387,6 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
 
 <a href="/{$userData?.username}/edit/appearance" class="btn btn-accent fixed top-4 right-4 ">appearance</a>
   
-<div class="bg-{customBackground ? customBackground : 'white'} w-20 h-3 fixed bottom-10 right-10">asdfasdf</div>
 </main>
 
 <Footer></Footer>
