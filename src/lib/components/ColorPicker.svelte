@@ -8,29 +8,6 @@
 <!-- 8.9.23 -->
 <!-- heres what the next steps are -->
 
-<!-- add a delete button for custom options -->
-<!-- delete bg, delete button color, etc.. -->
-<!-- that way it will defaul back to the theme options -->
-
-<!-- edit ui based on colorpicker mode! -->
-<!-- titles should reflect the correct mode currentl in -->
-
-<!-- create uniformity throughout pages! -->
-<!-- this include edit, login, appearance, and the little mini phone preview -->
-
-<!-- figure out how to use the buttonColor to style the borders and shadows -->
-<!-- figure out how to do the contradsted border -->
-
-<!-- figure out button font color -->
-<!-- figure out font color -->
-
-<!-- finish video series -->
-<!-- host site -->
-
-<!-- create link back to profile from the mini preview -->
-<!-- think of domain name -->
-
-
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { cubicInOut } from "svelte/easing";
@@ -38,6 +15,8 @@
   import type { DataToSave, CustomTheme } from "$lib/firebase";
   import { db, user } from "$lib/firebase";
   import { doc, writeBatch, deleteField, updateDoc } from "firebase/firestore";
+  import { writable } from 'svelte/store';
+
 
     
     export let mode = '';
@@ -63,6 +42,11 @@
     let chosenBackground = '';
 
     let chosenValue = '';
+
+
+  export const customBG = writable('');
+  $: dynamicBG = `bg-${$customBG}`;
+
 
     async function saveChoice(deletion = false) {
 
@@ -112,7 +96,12 @@
       switch(mode) {
         case 'background':
           dataToSave = { customTheme: { background: chosenValue }};
+          // set store
+          customBG.set(chosenValue);
           currentBackground = chosenValue;
+          console.log('customBG: ', $customBG);
+          console.log('currentBackground: ', currentBackground);
+          console.log('chosenValue: ', chosenValue);
           break;
         case 'gradient':
           dataToSave = { customTheme: { gradient: chosenValue }};
@@ -499,7 +488,7 @@
             <div 
               on:mouseenter={() => currentBackgroundHover = true} 
               on:mouseleave={() => currentBackgroundHover = false} 
-              class="w-40 h-16 rounded-xl shadow-md bg-{currentBackground} relative">
+              class="w-40 h-16 rounded-xl shadow-md relative {dynamicBG}">
               {#if currentBackgroundHover}
               <!-- delete button -->
                 <button on:click={handleDelete} class="bg-info absolute -top-4 -right-2 p-2">
@@ -575,3 +564,5 @@
 <!-- user will scroll verticall through the middle color -->
 <!-- then once on a color they can scroll horizontally for the lighter - darker -->
 
+
+<!-- august 19 -->

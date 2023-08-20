@@ -212,3 +212,33 @@ focused tasks
 links load in 1 at a time. 
 i used to know how to do this idk where the solution went 
 but its al ot more simpler that the ones ive been seeeing
+
+🌸
+august 19
+
+goal:
+    create a working store for the users themes
+
+
+🪴example from docs
+    <script>
+  import { writable } from 'svelte/store';
+
+  const count = writable(0);
+  console.log($count); // logs 0
+
+  count.set(1);
+  console.log($count); // logs 1
+
+  $count = 2;
+  console.log($count); // logs 2
+</script>
+
+
+why? 
+    instant reactive changes. 
+    consistent easily called customizations across pages
+
+how:
+    get data into store from db, 
+    call store from anywhere in project

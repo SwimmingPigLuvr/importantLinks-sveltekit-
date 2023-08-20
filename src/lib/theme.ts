@@ -1,4 +1,6 @@
 import { writable } from "svelte/store";
+import { db, user, userTheme } from "$lib/firebase";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 export const buttonStyles = {
   squareFill: {
@@ -57,15 +59,28 @@ export const buttonStyles = {
   },
 };
 
-const defaultTheme = {
-  customBackground: 'primary',
-  customButtonStyle: 'squareFill' as keyof typeof buttonStyles,
-  customButtonColor: 'secondary',
-  customButtonFontColor: 'secondary-content',
-  customFont: 'input-mono',
+export interface CustomTheme {
+  customBG: string;
+  customBS: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  customBC: string;
+  customBFC: string;
+  customF: string;
+  customFC: string;
+}
+
+export const defaultTheme: CustomTheme = {
+  customBG: 'primary',
+  customBS: 'squareFill',
+  customBC: 'secondary',
+  customBFC: 'secondary-content',
+  customF: 'input-mono',
+  customFC: 'black',
 };
 
+
 export const themeStore = writable(defaultTheme);
+
+
 
 export function setTheme(theme: string) {
     if (typeof window !== 'undefined') {

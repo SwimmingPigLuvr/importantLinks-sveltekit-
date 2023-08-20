@@ -74,10 +74,10 @@
   }
 
 
-  let { customBackground, customButtonStyle, customButtonColor, customButtonFontColor, customFont } = $themeStore;
+  let { customBG, customBS, customBC, customBFC, customF, customFC } = $themeStore;
 
   $: if ($themeStore) {
-    customBackground = $themeStore.customBackground;
+    customBG = $themeStore.customBG;
   }
 
 
@@ -169,12 +169,12 @@
 
 
 <main 
-class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center text-${customButtonFontColor}`}>
+class={`bg-${customBG ? customBG : 'primary'} font-${customF} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center text-${customBFC}`}>
 
 
 
   {#if $userData?.username == $page.params.username}
-    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-{customFont} font-bold text-center">
+    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-{customF} font-bold text-center">
       Edit Profile
     </h1>
 
@@ -238,7 +238,7 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
 
 
     <!-- USERNAME -->
-    <h1 class="text-[1.5rem] m-auto text-center font-{customFont}">
+    <h1 class="text-[1.5rem] m-auto text-center font-{customF}">
       @{username}
     </h1>
 
@@ -258,7 +258,7 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
       </div>
     </div>
 {:else}
-  <p class="text-[1rem] p-5 font-{customFont? customFont : 'elven'} text-center">{bio ?? "no bio"}</p>
+  <p class="text-[1rem] p-5 font-{customF? customF : 'elven'} text-center">{bio ?? "no bio"}</p>
   <button on:click={editBio} class="btn btn-outline">Edit Bio</button>
 {/if}
 
@@ -286,9 +286,10 @@ class={`bg-${customBackground ? customBackground : 'primary'} font-${customFont}
         iconURL={item.iconURL} 
         title={item.title} 
         url={item.url} 
-        buttonStyle={customButtonStyle} 
-        font={customFont} buttonColor={customButtonColor} 
-        buttonFontColor={customButtonFontColor} 
+        buttonStyle={customBS} 
+        font={customF} 
+        buttonColor={customBC} 
+        buttonFontColor={customBFC} 
       />      
   
 
