@@ -23,12 +23,12 @@
   export let links: any[] = [];
   export let theme: string = '';
   export let customTheme: CustomTheme = {
-     customBG: "lime-400",
-     customBS: "squareFill",
-     customBC: "lime-400",
-     customBFC: "",
-     customF: "elven",
-     customFC: "white"
+     background: "lime-400",
+     buttonStyle: "squareFill",
+     buttonColor: "lime-400",
+     buttonFontColor: "",
+     font: "elven",
+     fontColor: "white"
    };
 
     let mounted = false;

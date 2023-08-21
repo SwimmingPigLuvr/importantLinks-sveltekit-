@@ -1,3 +1,7 @@
+
+<!-- the themestore is logged as the old data: fontColorolor 
+  should be fontColor -->
+
 <script lang="ts">
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
@@ -14,7 +18,16 @@
   // get user data
   export let data: PageData;
 
-  let custom: CustomTheme = defaultTheme;
+  let userTheme: CustomTheme;
+
+  const font = $themeStore.font;
+  const fontColor = $themeStore.fontColor;
+  const background = $themeStore.background;
+  const buttonStyle = $themeStore.buttonStyle;
+  const buttonColor = $themeStore.buttonColor;
+  const buttonFontColor = $themeStore.buttonFontColor;
+
+
   
   const username: string = data.username;
   const photoURL: string = data.photoURL;
@@ -23,11 +36,7 @@
   const theme: string = data.theme;
   const customTheme: CustomTheme = data.customTheme;
 
-  $: if (data && data.customTheme) {
-    custom = $themeStore;
-    updateTheme(customTheme);
-    console.log('$themeStore: ', $themeStore);
-  }
+
 
 
   
@@ -36,18 +45,15 @@
 
   let mounted = false;
   onMount(() => {
-    if (data && theme) {
-      setTheme(theme);
-    }
+
+    console.log('theme store ', $themeStore)
+    
     if (data && data.customTheme) {
       updateTheme(customTheme);
+      console.log('themeupdated 🍨', $themeStore);
     }
     mounted = true;
   });
-
-
-  // THIS SKIPS THE GETCUSTOMSTYLES FUNCTION
-  // lets come back to this way to see if it's simpler
 
 </script>
 
@@ -71,7 +77,10 @@
 
 <main 
   
-class={`bg-${custom.customBG? custom.customBG : 'bg-gradient-to-tr from-primary to-secondary'} font-${customTheme.customF? custom.customF : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center text-${custom.customFC}`}>
+class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center text-${fontColor}`}>
+
+<!-- test theme styles -->
+<div class="bg-{background? background : 'white'} w-10 h-10"></div>
 
   <!-- PFP -->
   <img 
@@ -81,13 +90,13 @@ class={`bg-${custom.customBG? custom.customBG : 'bg-gradient-to-tr from-primary 
   />
   
   <!-- USERNAME -->
-  <h1 class="text-[1.5rem] m-auto font-{custom.customF}">
+  <h1 class="text-[1.5rem] m-auto font-{font}">
     @{username}
   </h1>
 
   <!-- BIO -->
   <p 
-    class={`text-[1rem] p-2 font-${custom.customF} bg-${custom.customBG}`}
+    class={`text-[1rem] p-2 font-${font} bg-${background}`}
   >
     {bio ?? "no bio"}
   </p>
@@ -103,10 +112,10 @@ class={`bg-${custom.customBG? custom.customBG : 'bg-gradient-to-tr from-primary 
           iconURL={item.iconURL} 
           title={item.title} 
           url={item.url} 
-          buttonStyle={custom.customBS} 
-          font={custom.customF} 
-          buttonColor={custom.customBC} 
-          buttonFontColor={custom.customBFC} 
+          buttonStyle={buttonStyle} 
+          font={font} 
+          buttonColor={buttonColor} 
+          buttonFontColor={buttonFontColor} 
         />
       </li>
     {/each}

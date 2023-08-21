@@ -2,12 +2,12 @@ import { writable } from "svelte/store";
 import type { CustomTheme } from "./theme";
 
 const defaultTheme: CustomTheme = {
-    customF: "input-mono",
-    customFC: "black",
-    customBG: "primary",
-    customBS: "squareFill",
-    customBC: "secondary",
-    customBFC: "secondary-content", 
+    font: "input-mono",
+    fontColor: "black",
+    background: "lime-400",
+    buttonStyle: "squareFill",
+    buttonColor: "secondary",
+    buttonFontColor: "secondary-content", 
 };
 
 export const themeStore = writable(defaultTheme);

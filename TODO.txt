@@ -262,3 +262,17 @@ figure out what i figured out from yesterday
 why how why
 
 figure out whats breaking and why
+
+😂
+also make sure that when a user wants to sign in on mobile they can. it gets all fucced up when it opens a google sign in
+
+
+🌸critical mission: fix theme
+
+so rn i have updatetheme called on homepage
+
+update theme sets the themeStore to custom theme
+
+so now the customtheme lives on the theme store
+
+so now i should use the themestore to style values

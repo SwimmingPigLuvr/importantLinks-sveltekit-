@@ -60,65 +60,27 @@ export const buttonStyles = {
 };
 
 export interface CustomTheme {
-  customBG: string;
-  customBS: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
-  customBC: string;
-  customBFC: string;
-  customF: string;
-  customFC: string;
+  background: string;
+  buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  buttonColor: string;
+  buttonFontColor: string;
+  font: string;
+  fontColor: string;
 }
 
 export const defaultTheme: CustomTheme = {
-  customBG: 'primary',
-  customBS: 'squareFill',
-  customBC: 'secondary',
-  customBFC: 'secondary-content',
-  customF: 'input-mono',
-  customFC: 'black',
+  background: 'primary',
+  buttonStyle: 'squareFill',
+  buttonColor: 'secondary',
+  buttonFontColor: 'secondary-content',
+  font: 'input-mono',
+  fontColor: 'black',
 };
 
-
 export const themeStore = writable(defaultTheme);
-
-
 
 export function setTheme(theme: string) {
     if (typeof window !== 'undefined') {
         document.documentElement.setAttribute('data-theme', theme);
     }
 };
-
-
-
-
-
-
-
-export function getCustomStyles(data: {customTheme?: CustomTheme }): CustomTheme {
-
-  let customF = '';
-  let customFC = '';
-  let customBG = '';
-  let customBS: CustomTheme['customBS'] = 'squareFill'; // Default value or a suitable one
-  let customBC = '';
-  let customBFC = '';
-
-    if (data && data.customTheme) {
-
-        customF = data.customTheme.customF;
-        customFC = data.customTheme.customFC;
-        customBG = data.customTheme.customBG;
-        customBS = data.customTheme.customBS;
-        customBC = data.customTheme.customBC;
-        customBFC = data.customTheme.customBFC;
-    }
-
-    return {
-        customF,
-        customFC,
-        customBG,
-        customBS,
-        customBC,
-        customBFC,
-    };
-}
