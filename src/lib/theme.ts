@@ -94,23 +94,31 @@ export function setTheme(theme: string) {
 
 
 
-export function getCustomStyles(data: any) {
-    let customBackground, customButtonStyle, customButtonColor, customButtonFontColor, customFont;
+export function getCustomStyles(data: {customTheme?: CustomTheme }): CustomTheme {
+
+  let customF = '';
+  let customFC = '';
+  let customBG = '';
+  let customBS: CustomTheme['customBS'] = 'squareFill'; // Default value or a suitable one
+  let customBC = '';
+  let customBFC = '';
 
     if (data && data.customTheme) {
 
-        customBackground = data.customTheme.buttonStyle;
-        customButtonStyle = data.customTheme.buttonStyle;
-        customButtonColor = data.customTheme.buttonColor;
-        customButtonFontColor = data.customTheme.buttonFontColor;
-        customFont = data.customTheme.font;
+        customF = data.customTheme.customF;
+        customFC = data.customTheme.customFC;
+        customBG = data.customTheme.customBG;
+        customBS = data.customTheme.customBS;
+        customBC = data.customTheme.customBC;
+        customBFC = data.customTheme.customBFC;
     }
 
     return {
-        customBackground,
-        customButtonStyle,
-        customButtonColor,
-        customButtonFontColor,
-        customFont,
+        customF,
+        customFC,
+        customBG,
+        customBS,
+        customBC,
+        customBFC,
     };
 }

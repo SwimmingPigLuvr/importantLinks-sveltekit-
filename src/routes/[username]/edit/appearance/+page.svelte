@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from "$app/stores";
   import ColorPicker from "$lib/components/ColorPicker.svelte";
   import Fonts from "$lib/components/Fonts.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
@@ -144,7 +143,7 @@
 
 </script>
 
-<LivePreview />
+<LivePreview username={''} />
 
 <main class="flex flex-col">
 

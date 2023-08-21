@@ -3,6 +3,7 @@ import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { writable, type Readable, derived } from "svelte/store";
+import type { CustomTheme } from "./theme";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBU5hSr2-g1e8VWIKzhcYuldgynMma5S_4",
@@ -85,17 +86,6 @@ interface LinkData {
   title: string,
   url: string,
   icon: string,
-}
-
-export interface CustomTheme {
-  background?: string;
-  buttonStyle?: string;
-  buttonColor?: string;
-  buttonFont?: string;
-  buttonFontColor?: string;
-  font?: string;
-  fontColor?: string;
-  [key: string]: string | undefined;
 }
 
 interface UserData {

@@ -3,51 +3,18 @@ import type { PageLoad } from './$types';
 import { db } from '$lib/firebase';
 import { error } from '@sveltejs/kit';
 import { setTheme } from '$lib/theme';
+import { updateTheme } from '$lib/themeStore';
+import { fetchUserData } from '$lib/fetchData';
 
 export const load = (async ({ params }) => {
-
-   
-
-    const collectionRef = collection(db, 'users');
-
-    const q = query(
-        collectionRef,
-        where("username", "==", params.username),
-        limit(1)
-    );
-
-    const snapshot = await getDocs(q);
-    const exists = snapshot.docs[0]?.exists();
-    const data = snapshot.docs[0]?.data();
-
-    if (!exists) {
-        throw error(404, "that user does not exist!");
-    }
-
-    if (!data.published) {
-        throw error(403, `the profile of @${data.username} is not public`);
-    } 
-    
-    if (data && data.theme) {
-        setTheme(data.theme);
-    }
-
-    const userData = {
-        username: data.username,
-        photoURL: data.photoURL,
-        bio: data.bio,
-        links: data.links ?? [],
-        theme: data.theme,
-        customTheme: data.customTheme,
-    };
-
-
-    return {
-        username: data.username,
-        photoURL: data.photoURL,
-        bio: data.bio,
-        links: data.links ?? [],
-        theme: data.theme,
-        customTheme: data.customTheme
-    }
+    console.log('Params:', params); // Logging the params
+  const { username } = params;
+  try {
+    const data = await fetchUserData(username);
+    console.log('Fetched data:', data); // Logging the fetched data
+    return data;
+  } catch (error) {
+    console.error('An error occurred:', error); // Logging any errors
+    throw error; // Re-throwing the error so that it gets handled appropriately
+  }
 }) satisfies PageLoad;

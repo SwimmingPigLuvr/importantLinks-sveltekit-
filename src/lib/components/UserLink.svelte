@@ -8,7 +8,7 @@
     export let title = 'some cool title';
     export let previewMode = false;
     export let buttonStyle: keyof typeof buttonStyles;
-    export let buttonColor: string;
+    export let buttonColor: string = '';
     export let font: string = 'font-elven';
     export let buttonFontColor: string = '';
     let tests = `${buttonFontColor} ${font}`;

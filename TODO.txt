@@ -242,3 +242,15 @@ why?
 how:
     get data into store from db, 
     call store from anywhere in project
+
+
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
+
+NEW FOCUS
+
+figure out the best way to make a store and go from there! 
+eliminate redundant code 
+
+so far the users first page works the best!
+find out why and use that why!
