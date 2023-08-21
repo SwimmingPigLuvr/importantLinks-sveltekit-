@@ -13,6 +13,8 @@
   import { backIn, backOut } from "svelte/easing";
   import { themeStore, updateTheme } from "$lib/themeStore";
   import type { CustomTheme } from "$lib/theme";
+  import colors from 'tailwindcss/colors';
+
 
 
   // get user data
@@ -55,6 +57,24 @@
     mounted = true;
   });
 
+
+
+  
+  let rose = 'rose-500';
+
+    function convert(colorName: string): string | undefined {
+      const [color, shade] = colorName.split('-');
+      return (colors as any)[color]?.[shade];
+    }
+
+    const roseHex = convert(rose);
+
+    
+
+    
+
+
+
 </script>
 
 <svelte:head>
@@ -80,7 +100,7 @@
 class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center text-${fontColor}`}>
 
 <!-- test theme styles -->
-<div class="bg-{background? background : 'white'} w-10 h-10"></div>
+<div class="w-10 h-10" style={`background-color: ${roseHex};`}></div>
 
   <!-- PFP -->
   <img 
@@ -133,5 +153,9 @@ class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z
 </main>
 
 
+
+<style>
+  
+</style>
 <!-- give user option to upload icons for each link -->
 <!-- add social links below -->
