@@ -9,20 +9,13 @@
     export let previewMode = false;
     export let buttonStyle: keyof typeof buttonStyles;
     export let buttonColor: string = '';
+    export let buttonColorHex: string = '';
     export let font: string = 'font-elven';
-    export let buttonFontColor: string = '';
-    let tests = `${buttonFontColor} ${font}`;
+    export let buttonFontColorHex: string = '';
 
-    export let testColor: string = '';
-
-    
-    let textColorClass = ``; // or whatever color you want
-
-  $: fullColor = previewMode ? 'text-[1rem]' : 'text-[1.5rem]';
-  $: classes = `${fullColor} absolute ${textColorClass} font-${font} text-center`;
 
   onMount(() => {
-    console.log('testColor: ', testColor);
+    
   })
 
 
@@ -47,13 +40,21 @@
 </script>
 
      <!-- if fill then bg-{buttonColor ? {buttonColor} : 'secondary'}, -->
+
+
+
+     <!-- todo make the conditional styles neccessary to apply: -->
+     <!-- buttonColorHex to the border and shadow of outline and shadow -->
+
+
 <a 
   href="{url}" 
+  style={shadow? `box-shadow: 0 25px 50px -12px ${buttonColorHex};` : ''}
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto max-w-[94%] 
      {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-2  
      {fill ? `bg-${buttonColor ? buttonColor : 'secondary'}` : 'bg-opacity-0'}
      {outline ? `border-${buttonColor ? buttonColor : 'secondary'}` : 'border-transparent'}
-     {shadow ? `shadow-xl shadow-${buttonColor ? buttonColor : 'secondary'}` : 'shadow-none'}
+     {shadow ? 'shadow-xl' : 'shadow-none'}
      hover:translate-x-1 hover:translate-y-1 stack text-center 
      flex justify-between items-center no-underline relative">
     <img 
@@ -62,6 +63,7 @@
       alt={iconURLalt} 
       class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
     <span 
-      class={classes}>{title}</span>
+      style={`color: ${buttonFontColorHex}`}
+      class='font-{font}'>{title}</span>
 </a>
 

@@ -2,12 +2,14 @@
 <!-- the themestore is logged as the old data: fontColorolor 
   should be fontColor -->
 
+  <!-- now i need to kick these hexes downstream to the userLink -->
+
 <script lang="ts">
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { onMount } from "svelte";
   import type { PageData } from "./$types";
-  import { defaultTheme, setTheme } from "$lib/theme";
+  import { buttonStyles, defaultTheme, setTheme } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
   import { fly } from "svelte/transition";
   import { backIn, backOut } from "svelte/easing";
@@ -22,12 +24,28 @@
 
   let userTheme: CustomTheme;
 
-  const font = $themeStore.font;
-  const fontColor = $themeStore.fontColor;
-  const background = $themeStore.background;
-  const buttonStyle = $themeStore.buttonStyle;
-  const buttonColor = $themeStore.buttonColor;
-  const buttonFontColor = $themeStore.buttonFontColor;
+  let font: string;
+  let fontColor: string;
+  let fontColorHex: string | undefined;
+  let background: string;
+  let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  let buttonColor: string;
+  let buttonColorHex: string | undefined;
+  let buttonFontColor: string;
+  let buttonFontColorHex: string | undefined;
+
+  $: {
+    font = $themeStore.font;
+    fontColor = $themeStore.fontColor;
+    background = $themeStore.background;
+    buttonStyle = $themeStore.buttonStyle;
+    buttonColor = $themeStore.buttonColor;
+    buttonFontColor = $themeStore.buttonFontColor;
+
+    fontColorHex = fontColor ? convert(fontColor) : undefined;
+    buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
+    buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+  }
 
 
   
@@ -69,6 +87,11 @@
 
     const roseHex = convert(rose);
 
+    // convert the pesky classes that tailwind is too lazy to let me use
+
+    
+    
+
     
 
     
@@ -96,8 +119,8 @@
 </svelte:head>
 
 <main 
-  
-class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center text-${fontColor}`}>
+style={`color: ${fontColorHex}`}
+class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 <!-- test theme styles -->
 <div class="w-10 h-10" style={`background-color: ${roseHex};`}></div>
@@ -135,7 +158,8 @@ class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z
           buttonStyle={buttonStyle} 
           font={font} 
           buttonColor={buttonColor} 
-          buttonFontColor={buttonFontColor} 
+          buttonColorHex={buttonColorHex} 
+          buttonFontColorHex={buttonFontColorHex} 
         />
       </li>
     {/each}

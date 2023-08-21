@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 import type { CustomTheme } from "./theme";
 
 const defaultTheme: CustomTheme = {
-    font: "input-mono",
+    font: "elven",
     fontColor: "black",
     background: "lime-400",
     buttonStyle: "squareFill",

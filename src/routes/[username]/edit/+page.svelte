@@ -12,6 +12,43 @@
   import { backIn, backInOut, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
   import { themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
+  import colors from "tailwindcss/colors";
+  import { updateTheme } from "$lib/themeStore";
+
+  let font: string;
+  let fontColor: string;
+  let fontColorHex: string | undefined;
+  let background: string;
+  let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  let buttonColor: string;
+  let buttonColorHex: string | undefined;
+  let buttonFontColor: string;
+  let buttonFontColorHex: string | undefined;
+
+  $: {
+    font = $themeStore.font;
+    fontColor = $themeStore.fontColor;
+    background = $themeStore.background;
+    buttonStyle = $themeStore.buttonStyle;
+    buttonColor = $themeStore.buttonColor;
+    buttonFontColor = $themeStore.buttonFontColor;
+
+    fontColorHex = fontColor ? convert(fontColor) : undefined;
+    buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
+    buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+  }
+
+  function convert(colorName: string): string | undefined {
+      const [color, shade] = colorName.split('-');
+      return (colors as any)[color]?.[shade];
+    }
+
+
+    // convert the pesky classes that tailwind is too lazy to let me use
+
+    
+
+
 
   // show modal for uploading to keep everything clean and separated
 
@@ -46,6 +83,7 @@
     const userRef = doc(db, "users", $user!.uid);
 
     updateDoc(userRef, {bio: bio });
+    console.log('updated bio: ', bio)
 
     editingBio = false;
   }
@@ -73,14 +111,6 @@
     photoURL = $userData.photoURL;
   }
 
-
-  let { customBG, customBS, customBC, customBFC, customF, customFC } = $themeStore;
-
-  $: if ($themeStore) {
-    customBG = $themeStore.customBG;
-  }
-
-
   const formDefaults = {
 
     iconURL: "",
@@ -100,6 +130,14 @@
 
   onMount (() => {
     showDndMessage = true;
+    console.log('themeupdated 🍨', $themeStore);
+    console.log('font: ', font);
+    console.log('fontColor: ', fontColor);
+    console.log('buttonFontColorHexfontColorHex: ', buttonFontColorHex);
+    console.log('background: ', background);
+    console.log('buttonColor: ', buttonColor);
+    console.log('buttonColorHex: ', buttonColorHex);
+    console.log('font: ', font);
   });
 
   
@@ -169,12 +207,14 @@
 
 
 <main 
-class={`bg-${customBG ? customBG : 'primary'} font-${customF} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center text-${customBFC}`}>
+
+style={`color: ${buttonFontColorHex}; background-color: ${backgroundHex}`}
+class={`bg-${background ? background : 'primary'} font-${font} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
 
   {#if $userData?.username == $page.params.username}
-    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-{customF} font-bold text-center">
+    <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-{font} font-bold text-center">
       Edit Profile
     </h1>
 
@@ -238,7 +278,9 @@ class={`bg-${customBG ? customBG : 'primary'} font-${customF} -z-20 h-screen fix
 
 
     <!-- USERNAME -->
-    <h1 class="text-[1.5rem] m-auto text-center font-{customF}">
+    <h1 
+      class="text-[1.5rem] m-auto text-center font-{font}">
+
       @{username}
     </h1>
 
@@ -258,7 +300,7 @@ class={`bg-${customBG ? customBG : 'primary'} font-${customF} -z-20 h-screen fix
       </div>
     </div>
 {:else}
-  <p class="text-[1rem] p-5 font-{customF? customF : 'elven'} text-center">{bio ?? "no bio"}</p>
+  <p class="text-[1rem] p-5 font-{font? font : 'elven'} text-center">{bio ?? "no bio"}</p>
   <button on:click={editBio} class="btn btn-outline">Edit Bio</button>
 {/if}
 
@@ -286,10 +328,11 @@ class={`bg-${customBG ? customBG : 'primary'} font-${customF} -z-20 h-screen fix
         iconURL={item.iconURL} 
         title={item.title} 
         url={item.url} 
-        buttonStyle={customBS} 
-        font={customF} 
-        buttonColor={customBC} 
-        buttonFontColor={customBFC} 
+        buttonStyle={buttonStyle} 
+        buttonColor={buttonColor}
+        buttonColorHex={buttonColorHex} 
+        font={font} 
+        buttonFontColorHex={buttonFontColorHex} 
       />      
   
 
