@@ -1,9 +1,11 @@
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { updateTheme } from "./themeStore";
-import { db } from "./firebase";
+import { db, userData } from "./firebase";
 import { error } from "@sveltejs/kit";
+import type { CustomTheme } from "./theme";
+import type { UserData } from "./firebase";
 
-export async function fetchUserData(username: string) {
+export async function fetchUserData(username: string): Promise<UserData> {
     const collectionRef = collection(db, 'users');
 
     const q = query(
@@ -34,6 +36,6 @@ export async function fetchUserData(username: string) {
         bio: data.bio,
         links: data.links ?? [],
         theme: data.theme,
-        customTheme: data.customTheme
+        customTheme: data.customTheme,
     }
 }

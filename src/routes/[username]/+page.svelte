@@ -15,13 +15,7 @@
   export let data: PageData;
 
   let custom: CustomTheme = defaultTheme;
-
-  $: if (data && data.customTheme) {
-    custom = $themeStore;
-    console.log('custom: ', custom, '$themeStore: ', $themeStore);
-  }
-
-
+  
   const username: string = data.username;
   const photoURL: string = data.photoURL;
   const bio: string = data.bio;
@@ -30,8 +24,14 @@
   const customTheme: CustomTheme = data.customTheme;
 
   $: if (data && data.customTheme) {
+    custom = $themeStore;
     updateTheme(customTheme);
+    console.log('$themeStore: ', $themeStore);
   }
+
+
+  
+
 
 
   let mounted = false;
@@ -95,9 +95,9 @@ class={`bg-${custom.customBG? custom.customBG : 'bg-gradient-to-tr from-primary 
   {#if mounted}
   <!-- LINKS -->
   <ul class="list-none mt-4 mb-60">
-    {#each links as item (item.id) }
+    {#each links as item, index (item.id) }
       <li 
-      in:fly={{ y: -10, duration: 200, easing: backOut, delay: (item.id * 300)}}
+      in:fly={{ y: -10, duration: 200, easing: backOut, delay: (index * 300)}}
       class="m-auto p-2">
         <UserLink 
           iconURL={item.iconURL} 

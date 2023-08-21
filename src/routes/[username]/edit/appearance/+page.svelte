@@ -1,14 +1,38 @@
+
+
+
 <script lang="ts">
   import ColorPicker from "$lib/components/ColorPicker.svelte";
   import Fonts from "$lib/components/Fonts.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { db, user, userData, storage } from "$lib/firebase";
-  import { setTheme } from "$lib/theme";
+  import { setTheme, type CustomTheme, defaultTheme } from "$lib/theme";
   import { doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { flip } from "svelte/animate";
   import { backIn, backOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
+  import { themeStore, updateTheme } from "$lib/themeStore";
+  import type { PageData } from "./$types";
+
+  export let data: PageData;
+
+  let custom: CustomTheme = defaultTheme;
+
+  const username: string = data.username;
+  const photoURL: string = data.photoURL;
+  const bio: string = data.bio;
+  const links = data.links;
+  const theme: string = data.theme;
+  const customTheme: CustomTheme = data.customTheme;
+
+  $: if (data && data.customTheme) {
+    custom = $themeStore;
+    updateTheme(customTheme);
+    console.log('custom: ', custom, '$themeStore: ', $themeStore);
+  }
+
+
 
   let mode = '';
 
@@ -83,9 +107,6 @@
 
   let currentFont = 'totally-gothic'
 
-
-  let links = $userData?.links || [];
-
   let colorPickerHover = false;
   let showColorPicker = false;
   let showGradientPicker = false;
@@ -143,7 +164,7 @@
 
 </script>
 
-<LivePreview username={''} />
+<LivePreview username={username} photoURL={photoURL} bio={bio} links={links} theme={theme} customTheme={customTheme}/>
 
 <main class="flex flex-col">
 

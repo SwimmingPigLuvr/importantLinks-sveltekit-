@@ -1,9 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { doc, getFirestore, onSnapshot } from "firebase/firestore";
-import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { writable, type Readable, derived } from "svelte/store";
 import type { CustomTheme } from "./theme";
+
+interface MyUser {
+  uid?: string;
+  userData?: UserData;
+
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyBU5hSr2-g1e8VWIKzhcYuldgynMma5S_4",
@@ -31,7 +37,7 @@ function userStore() {
 
   if (!auth || !globalThis.window) {
     console.warn('Auth is not initialized or not in browser');
-    const { subscribe } = writable<User | null>(null);
+    const { subscribe } = writable<MyUser | null>(null);
     return {
       subscribe,
     }
@@ -50,7 +56,7 @@ function userStore() {
   };
 }
 
-export const user = userStore();
+export const user: Readable<MyUser | null> = userStore();
 
 /**
  * @param  {string} path document path or reference
@@ -88,12 +94,13 @@ interface LinkData {
   icon: string,
 }
 
-interface UserData {
+export interface UserData {
   username: string;
   bio: string;
   photoURL: string;
   links: LinkData[];
-  theme: CustomTheme;
+  customTheme: CustomTheme;
+  theme: string;
 }
 
 
@@ -111,4 +118,4 @@ export const userData: Readable<UserData | null> = derived(user, ($user, set) =>
   }
 });  
 
-export const userTheme: Readable<CustomTheme | null> = derived(userData, $userData => $userData?.theme || null);
+export const userTheme: Readable<string | null> = derived(userData, $userData => $userData?.theme || null);
