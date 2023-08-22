@@ -83,18 +83,6 @@
     bio = $userData.bio;
   }
 
-  
-
-  
-
-  
-
-  
-
-
-  $: {
-  }
-
   // convert tailwind to hex
   function convert(colorName: string): string | undefined {
     const [color, shade] = colorName.split('-');

@@ -12,27 +12,66 @@
   import { flip } from "svelte/animate";
   import { backIn, backOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
-  import { themeStore, updateTheme } from "$lib/themeStore";
+  import { updateTheme } from "$lib/themeStore";
   import type { PageData } from "./$types";
+  import Nav from "$lib/components/Nav.svelte";
+  import colors from "tailwindcss/colors";
 
   export let data: PageData;
 
-  let custom: CustomTheme = defaultTheme;
+  // declare user data vars
+  let username: string | undefined;
+  let bio: string | undefined;
+  let photoURL: string | undefined;
+  let links: LinkData[];
+  let customTheme: CustomTheme;
+  let theme: string | undefined;
+  
+  // declare customTheme vars
+  let font: string;
+  let fontColor: string;
+  let fontColorHex: string | undefined;
+  let background: string;
+  let backgroundHex: string | undefined;
+  let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  let buttonColor: string;
+  let buttonColorHex: string | undefined;
+  let buttonFontColor: string;
+  let buttonFontColorHex: string | undefined;
 
-  const username: string = data.username;
-  const photoURL: string = data.photoURL;
-  const bio: string = data.bio;
-  const links = data.links;
-  const theme: string = data.theme;
-  const customTheme: CustomTheme = data.customTheme;
+  $: if ($userData) {
+    username = $userData.username;
+    bio = $userData.bio;
+    photoURL = $userData.photoURL;
+    links = $userData.links;
+    customTheme = $userData.customTheme;
+    theme = $userData.theme;    
 
-  $: if (data && data.customTheme) {
-    custom = $themeStore;
-    updateTheme(customTheme);
-    console.log('custom: ', custom, '$themeStore: ', $themeStore);
+    // set customTheme vars
+    font = customTheme.font;
+    fontColor = customTheme.fontColor;
+    background = customTheme.background;
+    buttonStyle = customTheme.buttonStyle;
+    buttonColor = customTheme.buttonColor;
+    buttonFontColor = customTheme.buttonFontColor;
+
+    // convert these to hex codes
+    backgroundHex = background ? convert(background) : undefined;
+    fontColorHex = fontColor ? convert(fontColor) : undefined;
+    buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
+    buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+
   }
 
+  $: if (data && data.customTheme) {
+    updateTheme(customTheme);
+  }
 
+  // convert tailwind to hex
+  function convert(colorName: string): string | undefined {
+    const [color, shade] = colorName.split('-');
+    return (colors as any)[color]?.[shade];
+  }
 
   let mode = '';
 
@@ -101,12 +140,6 @@
   let currentColorSelection = null;
 
 
-
-  let buttonColor = 'white';
-  let buttonFontColor = 'black';
-
-  let currentFont = 'totally-gothic'
-
   let colorPickerHover = false;
   let showColorPicker = false;
   let showGradientPicker = false;
@@ -133,13 +166,13 @@
   }
   
   const themes = [
-      'red',
       'retro',
       'garden',
       'forest',
       'luxury',
       'aqua',
       'night',
+      'red',
       'coffee',
       'methyleneBlue',
       'acid',
@@ -347,9 +380,9 @@
         <h3 class="font-input-mono text-white my-2">Font</h3>
         <button on:click|preventDefault={() => toggleFontDropdown()} class="btn group border-neutral-200 shadow shadow-neutral-200 bg-white h-20 flex items-center justify-start space-x-4">
           <div class="bg-neutral-200 w-12 h-12 rounded-sm items-center justify-center flex">
-            <p class="m-auto font-{currentFont} text-black text-[1.5rem]">Aa</p>
+            <p class="m-auto font-{font} text-black text-[1.5rem]">Aa</p>
           </div>
-          <p class="font-{currentFont} group-hover:text-neutral-200 text-[1.5rem] text-black">{currentFont}</p>
+          <p class="font-{font} group-hover:text-neutral-200 text-[1.5rem] text-black">{font}</p>
         </button>
  
       <h3 class="font-input-mono text-white my-2">Font Color</h3>
@@ -373,6 +406,8 @@
 <a href="#top" class="fixed bottom-3 right-3 text-[3rem]">
   👆
 </a>
+
+<Nav username={username} />
 
 </main>
 
@@ -407,6 +442,4 @@
   </style>
 
 
-<!-- in order to figure out how to save the styles instantly 
-  i should look at how the save theme button saves the theme instantly -->
   

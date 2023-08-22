@@ -303,7 +303,17 @@ then ui
 ✅nav bar: quicker, made into a component, text size
 ✅nav bar: home. edit. appearance.
 ✅if on page then the nav should reflect that: dimmer text color
+
 livepreview should reflect a real live preview
+    set up store same way that the other files have it
+        ✅data loaded in properly
+            variables set up properly
+                lets set up divs to test? wait is this really the best way
+
+        question? should i set up the userdata for live preview? or just pass it in as props?
+        lets find out shall we
+    ???
+
 
 maybe different nav solution for the appearance page. 
     let's see how well it fits in

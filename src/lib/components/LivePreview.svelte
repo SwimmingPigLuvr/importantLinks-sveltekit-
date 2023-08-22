@@ -4,8 +4,6 @@
     import { fly } from "svelte/transition";
     import { backIn, backInOut, backOut, cubicInOut } from "svelte/easing";
   import type { CustomTheme } from "$lib/theme";
-  import { themeStore } from "$lib/themeStore";
-  import { writable } from "svelte/store";
 
   let showPreview = false;
 
