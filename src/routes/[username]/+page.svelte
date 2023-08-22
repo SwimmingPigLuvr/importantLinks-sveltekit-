@@ -9,69 +9,66 @@
   import { themeStore, updateTheme } from "$lib/themeStore";
   import type { CustomTheme } from "$lib/theme";
   import colors from 'tailwindcss/colors';
-  
+  import { userData, type LinkData } from "$lib/firebase";
+
+  // states
   let mounted = false;
-  onMount(() => {
 
-    console.log('theme store ', $themeStore)
-    
-    if (data && data.customTheme) {
-      updateTheme(customTheme);
-      console.log('themeupdated 🍨', $themeStore);
-    }
-    mounted = true;
-  });
+  
 
+  // get user data from $userData store
+  export let data: {
+    username: string;
+    bio: string;
+    photoURL: string;
+    links: LinkData[];
+    customTheme: CustomTheme;
+    theme: string;
+  } | null = $userData;
 
+  // declare user data vars
+  let username: string | undefined;
+  let bio: string | undefined;
+  let photoURL: string | undefined;
+  let links: LinkData[];
+  let customTheme: CustomTheme;
+  let theme: string | undefined;
 
-  // get user data
-  export let data: PageData;
-
-  let userTheme: CustomTheme;
-
+  // declare customTheme vars
   let font: string;
   let fontColor: string;
   let fontColorHex: string | undefined;
   let background: string;
+  let backgroundHex: string | undefined;
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonColorHex: string | undefined;
   let buttonFontColor: string;
   let buttonFontColorHex: string | undefined;
 
-  $: {
-    font = $themeStore.font;
-    fontColor = $themeStore.fontColor;
-    background = $themeStore.background;
-    buttonStyle = $themeStore.buttonStyle;
-    buttonColor = $themeStore.buttonColor;
-    buttonFontColor = $themeStore.buttonFontColor;
+  $: if ($userData) {
+    username = $userData.username;
+    photoURL = $userData.photoURL;
+    links = $userData.links;
+    customTheme = $userData.customTheme;
+    theme = $userData.theme;    
 
+    // set customTheme vars
+    font = customTheme.font;
+    fontColor = customTheme.fontColor;
+    background = customTheme.background;
+    buttonStyle = customTheme.buttonStyle;
+    buttonColor = customTheme.buttonColor;
+    buttonFontColor = customTheme.buttonFontColor;
+
+    // convert these to hex codes
+    backgroundHex = background ? convert(background) : undefined;
     fontColorHex = fontColor ? convert(fontColor) : undefined;
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+
   }
-
-
-  
-  const username: string = data.username;
-  const photoURL: string = data.photoURL;
-  const bio: string = data.bio;
-  const links = data.links;
-  const theme: string = data.theme;
-  const customTheme: CustomTheme = data.customTheme;
-
-
-
-
-  
-
-
-
-
-
-
-  
+   
   let rose = 'rose-500';
 
     function convert(colorName: string): string | undefined {
@@ -83,7 +80,16 @@
 
     // convert the pesky classes that tailwind is too lazy to let me use
 
+    onMount(() => {
+
+    console.log('theme store ', $themeStore)
     
+    if (data && data.customTheme) {
+      updateTheme(customTheme);
+      console.log('themeupdated 🍨', $themeStore);
+    }
+    mounted = true;
+  });
     
 
     

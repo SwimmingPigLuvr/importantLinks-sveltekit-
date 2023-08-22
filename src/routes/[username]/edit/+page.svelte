@@ -26,6 +26,7 @@
   let editingBio = false;
   let showForm = false;
 
+  // get user data from $userData store
   export let data: {
     username: string;
     bio: string;
