@@ -3,19 +3,20 @@
 @tailwind utilities;
 
 :root {
-    transition: background-color 1s ease-out,
-                color 1.5s ease-out,
-                border-color 1.5s ease-out;
+  transition:
+    background-color 1s ease-out,
+    color 1.5s ease-out,
+    border-color 1.5s ease-out;
 }
 
 .btn {
-    transition: background-color 0.23s ease-out,
-                color 0.5s ease-out,
-                border-color 1.5s ease-out;
-                border-radius: 2s ease-out;
-
+  transition:
+    background-color 0.23s ease-out,
+    color 0.5s ease-out,
+    border-color 1.5s ease-out;
+  border-radius: 2s ease-out;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }

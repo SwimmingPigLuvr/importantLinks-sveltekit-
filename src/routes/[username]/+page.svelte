@@ -11,13 +11,29 @@
   import type { PageData } from "./$types";
   import { buttonStyles, defaultTheme, setTheme } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
-  import { fly } from "svelte/transition";
-  import { backIn, backOut } from "svelte/easing";
+  import { blur, fly, slide } from "svelte/transition";
+  import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { themeStore, updateTheme } from "$lib/themeStore";
   import type { CustomTheme } from "$lib/theme";
   import colors from 'tailwindcss/colors';
+  
+  let mounted = false;
+  onMount(() => {
 
+    console.log('theme store ', $themeStore)
+    
+    if (data && data.customTheme) {
+      updateTheme(customTheme);
+      console.log('themeupdated 🍨', $themeStore);
+    }
+    mounted = true;
+  });
 
+let openNav = false;
+
+function toggleNav() {
+  openNav = !openNav
+}
 
   // get user data
   export let data: PageData;
@@ -63,17 +79,6 @@
 
 
 
-  let mounted = false;
-  onMount(() => {
-
-    console.log('theme store ', $themeStore)
-    
-    if (data && data.customTheme) {
-      updateTheme(customTheme);
-      console.log('themeupdated 🍨', $themeStore);
-    }
-    mounted = true;
-  });
 
 
 
@@ -123,7 +128,7 @@ style={`color: ${fontColorHex}`}
 class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 <!-- test theme styles -->
-<div class="w-10 h-10" style={`background-color: ${roseHex};`}></div>
+<div class="w-10 h-10 fixed top-0 left-0" style={`background-color: ${roseHex};`}></div>
 
   <!-- PFP -->
   <img 
@@ -167,8 +172,41 @@ class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z
   {/if}
 
   <AuthCheck>
+    <div class="fixed top-0 right-0 p-2 flex">
 
-    <a href="{username}/edit" class="btn w-20 fixed top-4 right-4">Edit</a>
+
+    {#if !openNav}
+      <button 
+        on:mouseenter={() => toggleNav()}
+        in:blur={{ amount: 100, delay: 200, duration: 500, easing: cubicInOut }}
+        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
+        class="m-auto text-5xl">☯︎</button>
+    {:else}
+    <button 
+      on:mouseleave={() => toggleNav()}
+      class="fixed top-0 right-0 flex flex-col items-end justify-center p-2 space-y-1 text-xl">
+      <a 
+        in:blur={{ amount: 100, delay: 200, duration: 1000, easing: cubicInOut }}
+        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
+        href="{username}/edit" 
+        class="flex filter hover:invert">
+        <p class="m-auto">
+          Edit Profile
+        </p>
+      </a>
+      <a 
+        in:blur={{ amount: 100, delay: 400, duration: 1000, easing: cubicInOut }}
+        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
+      href="{username}/edit/appearance" 
+      class="flex filter hover:invert">
+        <p class="m-auto">
+          Appearance Settings
+        </p>
+      </a>
+    </button>
+    {/if}
+    
+    </div>
     
   </AuthCheck>
 

@@ -284,3 +284,36 @@ but not too complicated
 
 should i have the theme store in my livepreview? or in my appearance page??
 both i think yeah
+
+figure out how to upload a new pfp from the edit page?
+
+also why the f is the edit page using a weird theme
+
+lets get down to the bottom of this
+
+
+august 22
+
+see where its fucked up
+fix that
+then ui
+
+🌸 APP TODO LIST 🌸
+✅ edit profile theme needs to work
+preload edit page so there is no lag at the begining
+enhanced customizating (see list below)
+theme should take over custom options
+upload pfp 
+upload bg 
+gradients
+
+ui todo list:
+center link titles
+link shadows are too big
+livepreview should animate in on fullscreen
+
+
+
+enhanced customization
+hover settings.
+link size and shape

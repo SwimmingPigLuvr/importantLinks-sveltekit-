@@ -14,71 +14,125 @@
   import Footer from "$lib/components/Footer.svelte";
   import colors from "tailwindcss/colors";
   import { updateTheme } from "$lib/themeStore";
+  import type { PageData } from "./$types";
+  import type { CustomTheme } from "$lib/theme";
+  import type { LinkData } from "$lib/firebase";
 
+  // states
+  let showDndMessage = false;
+  let showChangePfpModal = false;
+  let showChangePfp = false;
+  let editingBio = false;
+  let showForm = false;
+
+  export let data: {
+    username: string;
+    bio: string;
+    photoURL: string;
+    links: LinkData[];
+    customTheme: CustomTheme;
+    theme: string;
+  } | null = $userData;
+  
+  // declare user data vars
+  let username: string | undefined;
+  let bio: string | undefined;
+  let photoURL: string | undefined;
+  let links: LinkData[];
+  let customTheme: CustomTheme;
+  let theme: string | undefined;
+  
+  // declare customTheme vars
   let font: string;
   let fontColor: string;
   let fontColorHex: string | undefined;
   let background: string;
+  let backgroundHex: string | undefined;
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonColorHex: string | undefined;
   let buttonFontColor: string;
   let buttonFontColorHex: string | undefined;
 
-  $: {
-    font = $themeStore.font;
-    fontColor = $themeStore.fontColor;
-    background = $themeStore.background;
-    buttonStyle = $themeStore.buttonStyle;
-    buttonColor = $themeStore.buttonColor;
-    buttonFontColor = $themeStore.buttonFontColor;
+  $: if ($userData) {
+    username = $userData.username;
+    photoURL = $userData.photoURL;
+    links = $userData.links;
+    customTheme = $userData.customTheme;
+    theme = $userData.theme;    
 
+    // set customTheme vars
+    font = customTheme.font;
+    fontColor = customTheme.fontColor;
+    background = customTheme.background;
+    buttonStyle = customTheme.buttonStyle;
+    buttonColor = customTheme.buttonColor;
+    buttonFontColor = customTheme.buttonFontColor;
+
+    // convert these to hex codes
+    backgroundHex = background ? convert(background) : undefined;
     fontColorHex = fontColor ? convert(fontColor) : undefined;
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+
   }
 
+  // makes sure bio isn't actively being edited
+  $: if ($userData && !editingBio) {
+    bio = $userData.bio;
+  }
+
+  
+
+  
+
+  
+
+  
+
+
+  $: {
+  }
+
+  // convert tailwind to hex
   function convert(colorName: string): string | undefined {
-      const [color, shade] = colorName.split('-');
-      return (colors as any)[color]?.[shade];
+    const [color, shade] = colorName.split('-');
+    return (colors as any)[color]?.[shade];
+  }
+
+  onMount (() => {
+    showDndMessage = true;
+
+    if (data && data.customTheme) {
+      updateTheme(customTheme);
+      console.log('themeupdated 🍨', $themeStore);
     }
-
-
-    // convert the pesky classes that tailwind is too lazy to let me use
-
-    
+  });
 
 
 
-  // show modal for uploading to keep everything clean and separated
+  // upload new pfp
+  async function upload(e: any) {
+      uploadSuccess = false;
+      uploading = true;
 
-  let showChangePfpModal = false;
+      try {
+          const file = e.target.files[0];
+          previewURL = URL.createObjectURL(file);
+          const storageRef = ref(storage, `users/${$user!.uid}/profile.png`);
+          const result = await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(result.ref);
 
+          await updateDoc(doc(db, "users", $user!.uid), { photoURL: url });
+          uploadSuccess = true;
+      } catch (error) {
+          console.error('an error occurred while attempting to upload the file: ', error);
+      } finally {
+          uploading = false;
+      }
+  }
 
-
-    async function upload(e: any) {
-        uploadSuccess = false;
-        uploading = true;
-
-        try {
-            const file = e.target.files[0];
-            previewURL = URL.createObjectURL(file);
-            const storageRef = ref(storage, `users/${$user!.uid}/profile.png`);
-            const result = await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(result.ref);
-
-            await updateDoc(doc(db, "users", $user!.uid), { photoURL: url });
-            uploadSuccess = true;
-        } catch (error) {
-            console.error('an error occurred while attempting to upload the file: ', error);
-        } finally {
-            uploading = false;
-        }
-    }
-
-  let showChangePfp = false;
-  let editingBio = false;
-
+  // save bio
   function saveBio() {
     const userRef = doc(db, "users", $user!.uid);
 
@@ -88,31 +142,14 @@
     editingBio = false;
   }
 
+  // edit bio
   function editBio() {
     editingBio = true;
     console.log('editingBio: ', editingBio);
   }
 
-  let username: string | undefined;
-
-  $: if ($userData) {
-    username = $userData.username;
-  }
-
-  let bio: string | undefined;
-
-  $: if ($userData && !editingBio) {
-    bio = $userData.bio;
-  }
-
-  let photoURL: string | undefined;
-
-  $: if ($userData) {
-    photoURL = $userData.photoURL;
-  }
 
   const formDefaults = {
-
     iconURL: "",
     title: "",
     url: "https://",
@@ -121,30 +158,19 @@
   const formData = writable(formDefaults);
 
   let files: FileList;
-  let showForm = false;
   let uploadSuccess = false;
   let uploading = false;
   let previewURL: string;
 
-  let showDndMessage = false;
 
-  onMount (() => {
-    showDndMessage = true;
-    console.log('themeupdated 🍨', $themeStore);
-    console.log('font: ', font);
-    console.log('fontColor: ', fontColor);
-    console.log('buttonFontColorHexfontColorHex: ', buttonFontColorHex);
-    console.log('background: ', background);
-    console.log('buttonColor: ', buttonColor);
-    console.log('buttonColorHex: ', buttonColorHex);
-    console.log('font: ', font);
-  });
 
-  
+  // verify url && title
   $: urlIsValid = $formData.url.match(/^(ftp|http|https):\/\/[^ "]+$/);
   $: titleIsValid = $formData.title.length < 20 && $formData.title.length > 0;
   $: formIsValid = urlIsValid && titleIsValid;
 
+
+  // add link
   async function addLink(e: SubmitEvent) {
     const userRef = doc(db, "users", $user!.uid);
 
@@ -181,18 +207,20 @@
   }
 
   
-
+  // cancel new link upload
   function cancelLink() {
     formData.set(formDefaults);
     showForm = false;
   }
 
+  // rearrange links in DB
   function sortList(e: CustomEvent) {
     const newList = e.detail;
     const userRef = doc(db, "users", $user!.uid);
     setDoc(userRef, { links: newList }, { merge: true });
   }
 
+  // handle user file choice
   function handleFileChange(event: { target: any; }) {
     const inputElement = event.target;
     if (inputElement.files && inputElement.files.length > 0) {
@@ -207,9 +235,8 @@
 
 
 <main 
-
-style={`color: ${buttonFontColorHex}; background-color: ${backgroundHex}`}
-class={`bg-${background ? background : 'primary'} font-${font} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
+style={`color: ${fontColorHex}`}
+class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
 

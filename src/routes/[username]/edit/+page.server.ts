@@ -1,4 +1,4 @@
-import type { PageLoad } from "../../$types";
+import type { PageLoad } from "../$types";
 import { fetchUserData } from "$lib/fetchData";
 
 export const load = (async ({ params }) => {
