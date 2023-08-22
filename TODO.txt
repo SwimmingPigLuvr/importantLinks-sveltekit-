@@ -386,9 +386,31 @@ but the live preview stays on the correct theme
 
 
 head to uselink and figure out how to center the titles
+ducktape bandaid solution: -translate-x-6
 
-prebuilt theme doesn't properly apply to homepage
+✅prebuilt theme doesn't properly apply to homepage
 
 
 
-homepage isnt reactive because its not using the store the same way that edit page is using $userData
+✅homepage isnt reactive because its not using the store the same way that edit page is using $userData
+
+
+
+need to resolve the footer
+
+need to have credit but also direct user to create their own if theyre not logged in
+
+
+should be able to see other users content without being logged in
+
+description of the error 
+i can only be signed in under @Remilio
+once signed in i can user any other users username as a route 
+localhost/PeterGriffin just shows me remilios data
+but if im logged in as PeterGriffin then i cant see anything
+
+
+somehow i broke it
+
+probably the userstore only accepts remilio as data but the app should be able to pull any users' data
+the only thing that you have to be logged in for is editing the data: edit, appearance

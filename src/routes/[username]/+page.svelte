@@ -47,6 +47,7 @@
   let buttonFontColorHex: string | undefined;
 
   $: if ($userData) {
+    bio = $userData.bio;
     username = $userData.username;
     photoURL = $userData.photoURL;
     links = $userData.links;
@@ -122,8 +123,6 @@
 style={`color: ${fontColorHex}`}
 class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
-<!-- test theme styles -->
-<div class="w-10 h-10 fixed top-0 left-0" style={`background-color: ${roseHex};`}></div>
 
   <!-- PFP -->
   <img 

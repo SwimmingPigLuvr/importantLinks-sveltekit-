@@ -67,7 +67,7 @@
     <!-- Link title -->
     <p 
       style={`color: ${buttonFontColorHex}`}
-      class='font-{font}'>{title}
+      class='font-{font} -translate-x-6 text-xl'>{title}
     </p>
     <!-- empty element -->
     <div class="right"></div>

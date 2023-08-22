@@ -10,9 +10,10 @@
 
 {#if $user}
     <slot />
+    
 {:else}
-    <p class="text-error">
-        please login to view this page
-        <a href="/login" class="btn btn-primary">sign in</a>
-    </p>
+    <!-- login -->
+    <div class="fixed top-0 left-0 w-10 h-10 p-2">
+        <a href="/login">Login</a>
+    </div>
 {/if}
