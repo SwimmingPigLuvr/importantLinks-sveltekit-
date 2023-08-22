@@ -1,6 +1,3 @@
-
-
-
 <script lang="ts">
   import ColorPicker from "$lib/components/ColorPicker.svelte";
   import Fonts from "$lib/components/Fonts.svelte";
@@ -197,7 +194,17 @@
 
 </script>
 
-<LivePreview username={username} photoURL={photoURL} bio={bio} links={links} theme={theme} customTheme={customTheme}/>
+<LivePreview 
+  username={username} 
+  photoURL={photoURL} 
+  bio={bio} links={links} 
+  theme={theme} 
+  customTheme={customTheme} 
+  backgroundHex={backgroundHex} 
+  fontColorHex={fontColorHex}
+  buttonColorHex={buttonColorHex}
+  buttonFontColorHex={buttonFontColorHex}
+/>
 
 <main class="flex flex-col">
 

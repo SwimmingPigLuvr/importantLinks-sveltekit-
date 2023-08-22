@@ -304,7 +304,7 @@ then ui
 ✅nav bar: home. edit. appearance.
 ✅if on page then the nav should reflect that: dimmer text color
 
-livepreview should reflect a real live preview
+✅livepreview should reflect a real live preview
     set up store same way that the other files have it
         ✅data loaded in properly
             variables set up properly
@@ -353,3 +353,9 @@ link size and shape.
 shadow color, size, grow on hover
 border color, size, grow on hover
 custom cursor
+
+
+idea:
+to get ready for all of these new customization features that i want to add
+i should extend CustomTheme
+already i have hex codes that should be added
