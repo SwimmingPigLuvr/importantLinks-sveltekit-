@@ -5,11 +5,10 @@
   <!-- now i need to kick these hexes downstream to the userLink -->
 
 <script lang="ts">
-  import AuthCheck from "$lib/components/AuthCheck.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
+  import Nav from "$lib/components/Nav.svelte";
   import { onMount } from "svelte";
   import type { PageData } from "./$types";
-  import { buttonStyles, defaultTheme, setTheme } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
   import { blur, fly, slide } from "svelte/transition";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
@@ -29,11 +28,7 @@
     mounted = true;
   });
 
-let openNav = false;
 
-function toggleNav() {
-  openNav = !openNav
-}
 
   // get user data
   export let data: PageData;
@@ -171,44 +166,8 @@ class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z
   </ul>
   {/if}
 
-  <AuthCheck>
-    <div class="fixed top-0 right-0 p-2 flex">
+  <Nav username={username}/>
 
-
-    {#if !openNav}
-      <button 
-        on:mouseenter={() => toggleNav()}
-        in:blur={{ amount: 100, delay: 200, duration: 500, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
-        class="m-auto text-5xl">☯︎</button>
-    {:else}
-    <button 
-      on:mouseleave={() => toggleNav()}
-      class="fixed top-0 right-0 flex flex-col items-end justify-center p-2 space-y-1 text-xl">
-      <a 
-        in:blur={{ amount: 100, delay: 200, duration: 1000, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
-        href="{username}/edit" 
-        class="flex filter hover:invert">
-        <p class="m-auto">
-          Edit Profile
-        </p>
-      </a>
-      <a 
-        in:blur={{ amount: 100, delay: 400, duration: 1000, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
-      href="{username}/edit/appearance" 
-      class="flex filter hover:invert">
-        <p class="m-auto">
-          Appearance Settings
-        </p>
-      </a>
-    </button>
-    {/if}
-    
-    </div>
-    
-  </AuthCheck>
 
 <Footer></Footer>
 

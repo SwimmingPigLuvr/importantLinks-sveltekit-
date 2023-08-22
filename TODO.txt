@@ -300,9 +300,22 @@ then ui
 
 🌸 APP TODO LIST 🌸
 ✅ edit profile theme needs to work
+✅nav bar: quicker, made into a component, text size
+✅nav bar: home. edit. appearance.
+✅if on page then the nav should reflect that: dimmer text color
+livepreview should reflect a real live preview
+
+maybe different nav solution for the appearance page. 
+    let's see how well it fits in
+
+
 preload edit page so there is no lag at the begining
+
 enhanced customizating (see list below)
+
 theme should take over custom options
+
+fix:
 upload pfp 
 upload bg 
 gradients
@@ -310,10 +323,23 @@ gradients
 ui todo list:
 center link titles
 link shadows are too big
-livepreview should animate in on fullscreen
+edit:
+    move edit bio button to the side
+livepreview:
+     should animate in on fullscreen
 
 
 
 enhanced customization
+composition: links locations
+content: videos, blog posts
+
 hover settings.
-link size and shape
+    default is currently translate to the right and down a bit
+    color changes
+    show preview
+    each link has a color id that changes the background on hover
+link size and shape.
+shadow color, size, grow on hover
+border color, size, grow on hover
+custom cursor

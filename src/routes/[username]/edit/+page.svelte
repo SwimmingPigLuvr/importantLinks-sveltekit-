@@ -17,6 +17,7 @@
   import type { PageData } from "./$types";
   import type { CustomTheme } from "$lib/theme";
   import type { LinkData } from "$lib/firebase";
+  import Nav from "$lib/components/Nav.svelte";
 
   // states
   let showDndMessage = false;
@@ -456,9 +457,11 @@ class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fix
     {/if}
   {/if}
 
-<a href="/{$userData?.username}/edit/appearance" class="btn btn-accent fixed top-4 right-4 ">appearance</a>
+<Nav username={username}/>
   
 </main>
+
+
 
 <Footer></Footer>
 
