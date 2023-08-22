@@ -1,9 +1,3 @@
-
-<!-- the themestore is logged as the old data: fontColorolor 
-  should be fontColor -->
-
-  <!-- now i need to kick these hexes downstream to the userLink -->
-
 <script lang="ts">
   import UserLink from "$lib/components/UserLink.svelte";
   import Nav from "$lib/components/Nav.svelte";

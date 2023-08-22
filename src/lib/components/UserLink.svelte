@@ -49,21 +49,27 @@
 
 <a 
   href="{url}" 
-  style={shadow? `box-shadow: 0 25px 50px -12px ${buttonColorHex};` : ''}
-    class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} m-auto max-w-[94%] 
-     {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-2  
+  style={shadow? `box-shadow: 0 25px 50px -12px ${buttonColorHex};` : '' + (outline ? `border: 3px solid ${buttonColorHex};` : '')}
+    class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
+     {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-0  
      {fill ? `bg-${buttonColor ? buttonColor : 'secondary'}` : 'bg-opacity-0'}
-     {outline ? `border-${buttonColor ? buttonColor : 'secondary'}` : 'border-transparent'}
+     {outline ? `border-2'}` : 'border-transparent'}
      {shadow ? 'shadow-xl' : 'shadow-none'}
-     hover:translate-x-1 hover:translate-y-1 stack text-center 
-     flex justify-between items-center no-underline relative">
+     hover:translate-x-1 hover:translate-y-1 
+     flex justify-between m-auto items-center no-underline">
+
+     <!-- link icon -->
     <img 
-      
       src={iconURL} 
       alt={iconURLalt} 
       class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
-    <span 
+    
+    <!-- Link title -->
+    <p 
       style={`color: ${buttonFontColorHex}`}
-      class='font-{font}'>{title}</span>
+      class='font-{font}'>{title}
+    </p>
+    <!-- empty element -->
+    <div class="right"></div>
 </a>
 

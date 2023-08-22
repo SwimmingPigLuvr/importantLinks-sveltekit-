@@ -314,6 +314,8 @@ then ui
         lets find out shall we
     ???
 
+update outline border styles
+
 
 maybe different nav solution for the appearance page. 
     let's see how well it fits in
@@ -359,3 +361,34 @@ idea:
 to get ready for all of these new customization features that i want to add
 i should extend CustomTheme
 already i have hex codes that should be added
+
+
+
+
+
+short todo
+
+fontcolor colorpicker is opening the button color picker
+it still works it just exists above
+
+live preview doesnt yet show the font color. 
+maybe the div that live preview is in can just be the font color so i dont have to pass the data (lazy)
+
+but if this doesn't result in a reactive change then let's just pass the data
+
+
+weird minor detail bug?
+
+on appearance page the theme of the page changes to default when refreshed.
+
+but the live preview stays on the correct theme
+
+
+
+head to uselink and figure out how to center the titles
+
+prebuilt theme doesn't properly apply to homepage
+
+
+
+homepage isnt reactive because its not using the store the same way that edit page is using $userData

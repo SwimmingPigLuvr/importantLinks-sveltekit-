@@ -19,7 +19,7 @@
 </script>
 
   <AuthCheck>
-    <div class="fixed top-0 right-0 p-2 flex">
+    <div class="fixed top-0 right-0 p-2 flex z-50">
 
 
     {#if !openNav}
