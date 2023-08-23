@@ -29,13 +29,15 @@
   // declare customTheme vars
   let font: string;
   let fontColor: string;
-  let fontColorHex: string | undefined;
   let background: string;
-  let backgroundHex: string | undefined;
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
-  let buttonColorHex: string | undefined;
   let buttonFontColor: string;
+  
+  // hex vars
+  let fontColorHex: string | undefined;
+  let backgroundHex: string | undefined;
+  let buttonColorHex: string | undefined;
   let buttonFontColorHex: string | undefined;
 
   $: if ($userData) {
@@ -47,12 +49,18 @@
     theme = $userData.theme;    
 
     // set customTheme vars
-    font = customTheme.font;
-    fontColor = customTheme.fontColor;
-    background = customTheme.background;
-    buttonStyle = customTheme.buttonStyle;
-    buttonColor = customTheme.buttonColor;
-    buttonFontColor = customTheme.buttonFontColor;
+    font = customTheme?.font?.family;
+    fontColor = customTheme?.font?.color;
+
+
+    // the style of backgorund will effect how we apply it
+    // we only need the string value rn
+    background = customTheme?.background?.value;
+
+    // buttons
+    buttonStyle = customTheme?.button?.style;
+    buttonColor = customTheme?.button?.color;
+    buttonFontColor = customTheme?.button?.fontColor;
 
     // convert these to hex codes
     backgroundHex = background ? convert(background) : undefined;

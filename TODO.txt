@@ -608,6 +608,41 @@ ez
 todo right now
 make sure to persist changes throughout project
 
+um i think i got it right so far i think i have to update the way the data is taken
+on the [username] page its funky
+[username]/edit works perfectly because all of the changes show instantly in the store and in the db
+
+
+
+
+ui notes
+
+"edit profile"
+should transition in because the pages are almost identical
+
+
+
+ui fixes are secondary
+ui changes / experiments are supplemental, low priority
+
+however they are all important to jot down so i can get to it later
+ui fix:
+appearacne page live preview:
+    weird padding on Filled buttons and shadow buttons:
+        its because there is no border. so the padding is thrown off
+
+    changing the theme causes the following changes:
+        fontcolor: buttons and normal text have the same color
+        outline + shadow colors
+
+    solutions
+
+        add padding to style that dont have borders
+        actually no! just add invisible border becasue the issue appears on normal mode userlinks
+        its just harder to see becasue the buttons are much bigger
+    
+        apply the fontColorHex to livePreview / UserLink, depending on where the break is
+        same with buttonCOlorHex!
 
 
 
