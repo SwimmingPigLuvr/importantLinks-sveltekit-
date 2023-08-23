@@ -1,10 +1,10 @@
 <script lang="ts">
     import { user, userData } from "$lib/firebase"; 
 
-    let username, photoURL, bio, links, theme;
+    let username, photoURL, bio, links, theme, customTheme;
 
     $: if ($user && $userData) {
-      ({ username, photoURL, bio, links, theme } = $userData);
+      ({ username, photoURL, bio, links, theme, customTheme } = $userData);
     }
 </script>
 

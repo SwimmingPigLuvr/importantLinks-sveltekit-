@@ -14,6 +14,8 @@
   import Nav from "$lib/components/Nav.svelte";
   import colors from "tailwindcss/colors";
 
+  let textEffect: {effect: string, onHover: boolean};
+
   export let data: PageData;
 
   // declare user data vars
@@ -118,12 +120,27 @@
     chosenButtonStyle = selectedButton;
     saveButtonStyle();
   }
-  // save button style
 
-  // save button color
-  
-  // save button color
+  async function saveTextEffect(textEffect: {effect: string, onHover: boolean}) {
+    console.log('saving text effect: ', textEffect);
 
+    const batch = writeBatch(db);
+
+    // update textEffect
+    batch.set(doc(db, "users", $user!.uid), {
+      customTheme: {
+        textEffect: textEffect
+      }
+    } , { merge: true });
+
+    await batch.commit();
+  }
+
+  const handleTextEffectSelect = (effect, onHover) => {
+    textEffect = {effect: effect, onHover: onHover}
+    console.log('handling text effect selection: ', textEffect);
+    saveTextEffect(textEffect);
+  }
 
 
   let fontDropdown = false;
@@ -161,6 +178,10 @@
   function toggleShowButtonColorPicker() {
     showButtonColorPicker = !showButtonColorPicker;
   }
+
+  function toggleShowFontColorPicker() {
+    showFontColorPicker = !showFontColorPicker;
+  }
   
   const themes = [
       'retro',
@@ -190,7 +211,14 @@
     const userRef = doc(db, "users/appearance", $user!.uid)
   }
 
+  let glow = 'glow';
+  let glowHover = 'glowHover';
+  let highlight = 'highlight';
+  let highlightHover = 'highlightHover';
+  let gradient = 'gradient';
+  let gradientHover = 'gradientHover';
 
+  let showOptions = false;
 
 </script>
 
@@ -367,6 +395,21 @@
     {#if showButtonColorPicker}
       <ColorPicker mode={mode}/>
     {/if}
+
+
+      <!-- shadow -->
+      <h3 class="font-input-mono text-white my-2 mt-6">Text Effects</h3>
+    <div class="flex flex-wrap justify-between">
+      <button 
+        on:mouseenter={() => showOptions = true}
+        on:mouseleaeve={() => showOptions = false}
+        on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
+        class="btn w-1/3 rounded-md mb-4">
+        Glow
+      </button>
+      <button on:click|preventDefault={() => handleTextEffectSelect('highligh', false)} class="btn w-1/3 rounded-md mb-4">Highlight</button>
+      <button on:click|preventDefault={() => handleButtonSelect('gradient', false)} class="btn w-1/4 rounded-md mb-4">Gradient</button>
+    </div>
   
       
       </div>
@@ -394,7 +437,7 @@
  
       <h3 class="font-input-mono text-white my-2">Font Color</h3>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div on:click={() => {toggleShowButtonColorPicker(); mode = 'fontColor'}} class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
+      <div on:click={() => {toggleShowFontColorPicker(); mode = 'fontColor'}} class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
       
     <div>
 
@@ -402,6 +445,8 @@
     {#if showFontColorPicker}
       <ColorPicker mode={mode}/>
     {/if}
+
+
     
 
 

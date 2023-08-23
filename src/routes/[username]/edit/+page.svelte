@@ -229,7 +229,7 @@ style={`color: ${fontColorHex}`}
 class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
-
+  <!-- this is an authcheck to make sure  -->
   {#if $userData?.username == $page.params.username}
     <h1 class="fixed top-2 left-1/2 -translate-x-1/2 text-2xl font-{font} font-bold text-center">
       Edit Profile

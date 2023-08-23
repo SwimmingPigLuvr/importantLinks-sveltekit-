@@ -385,7 +385,7 @@ but the live preview stays on the correct theme
 
 
 
-head to uselink and figure out how to center the titles
+✅head to uselink and figure out how to center the titles
 ducktape bandaid solution: -translate-x-6
 
 ✅prebuilt theme doesn't properly apply to homepage
@@ -414,3 +414,201 @@ somehow i broke it
 
 probably the userstore only accepts remilio as data but the app should be able to pull any users' data
 the only thing that you have to be logged in for is editing the data: edit, appearance
+
+
+august 22 6:13pm
+
+planning each step so i can organize how i think about the code:
+
+✅{right now the link title is shifted to the left. 
+this centers it perfectly 
+but in the live preview it goes too far
+
+i need to find the state that is passed into userlink that lets it know that it is in preview mode
+then i need to make sure the style is cahanged for the little mini baby links}✅
+
+
+
+themes only work if there is no custom theme value
+prebuilt themes are the fallback
+
+tell the user that themes are fallbacks 
+
+or we can take into consideration that themes weigh more than custom themes
+let the user save a custom theme
+
+
+
+main user page has no set theme
+fallsback to default theme
+
+last selection first
+current theme goes
+
+theme -> custombuttons => theme + customButtons
+custombuttons -> theme => theme
+
+how do we go about this?
+
+certain bg colors dont cover screen weird
+
+
+
+important tasks
+fix auth buggy wigyyy
+
+
+
+dnd message feels weird
+
+
+
+focus
+
+todo
+get data from the user that is in the route
+
+example if user is on yin.yang/PeterGriffin then we use that to get the data
+update the $themeStore with that
+
+make sure edit only is available to signed in users
+edit only if (user is signed in && user matches yin.yang/username)
+
+
+lets see how i got that page param in the nav
+
+import page from $app/svelte
+
+// on yin.yang/remilio
+
+console.log('$page.params.username: ', $page.params.username); === [username]
+then updates the $userData store 
+with all of the data from that users db
+
+nav to edit / appearance only if logged in
+
+
+
+add glow effects
+
+fullscreen preview on hover would be sick
+
+new section:
+text effects
+tracking
+
+
+create a toggle to choose hover on text effects
+
+hover effects: rotate? clock animation thing real old school style
+the css possibilities are endless
+
+
+august 23:
+focus
+
+is anything broken??
+
+or can i just start throwing in styles?
+
+I should really expand on the CustomTheme type
+
+so that i can easily add it to my data
+
+so my ui focues should be the userlink component styles
+
+
+todoList
+Create toggle for text styles:
+    hover / static
+    on:clicking the text style should default to static
+    ✅this should trigger a handler function that saves into the db
+    what info do i need to know?
+        textEffect: {effect: string, onHover: boolean}
+    should toggle only appear on chosen style?
+        {#if customTheme.textEffect === buttonId}
+
+change data structure:
+
+right now we have
+
+customTheme = {
+    background: string,
+    buttonColor: string,
+    buttonFontColor: string,
+    buttonStyle: string,
+    font: string,
+    fontColor: string,
+    textEffect: {
+        effect: string,
+        onHover: false,
+    }
+}
+
+this is weird. i should make it consistent 
+exactly how i did textEffect
+
+export interface CustomTheme {
+  background: {
+    style: 'image' | 'gradient' | 'solid',
+    value: string
+  };
+  button: {
+    style: | "squareFill"
+    | "roundFill"
+    | "circleFill"
+    | "squareOutline"
+    | "roundOutline"
+    | "circleOutline"
+    | "squareShadow"
+    | "roundShadow"
+    | "circleShadow",
+    color: string,
+    fontColor: string,
+    textEffect: {
+      effect: 'none' | 'glow' | 'gradient' | 'highlight',
+      onHover: boolean
+    }
+  };
+  font: {
+    family: string,
+    color: string,
+  }
+}
+
+export const defaultTheme: CustomTheme = {
+  background: {
+    style: 'solid',
+    value: 'accent'
+  },
+  button: {
+    style: 'circleFill',
+    color: 'primary',
+    fontColor: 'primary-content',
+    textEffect: {
+      effect: 'none',
+      onHover: false
+    }
+  },
+  font: {
+    family: 'input-mono',
+    color: 'black'
+  }
+};
+
+this seems like a lot but it's actually way simpler
+
+now i have a type: CustomTheme that contains 3 objects:
+background
+button
+and font
+
+ez
+
+todo right now
+make sure to persist changes throughout project
+
+
+
+
+

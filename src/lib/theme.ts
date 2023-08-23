@@ -60,9 +60,12 @@ export const buttonStyles = {
 };
 
 export interface CustomTheme {
-  background: string;
-  buttonStyle:
-    | "squareFill"
+  background: {
+    style: 'image' | 'gradient' | 'solid',
+    value: string
+  };
+  button: {
+    style: | "squareFill"
     | "roundFill"
     | "circleFill"
     | "squareOutline"
@@ -70,20 +73,38 @@ export interface CustomTheme {
     | "circleOutline"
     | "squareShadow"
     | "roundShadow"
-    | "circleShadow";
-  buttonColor: string;
-  buttonFontColor: string;
-  font: string;
-  fontColor: string;
+    | "circleShadow",
+    color: string,
+    fontColor: string,
+    textEffect: {
+      effect: 'none' | 'glow' | 'gradient' | 'highlight',
+      onHover: boolean
+    }
+  };
+  font: {
+    family: string,
+    color: string,
+  }
 }
 
 export const defaultTheme: CustomTheme = {
-  background: "primary",
-  buttonStyle: "squareFill",
-  buttonColor: "secondary",
-  buttonFontColor: "secondary-content",
-  font: "input-mono",
-  fontColor: "black",
+  background: {
+    style: 'solid',
+    value: 'accent'
+  },
+  button: {
+    style: 'circleFill',
+    color: 'primary',
+    fontColor: 'primary-content',
+    textEffect: {
+      effect: 'none',
+      onHover: false
+    }
+  },
+  font: {
+    family: 'input-mono',
+    color: 'black'
+  }
 };
 
 export const themeStore = writable(defaultTheme);

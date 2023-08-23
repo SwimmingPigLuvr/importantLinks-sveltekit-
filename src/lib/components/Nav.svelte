@@ -8,6 +8,9 @@
         // Check if the current page path matches the given path
         return $page.url.pathname === path;
     }
+    
+    console.log('$page.url.pathname: ', $page.url.pathname);
+    console.log('$page.params.username: ', $page.params.username);
 
 
     export let username = '';
@@ -16,6 +19,8 @@
     function toggleNav() {
         openNav = !openNav
     }
+
+
 </script>
 
   <AuthCheck>

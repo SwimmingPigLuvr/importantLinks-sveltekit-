@@ -10,21 +10,12 @@
   import type { CustomTheme } from "$lib/theme";
   import colors from 'tailwindcss/colors';
   import { userData, type LinkData } from "$lib/firebase";
+  import { page } from "$app/stores";
 
   // states
   let mounted = false;
 
-  
-
-  // get user data from $userData store
-  export let data: {
-    username: string;
-    bio: string;
-    photoURL: string;
-    links: LinkData[];
-    customTheme: CustomTheme;
-    theme: string;
-  } | null = $userData;
+  export let data: PageData;
 
   // declare user data vars
   let username: string | undefined;
@@ -35,7 +26,7 @@
   let theme: string | undefined;
 
   // declare customTheme vars
-  let font: string;
+  let font:string;
   let fontColor: string;
   let fontColorHex: string | undefined;
   let background: string;
@@ -47,20 +38,20 @@
   let buttonFontColorHex: string | undefined;
 
   $: if ($userData) {
-    bio = $userData.bio;
-    username = $userData.username;
-    photoURL = $userData.photoURL;
-    links = $userData.links;
-    customTheme = $userData.customTheme;
-    theme = $userData.theme;    
+    bio = data.bio;
+    username = data.username;
+    photoURL = data.photoURL;
+    links = data.links;
+    customTheme = data.customTheme;
+    theme = data.theme;    
 
     // set customTheme vars
-    font = customTheme.font;
-    fontColor = customTheme.fontColor;
-    background = customTheme.background;
-    buttonStyle = customTheme.buttonStyle;
-    buttonColor = customTheme.buttonColor;
-    buttonFontColor = customTheme.buttonFontColor;
+    font = customTheme?.font;
+    fontColor = customTheme?.fontColor;
+    background = customTheme?.background;
+    buttonStyle = customTheme?.buttonStyle;
+    buttonColor = customTheme?.buttonColor;
+    buttonFontColor = customTheme?.buttonFontColor;
 
     // convert these to hex codes
     backgroundHex = background ? convert(background) : undefined;

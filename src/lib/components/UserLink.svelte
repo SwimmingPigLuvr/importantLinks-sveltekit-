@@ -13,6 +13,9 @@
     export let font: string = 'font-elven';
     export let buttonFontColorHex: string = '';
 
+    // instead of exporting each one individually i should
+    // export a customTheme object that is CustomTheme typed
+
 
   onMount(() => {
     
@@ -49,7 +52,7 @@
 
 <a 
   href="{url}" 
-  style={shadow? `box-shadow: 0 25px 50px -12px ${buttonColorHex};` : '' + (outline ? `border: 3px solid ${buttonColorHex};` : '')}
+  style={shadow? `box-shadow: 0 10px 20px  -12px ${buttonColorHex};` : '' + (outline ? `border: 3px solid ${buttonColorHex};` : '')}
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-0  
      {fill ? `bg-${buttonColor ? buttonColor : 'secondary'}` : 'bg-opacity-0'}
@@ -66,8 +69,8 @@
     
     <!-- Link title -->
     <p 
-      style={`color: ${buttonFontColorHex}`}
-      class='font-{font} -translate-x-6 text-xl'>{title}
+      style={`color: ${buttonFontColorHex};` + (previewMode ? `transform: translateX(-1rem); font-size: 1rem;` : 'transform: translateX(-1.6rem);')}
+      class='font-{font}  text-xl'>{title}
     </p>
     <!-- empty element -->
     <div class="right"></div>
