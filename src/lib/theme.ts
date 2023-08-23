@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 import { db, user, userTheme } from "$lib/firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
+import colors from "tailwindcss/colors";
 
 export const buttonStyles = {
   squareFill: {
@@ -105,6 +106,11 @@ export const defaultTheme: CustomTheme = {
     family: 'input-mono',
     color: 'black'
   }
+};
+
+export function convert(colorName: string): string | undefined {
+  const [color, shade] = colorName.split('-');
+  return (colors as any)[color]?.[shade];
 };
 
 export const themeStore = writable(defaultTheme);

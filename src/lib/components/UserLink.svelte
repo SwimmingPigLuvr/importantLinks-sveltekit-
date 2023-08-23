@@ -1,20 +1,36 @@
 <script lang="ts">
-  import { buttonStyles } from "$lib/theme";
+  import { buttonStyles, convert } from "$lib/theme";
   import { onMount } from "svelte";
+  import type { CustomTheme } from "$lib/theme";
 
+    // one export to rulle them all
+    export let customTheme: CustomTheme;
+
+    // link data items
     export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
     export let iconURLalt = 'ha';
     export let url = 'foo';
     export let title = 'some cool title';
     export let previewMode = false;
-    export let buttonStyle: keyof typeof buttonStyles;
-    export let buttonColor: string = '';
-    export let buttonColorHex: string = '';
-    export let font: string = 'font-elven';
-    export let buttonFontColorHex: string = '';
 
-    // instead of exporting each one individually i should
-    // export a customTheme object that is CustomTheme typed
+    let buttonStyle = 'squareFill';
+    let buttonColor = 'black';
+    let buttonFontColor = 'white';
+
+    // buttons
+    if (customTheme && customTheme.button) {
+      buttonStyle = customTheme.button.style;
+      buttonColor = customTheme.button.color;
+      buttonFontColor = customTheme.button.fontColor;
+    }
+
+
+    // convert tailwind classes to hex codes for more robust uses
+    let buttonColorHex: string | undefined = convert(buttonColor);
+    let buttonFontColorHex: string | undefined = convert(buttonFontColor);
+
+    // fonts
+    let font: string = customTheme.font.family;
 
 
   onMount(() => {

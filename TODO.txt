@@ -1,4 +1,8 @@
 make sure that theme is saved to firestore
+
+
+
+
 make sure that the html is using the user's saved theme as the theme, 
 not the selected theme
 
@@ -643,6 +647,44 @@ appearacne page live preview:
     
         apply the fontColorHex to livePreview / UserLink, depending on where the break is
         same with buttonCOlorHex!
+
+
+
+
+macro steps:
+
+fix app
+host on server with domain: yin.yang? lol something easy / catchy etc / 
+    net themes? tech
+    .tech? .io? .com
+let people sign up / test
+
+
+current todo: fixing the homepage
+
+upon console logging the customTheme data is correct
+
+now i have to apply it correctly
+on the page i have to fix how background is applied
+and how font is applied
+
+then for the links
+im going to pass in customTheme as a prop
+and clean up the other props
+
+old export let 100 different items 🤮
+new export let 1 object with 100 items 😎
+
+
+cleaning up rn
+
+✅putting the convert function in a file so i dont have to type it multiple times across files
+
+figure out where i left off:
+
+applying the styles correctly?
+
+now that im passing the whole customTHeme object then i dont need the link styles on my main page
 
 
 

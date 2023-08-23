@@ -7,9 +7,9 @@
   import { blur, fly, slide } from "svelte/transition";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { themeStore, updateTheme } from "$lib/themeStore";
-  import type { CustomTheme } from "$lib/theme";
+  import { convert, type CustomTheme } from "$lib/theme";
   import colors from 'tailwindcss/colors';
-  import { userData, type LinkData } from "$lib/firebase";
+  import type { LinkData } from "$lib/firebase";
   import { page } from "$app/stores";
 
   // states
@@ -42,7 +42,7 @@
   let buttonTextEffect: 'none' | 'glow' | 'gradient' | 'highlight';
   let buttonTextEffectHover: boolean;
 
-  $: if ($userData) {
+  $: if (data) {
     bio = data.bio;
     username = data.username;
     photoURL = data.photoURL;
@@ -51,7 +51,7 @@
     theme = data.theme;    
 
     // set customTheme vars
-    font = customTheme?.font?.family;
+    font = customTheme.font.family;
     fontColor = customTheme?.font?.color;
 
 
@@ -78,10 +78,7 @@
    
   let rose = 'rose-500';
 
-    function convert(colorName: string): string | undefined {
-      const [color, shade] = colorName.split('-');
-      return (colors as any)[color]?.[shade];
-    }
+    
 
     const roseHex = convert(rose);
 
@@ -93,6 +90,7 @@
     
     if (data && data.customTheme) {
       updateTheme(customTheme);
+      console.log('customTHeme: ', customTheme);
       console.log('themeupdated 🍨', $themeStore);
     }
     mounted = true;
@@ -160,11 +158,7 @@ class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z
           iconURL={item.iconURL} 
           title={item.title} 
           url={item.url} 
-          buttonStyle={buttonStyle} 
-          font={font} 
-          buttonColor={buttonColor} 
-          buttonColorHex={buttonColorHex} 
-          buttonFontColorHex={buttonFontColorHex} 
+          customTheme={customTheme} 
         />
       </li>
     {/each}
