@@ -2,6 +2,7 @@
   import { buttonStyles, convert } from "$lib/theme";
   import { onMount } from "svelte";
   import type { CustomTheme } from "$lib/theme";
+  import Page from "../../routes/+page.svelte";
 
     // one export to rulle them all
     export let customTheme: CustomTheme;
@@ -13,24 +14,35 @@
     export let title = 'some cool title';
     export let previewMode = false;
 
-    let buttonStyle = 'squareFill';
-    let buttonColor = 'black';
+    let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow"  = 'squareFill';
+    let buttonColor = 'rose-100';
+    let buttonFont = 'ellograph';
     let buttonFontColor = 'white';
+    let buttonTextEffect = 'none';
+    let buttonTextEffectHover = false;
+    let buttonColorHex: string | undefined;
+    let buttonFontColorHex: string | undefined;
 
     // buttons
     if (customTheme && customTheme.button) {
       buttonStyle = customTheme.button.style;
       buttonColor = customTheme.button.color;
+      buttonFont = customTheme.font.family;
       buttonFontColor = customTheme.button.fontColor;
+    }
+
+    if (customTheme.button.textEffect) {
+      buttonTextEffect = customTheme.button.textEffect.effect;
+      buttonTextEffectHover = customTheme.button.textEffect.onHover;
     }
 
 
     // convert tailwind classes to hex codes for more robust uses
-    let buttonColorHex: string | undefined = convert(buttonColor);
-    let buttonFontColorHex: string | undefined = convert(buttonFontColor);
+    if (buttonColor && buttonFontColor) {
+      buttonColorHex = convert(buttonColor);
+      buttonFontColorHex = convert(buttonFontColor);
+    }
 
-    // fonts
-    let font: string = customTheme.font.family;
 
 
   onMount(() => {
@@ -86,7 +98,7 @@
     <!-- Link title -->
     <p 
       style={`color: ${buttonFontColorHex};` + (previewMode ? `transform: translateX(-1rem); font-size: 1rem;` : 'transform: translateX(-1.6rem);')}
-      class='font-{font}  text-xl'>{title}
+      class='font-{buttonFont}  text-xl'>{title}
     </p>
     <!-- empty element -->
     <div class="right"></div>

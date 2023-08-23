@@ -3,6 +3,10 @@ make sure that theme is saved to firestore
 
 
 
+
+
+
+
 make sure that the html is using the user's saved theme as the theme, 
 not the selected theme
 
@@ -687,5 +691,72 @@ applying the styles correctly?
 now that im passing the whole customTHeme object then i dont need the link styles on my main page
 
 
+somehow i broke everything again
+
+only certain settings are reactive on the edit page
+
+nothing is reactive in the home page
 
 
+
+todo
+
+up date the appearance page to save everythign correctly:
+use the new custom theme as the model
+
+
+stop passing unneccessary props
+
+just like we cleaned up the props for uselink we should clean up the props for
+livepreview
+
+live preview needs
+
+userinfo: username, bio, pfp, links
+userTheme: bg, font, customTheme object
+
+props: bg, bio, username, pfp, customtheme
+
+
+wait lets no do too much
+live preview only needs customtheme becasue userlink nneds customtheme
+
+it doesn't do anything
+
+oh actiually it does bg adn fonts
+
+
+
+whenever im kinda floating looking for an error to tackle
+checiklist
+
+terminal errors?
+console.log errors?
+intellisence errors?
+
+in no particular order
+
+also writing down what im ddoing helps
+
+sets my intention
+
+one thing at a time baby
+
+current:
+ 
+terminal:
+nothing
+intellisence:
+nothing
+console:
+UserLink is breaking the homePage
+cant read properties of undefined 'effect':
+
+effect has to exist in the first place
+
+if customTheme && customTheme.button && customTheme.button.textEffect?
+
+
+fixed an error without gpt
+
+how i just did thats how

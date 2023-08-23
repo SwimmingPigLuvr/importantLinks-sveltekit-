@@ -116,7 +116,9 @@
     // update buttonStyle
     batch.set(doc(db, "users", $user!.uid), {
       customTheme: {
-        buttonStyle: chosenButtonStyle
+        button: {
+          style: chosenButtonStyle
+        }
       }
     }, { merge: true });
 

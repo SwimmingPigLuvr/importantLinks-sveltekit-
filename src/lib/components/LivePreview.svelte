@@ -3,60 +3,63 @@
     import UserLink from "./UserLink.svelte";
     import { fly } from "svelte/transition";
     import { backOut } from "svelte/easing";
-  import type { CustomTheme } from "$lib/theme";
+  import { convert, type CustomTheme } from "$lib/theme";
+
+  // customTHeme prop
+  export let customTheme: CustomTheme;
+
+  // user data
+  export let username: string = '';
+  export let photoURL: string = '';
+  export let bio: string = '';
+  export let links: any[] = [];
+  export let theme: string = '';
+
+  let background = 'lime-400';
+  let font = 'input-mono';
+  let fontColor = 'lime-800';
+  let fontColorHex = convert(fontColor);
+
+  if (customTheme) {
+    background = customTheme.background.style;
+    font = customTheme.font.family;
+    fontColor = customTheme.font.color;
+  }
+
+
+  
 
   let showPreview = false;
 
+  let mounted = false;
+    
   function togglePreview() {
     showPreview = !showPreview;
   }
 
   $: previewMode = !showPreview;
 
+  onMount(() => { 
+    
+    mounted = true;
+    console.log('mounted');
 
-
-  export let username: string = '';
-  export let photoURL: string = '';
-  export let bio: string = '';
-  export let links: any[] = [];
-  export let theme: string = '';
-  export let customTheme: CustomTheme = {
-     background: "lime-400",
-     buttonStyle: "squareFill",
-     buttonColor: "lime-400",
-     buttonFontColor: "",
-     font: "elven",
-     fontColor: "white"
-   };
-  export let fontColorHex: string | undefined;
-  export let buttonColorHex: string | undefined;
-  export let buttonFontColorHex: string | undefined;
-
-
-
-    let mounted = false;
-
-    onMount(() => { 
-      
-      mounted = true;
-      console.log('mounted');
-
-      function handleResize() {
-        if (window.innerWidth >= 768) {
-          showPreview = false
-        }
+    function handleResize() {
+      if (window.innerWidth >= 768) {
+        showPreview = false
       }
-      
-      window.addEventListener('resize', handleResize);
+    }
+    
+    window.addEventListener('resize', handleResize);
 
-      handleResize();
-      console.log('showPreview: ', showPreview)
+    handleResize();
+    console.log('showPreview: ', showPreview)
 
-      
+    
 
-          
-        }
-    );
+        
+      }
+  );
     
 
     
@@ -113,14 +116,9 @@
             <li class="m-auto py-[0.33rem]">
               <UserLink 
                 iconURL={link.iconURL} 
-                iconURLalt={link.iconURLalt} 
-                title={link.title} url={link.url} 
-                previewMode={previewMode} 
-                buttonStyle={customTheme.buttonStyle} 
-                buttonColor={customTheme.buttonColor} 
-                buttonColorHex={buttonColorHex} 
-                buttonFontColorHex={buttonFontColorHex} 
-                font={customTheme.font} 
+                title={link.title}
+                url={link.url}
+                customTheme={customTheme}
               />
             </li>
           {/each}
