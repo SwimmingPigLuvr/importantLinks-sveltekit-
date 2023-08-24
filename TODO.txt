@@ -1044,3 +1044,44 @@ $: if (something) {
 reminder:
 
 (IM USING SVELTE ;')
+
+
+
+edit page reactivity
+
+            bg ✅
+            fontColor ✅
+            font ✅
+            buttonstyle ✅
+            buttoncolor ✅
+            buttonFontColor ❌
+
+
+button font color saves perfectly in the db
+but isnt reflective nor does it reflect in the edit page at all
+
+lets see how incorrectly userlink is using it
+
+
+error:
+    i was doing 
+    if (buttoncolor && buttonfontColor) {
+        tailwind to hex conversions
+    }
+
+    but i should've jsut had the tailwind hex conversions in 
+    $: if (customTHeme && customTHeme.button) {
+        tailwind hex converters
+    }
+
+
+ edit page reactivity
+
+            bg ✅
+            fontColor ✅
+            font ✅
+            buttonstyle ✅
+            buttoncolor ✅
+            buttonFontColor ✅   
+
+major w

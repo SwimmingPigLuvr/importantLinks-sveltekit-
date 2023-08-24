@@ -15,10 +15,10 @@
     export let previewMode = false;
 
     let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow"  = 'squareFill';
-    let buttonColor = 'rose-100';
-    let buttonFont = 'ellograph';
-    let buttonFontColor = 'white';
-    let buttonTextEffect = 'none';
+    let buttonColor: string;
+    let buttonFont: string;
+    let buttonFontColor: string;
+    let buttonTextEffect: string;
     let buttonTextEffectHover = false;
     let buttonColorHex: string | undefined;
     let buttonFontColorHex: string | undefined;
@@ -29,20 +29,17 @@
       buttonColor = customTheme.button.color;
       buttonFont = customTheme.font.family;
       buttonFontColor = customTheme.button.fontColor;
-    }
-
-    if (customTheme.button.textEffect) {
-      buttonTextEffect = customTheme.button.textEffect.effect;
-      buttonTextEffectHover = customTheme.button.textEffect.onHover;
-    }
 
 
-    // convert tailwind classes to hex codes for more robust uses
-    if (buttonColor && buttonFontColor) {
+      // convet tailwind to hex
       buttonColorHex = convert(buttonColor);
       buttonFontColorHex = convert(buttonFontColor);
     }
 
+    $: if (customTheme.button.textEffect) {
+      buttonTextEffect = customTheme.button.textEffect.effect;
+      buttonTextEffectHover = customTheme.button.textEffect.onHover;
+    }
 
 
   onMount(() => {
