@@ -1000,3 +1000,47 @@ elven doesnt display correctly on the font dropdown but i know for a fakt that '
 elven is a very important font to my users
 
 font now svaes correctly
+
+
+
+edit page reactivity
+
+            bg ✅
+            fontColor ✅
+            font ✅
+            buttonstyle ❌
+            buttoncolor ❌
+            buttonFontColor ❌
+
+
+now lets get to the bottom of these buttons being unreactive
+
+right now buttonstyles are coming from the customTHeme.button.style
+
+so i guess its breaking un the userlink because userlink takes customtheme and customtheme seems to be A okay
+
+
+
+
+side note ui thingy
+
+text too big on livepreview in preview mode
+
+
+$$$
+
+changed
+
+if (something) {
+    something
+}
+
+to
+
+$: if (something) {
+    something way better and cooler
+}
+
+reminder:
+
+(IM USING SVELTE ;')

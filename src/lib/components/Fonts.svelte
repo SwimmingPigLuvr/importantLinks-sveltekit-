@@ -3,12 +3,11 @@
 <script lang="ts">
   import { db, user } from "$lib/firebase";
   import { doc, writeBatch } from "firebase/firestore";
-  import { backIn, backOut, cubicInOut } from "svelte/easing";
+  import { backIn, backOut } from "svelte/easing";
   import { slide } from "svelte/transition";
 
 
     let chosenFont = '';
-    let chosenColor = '';
 
     let fonts = [
         'gin',

@@ -24,7 +24,7 @@
     let buttonFontColorHex: string | undefined;
 
     // buttons
-    if (customTheme && customTheme.button) {
+    $: if (customTheme && customTheme.button) {
       buttonStyle = customTheme.button.style;
       buttonColor = customTheme.button.color;
       buttonFont = customTheme.font.family;
