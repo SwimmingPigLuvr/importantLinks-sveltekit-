@@ -7,6 +7,16 @@ make sure that theme is saved to firestore
 
 
 
+
+
+
+
+
+
+
+
+
+
 make sure that the html is using the user's saved theme as the theme, 
 not the selected theme
 
@@ -760,3 +770,160 @@ if customTheme && customTheme.button && customTheme.button.textEffect?
 fixed an error without gpt
 
 how i just did thats how
+
+
+unneccessary props passed in livepreview
+
+undefined 'font' breaking livepreview
+
+
+not sure if everyhting makes it into the live prewview after being passed in 
+so i might as well use the store to get it
+
+need to save everything as the correct CustomTHeme type in my db
+
+so lets het to appearance and update asll these save functions
+
+also update the save functions in the colorpicker component
+
+spent a lot of time on one const value 
+so now i need to touch base again to see whats next
+
+update all functions
+
+colorpicker is just dealing with colors so i dont have to listen to chatgpt
+
+carefule becasue now wehn i save the default datatosave that i used is saved everytime
+
+so lets use the userData in the default data to save. only the new cahgnes will override
+
+
+
+
+august 24
+
+new day new ....
+new day, new _____
+
+
+FOCUS
+implement changes slowly to see how they change my project
+one brick at a time. deliberatley placed
+
+ui comments
+
+
+✅can't see the text on addLink form: 
+    from what i remember it's using the users theme
+    but it is also using the user's font
+    so has to be one or the other not both
+        findings:
+            not using the users theme, just using the default theme: 'red'
+        solution:
+            ✅use the user's fontCOlor for bg
+            ✅and the bg for the font color
+            ✅that way there's no way that it clashes
+                unless the user chooses a font that they can't see
+                boom now the problem is put on them haha checkmate😎
+
+✅saving colors
+    have to make sure that just the colors are saved and 
+    that it isn't changing everything to the placeholder theme im passing into the function
+
+    findings: 
+        i am using a default custom theme 
+        just so the intellisence errors dont yell at me
+
+    solution:
+        take customTheme as a prop
+        update save functions to take customTHeme as an argument
+
+        how to implement solution:
+            ✅1 have customTHeme defined in username/edit/appearance as the user's custom theme: data.customTheme (however data is defined) 
+            2 pass customTHeme into all instances of the colorpicker component
+
+        how to test each step:
+            ✅1 consolelog customTheme so i know that it is the correct theme and that is is congruent with the settings in their dbo
+
+        testing:
+            i watn to be very procedural so that i dont have to go back and figure out what went wrong
+            now that everything looks good i can start saving colors and see how they update the customTheme
+
+            check:
+                db and customTheme to see if they are equal
+
+        BOOM it works that was eassy haha
+        easy when i know what to do
+        i know what to do when i understand how everything works a little more
+        lesson: 
+        it's good to ask questions
+        if i know how my tools work i know how to use them
+        and when to use them
+            good questions:
+                What is this doing?
+                Why is this doing this?
+                
+
+appearance page:
+    current choices need to reflect the current choice that is saved in the user's db
+    right now it is blank until the user makes a new choice
+    that's probably because the color value is coming from ???
+    
+    solution;
+        use the db to set the value: customTheme.(correct value)  o   
+
+theme fallback
+    preset theme should be the fallback if there is no customTheme value
+    solution: 
+        data-theme={data.theme} 
+        bg-{background? background : 'primary'} in the body of everypage
+
+
+    findings
+        accent>
+        appearacne page:
+            currently uses a theme value for the phone bg
+            but it doesn't use the customTHeme background
+
+            solution:
+                make sure it does those things
+
+            how: 
+                find out if this is a livepreview issue or appearance page issue
+                probably livePreview issue
+
+            okay i guess i got it to work but
+            the livePreview isn't reactive! thats the whol point to see the changes instantly
+
+            make it reactive!
+            edit page is reactive so copy how they did it there 
+            ask the team in cahrge of the edit page how they did it
+
+            edit page reactivity
+
+            bg ✅
+            fontColor ✅
+            font ❌
+            buttonstyle ❌
+            buttoncolor ❌
+            buttonFontColor ❌
+
+reminder of where im at:
+trying to get the site consistent and make sure everything works that's it
+once it's cleaned up then i add more effects. host the site. then profit 😈
+
+current tasks 
+    get the edit page fully reactive
+    use those methods to get live preview reactive
+    save fonts correctly
+    get teh pfp upload working correctly
+
+
+    errors to address later:
+        if viewing page that isn't the current signed in user:
+            ✅username, pfp, bio work correctly
+            breaks at userLink
+
+
+jstu sat back down have ot remind myself of current task:
+    check what makes the edit page bg reactive and apply that method as far as the eye can see

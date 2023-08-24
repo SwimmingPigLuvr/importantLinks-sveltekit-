@@ -238,10 +238,6 @@
   bio={bio} links={links} 
   theme={theme} 
   customTheme={customTheme} 
-  backgroundHex={backgroundHex} 
-  fontColorHex={fontColorHex}
-  buttonColorHex={buttonColorHex}
-  buttonFontColorHex={buttonFontColorHex}
 />
 
 <main class="flex flex-col">
@@ -347,10 +343,10 @@
     </div>
 
     {#if showColorPicker && !showGradientPicker}
-      <ColorPicker mode={'background'}/>
+      <ColorPicker mode={'background'} customTheme={customTheme}/>
     {/if}
     {#if showGradientPicker && !showColorPicker}
-      <ColorPicker mode={'gradient'} />
+      <ColorPicker mode={'gradient'} customTheme={customTheme}/>
     {/if}
 
   </div>
@@ -403,7 +399,7 @@
 
   </div>
     {#if showButtonColorPicker}
-      <ColorPicker mode={mode}/>
+      <ColorPicker mode={mode} customTheme={customTheme}/>
     {/if}
 
 
@@ -453,7 +449,7 @@
 
     </div> 
     {#if showFontColorPicker}
-      <ColorPicker mode={mode}/>
+      <ColorPicker mode={mode} customTheme={customTheme}/>
     {/if}
 
 

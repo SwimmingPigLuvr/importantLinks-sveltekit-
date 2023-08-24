@@ -47,13 +47,15 @@
   // declare customTheme vars
   let font: string;
   let fontColor: string;
-  let fontColorHex: string | undefined;
   let background: string;
-  let backgroundHex: string | undefined;
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
-  let buttonColorHex: string | undefined;
   let buttonFontColor: string;
+
+  // hexes 
+  let backgroundHex: string | undefined;
+  let fontColorHex: string | undefined;
+  let buttonColorHex: string | undefined;
   let buttonFontColorHex: string | undefined;
 
   $: if ($userData) {
@@ -64,12 +66,12 @@
     theme = $userData.theme;    
 
     // set customTheme vars
-    font = customTheme.font;
-    fontColor = customTheme.fontColor;
-    background = customTheme.background;
-    buttonStyle = customTheme.buttonStyle;
-    buttonColor = customTheme.buttonColor;
-    buttonFontColor = customTheme.buttonFontColor;
+    font = customTheme.font.family;
+    fontColor = customTheme.font.color;
+    background = customTheme.background.value;
+    buttonStyle = customTheme.button.style;
+    buttonColor = customTheme.button.color;
+    buttonFontColor = customTheme.button.fontColor;
 
     // convert these to hex codes
     backgroundHex = background ? convert(background) : undefined;
@@ -225,6 +227,7 @@
 
 
 <main 
+data-theme={theme}
 style={`color: ${fontColorHex}`}
 class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
@@ -345,11 +348,7 @@ class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fix
         iconURL={item.iconURL} 
         title={item.title} 
         url={item.url} 
-        buttonStyle={buttonStyle} 
-        buttonColor={buttonColor}
-        buttonColorHex={buttonColorHex} 
-        font={font} 
-        buttonFontColorHex={buttonFontColorHex} 
+        customTheme={customTheme}
       />      
   
 
@@ -364,7 +363,7 @@ class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fix
         in:slide={{ duration: 700, easing: cubicInOut}}
         out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-base-300 p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
+        class="bg-{fontColor} text-{background} font-{font} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -15,13 +15,13 @@
   export let links: any[] = [];
   export let theme: string = '';
 
-  let background = 'lime-400';
-  let font = 'input-mono';
-  let fontColor = 'lime-800';
+  let background = '';
+  let font = '';
+  let fontColor = '';
   let fontColorHex = convert(fontColor);
 
   if (customTheme) {
-    background = customTheme.background.style;
+    background = customTheme.background.value;
     font = customTheme.font.family;
     fontColor = customTheme.font.color;
   }
@@ -96,13 +96,13 @@
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
         data-theme={theme}
         style="{showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'}" 
-        class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg-{customTheme.background} flex flex-col justify-start overflow-auto">
+        class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg-{background? background : 'primary'} flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
 
       <div 
       style={`color: ${fontColorHex}`}
-      class="flex flex-col items-center mt-8 mb-4 font-{customTheme.font}">
+      class="flex flex-col items-center mt-8 mb-4 font-{font}">
         <!-- pfp -->
         <img class="min-w-[38px] min-h-[38px] max-h-[88px] max-w-[88px]"  src="{photoURL}" alt="pfp">
         <!-- Username -->

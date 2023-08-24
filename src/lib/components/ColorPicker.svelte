@@ -12,13 +12,15 @@
   import { createEventDispatcher } from "svelte";
   import { cubicInOut } from "svelte/easing";
   import { slide } from "svelte/transition";
-  import type { DataToSave, CustomTheme } from "$lib/firebase";
+  import type { DataToSave } from "$lib/firebase";
   import { db, user } from "$lib/firebase";
   import { doc, writeBatch, deleteField, updateDoc } from "firebase/firestore";
   import { writable } from 'svelte/store';
+  import type { CustomTheme } from "$lib/theme";
+  import { defaultTheme } from "$lib/theme"
 
 
-    
+    export let customTheme: CustomTheme; 
     export let mode = '';
 
     const dispatch = createEventDispatcher();
@@ -31,7 +33,7 @@
     let currentBackgroundHover = false;
 
     let dataToSave: DataToSave = {
-      customTheme: {}
+      customTheme: defaultTheme
     };
 
 
@@ -43,28 +45,22 @@
 
     let chosenValue = '';
 
+    let currentGradient = '';
+
 
   export const customBG = writable('');
   $: dynamicBG = `bg-${$customBG}`;
 
 
-    async function saveChoice(deletion = false) {
+    async function saveChoice(deletion = false, customTheme: CustomTheme) {
 
       console.log("saving choice: ", mode);
 
       const userRef = doc(db, "users", $user!.uid);
-
-
       const batch = writeBatch(db);
 
       let dataToSave: { customTheme: CustomTheme } = {
-        customTheme: {
-          background: undefined,
-          gradient: undefined,
-          buttonColor: undefined,
-          buttonFontColor: undefined,
-          fontColor: undefined,
-        }
+        customTheme
       };
 
       if (deletion) {
@@ -72,21 +68,20 @@
 
         switch(mode) {
           case 'background':
-            dataToDelete['customTheme.background'] = deleteField();
+            dataToDelete['customTheme.background.value'] = deleteField();
             break;
           case 'gradient':
-            dataToDelete['customTheme.gradient'] = deleteField();
+            dataToDelete['customTheme.background.value'] = deleteField();
             break;
           case 'buttonColor':
-            dataToDelete['customTheme.buttonColor'] = deleteField();
+            dataToDelete['customTheme.button.color'] = deleteField();
             break;
           case 'buttonFontColor':
-            dataToDelete['customTheme.buttonFontColor'] = deleteField();
+            dataToDelete['customTheme.button.fontColor'] = deleteField();
             break;
           case 'fontColor':
-            dataToDelete['customTheme.fontColor'] = deleteField();
+            dataToDelete['customTheme.font.color'] = deleteField();
             break;
-            // Handle other cases similarly
           }
 
         await updateDoc(userRef, dataToDelete);
@@ -95,25 +90,36 @@
 
       switch(mode) {
         case 'background':
-          dataToSave = { customTheme: { background: chosenValue }};
-          // set store
-          customBG.set(chosenValue);
+          dataToSave.customTheme.background = {
+              style: 'solid',
+              value: chosenValue
+          };
           currentBackground = chosenValue;
-          console.log('customBG: ', $customBG);
-          console.log('currentBackground: ', currentBackground);
-          console.log('chosenValue: ', chosenValue);
           break;
         case 'gradient':
-          dataToSave = { customTheme: { gradient: chosenValue }};
+          dataToSave.customTheme.background = {
+              style: 'gradient',
+              value: chosenValue
+          };
+          currentGradient = chosenValue;
           break;
         case 'buttonColor':
-          dataToSave = { customTheme: { buttonColor: chosenValue }};
+          dataToSave.customTheme.button = {
+              ...dataToSave.customTheme.button,
+              color: chosenValue
+          };
           break;
         case 'buttonFontColor':
-          dataToSave = { customTheme: { buttonFontColor: chosenValue }};
+          dataToSave.customTheme.button = {
+              ...dataToSave.customTheme.button,
+              fontColor: chosenValue
+          };
           break;
         case 'fontColor':
-          dataToSave = { customTheme: { fontColor: chosenValue }};
+          dataToSave.customTheme.font = {
+              ...dataToSave.customTheme.font,
+              color: chosenValue
+          };
           break;
         default: 
           console.error('unknown mode:', mode);
@@ -132,11 +138,11 @@
 
   const handleColorSelect = (selectedValue: string) => {
     chosenValue = selectedValue;
-    saveChoice();
+    saveChoice(false, customTheme);
   };
 
   const handleDelete = () => {
-    saveChoice(true);
+    saveChoice(true, customTheme);
   }
 
 </script>

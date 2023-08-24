@@ -26,7 +26,7 @@
   let theme: string | undefined;
 
   // declare customTheme vars
-  let font:string;
+  let font: string;
   let fontColor: string;
   let background: string;
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
