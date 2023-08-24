@@ -927,3 +927,41 @@ current tasks
 
 jstu sat back down have ot remind myself of current task:
     check what makes the edit page bg reactive and apply that method as far as the eye can see
+
+
+vim cmds to learn:
+    ✅jump to bottom of file
+        G
+    ✅jump to top of file
+        gg
+
+edit page reactivity finginds
+    background + fontColor + font works from:
+    $: if ($userData) {
+        customTHeme = $userData.customTheme;
+        background = customTheme.background.value;
+        fontCOlor = customTHeme.font.color;
+        font = customTHeme.font.family;
+    }
+
+    font simply isnt saving
+
+
+
+    another issue: font color preview div
+    isn't showing the fontCOlor rip
+    im using 
+    style={`color: ${fontColorHex}`}
+
+    ✅solved: 
+        dont need to use the hex!
+        just a normal tailwind class
+        bg-{fontColor}
+
+    going back to updating the font save
+
+    noticed taht in the font component colorpicker is imported
+    it was grayed out so i just deleted it
+    just jotting this down incase
+
+    i want to record all of the changes that i make so i can see what the heck im doing

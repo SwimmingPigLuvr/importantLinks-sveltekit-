@@ -443,7 +443,10 @@
  
       <h3 class="font-input-mono text-white my-2">Font Color</h3>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div on:click={() => {toggleShowFontColorPicker(); mode = 'fontColor'}} class="w-10 h-10 bg-{buttonColor} rounded-md"></div>
+      <div 
+        on:click={() => {toggleShowFontColorPicker(); mode = 'fontColor'}} 
+        style={`color: ${fontColorHex}`}
+        class="w-10 h-10 bg-{fontColor} rounded-md"></div>
       
     <div>
 

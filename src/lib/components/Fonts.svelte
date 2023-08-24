@@ -5,7 +5,6 @@
   import { doc, writeBatch } from "firebase/firestore";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { slide } from "svelte/transition";
-  import ColorPicker from "./ColorPicker.svelte";
 
 
     let chosenFont = '';

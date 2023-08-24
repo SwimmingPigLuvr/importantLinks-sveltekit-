@@ -89,6 +89,9 @@
   // convert tailwind to hex
   function convert(colorName: string): string | undefined {
     const [color, shade] = colorName.split('-');
+
+    // convert('lime-400') returns colors[lime].[400]
+    // colors[lime].[400] === the correct hex code
     return (colors as any)[color]?.[shade];
   }
 
@@ -229,7 +232,7 @@
 <main 
 data-theme={theme}
 style={`color: ${fontColorHex}`}
-class={`bg-${background ? background : 'accent'} font-${font} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
+class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-gothic'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
   <!-- this is an authcheck to make sure  -->
