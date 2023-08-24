@@ -1099,7 +1099,62 @@ livepreview reactivity:
             buttonFontColor ✅  
 
 
+steps
+bg
+    bg-{bg? bg : 'secondary'} is going to secondary
+    so maybe its an issue with how background is 
 
+changing:
+    if (customTheme) {
+        background = customTheme.background.value;
+        font = customTheme.font.family;
+        fontColor = customTheme.font.color;
+    } 
+
+    to:
+        background = customTheme.background.value;
+        font = customTheme.font.family;
+        fontColor = customTheme.font.color;
+
+results:
+
+    it works: it shows the correct bg but then it breaks the pages
+    lets see whats wrong:
+
+    terminal error:
+        Cannot read properties of undefined (reading 'background')
+        at eval (/Users/dylannevell/dev/fireship/svelte/myapp/src/lib/components/LivePreview.svelte:30:27)
+
+        i think i have to wrap the change i made in an if statement
+
+
+        yup
+
+        i chagned the change early by taking off the if block completely
+        but i shoulda jsut added some reactiviy
+        just a sprinkly of 
+        $: if (something) {
+            somtehing really cool
+        }
+
+
+
+
+
+
+
+fontcolor
+font
+
+
+livepreview reactivity:
+
+            bg ✅
+            fontColor ✅
+            font ✅
+            buttonstyle ✅
+            buttoncolor ✅
+            buttonFontColor ✅  
 
 
 new vim cmd:
@@ -1109,3 +1164,37 @@ change all instances after cursor
 
 . === current line
 $ === end of file
+
+
+
+
+
+current todo currently
+
+make sure the current colors are upto date on the colorpicker
+
+i was ableto fix this by making sure that backgorund was up to date
+
+but!
+
+the div changes based on the current mode
+
+so i have to conditionally apply the style based on the mode
+
+wish me luck...luck! ok thanks
+
+
+
+
+
+o
+
+
+
+
+
+
+
+more notes:
+
+transition into the fullscreen live preview

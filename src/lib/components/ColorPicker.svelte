@@ -23,6 +23,18 @@
     export let customTheme: CustomTheme; 
     export let mode = '';
 
+    let fontColor: string;
+    let background: string;
+    let buttonColor: string;
+    let buttonFontColor: string;
+
+    $: if (customTheme) {
+      fontColor = customTheme.font.color;
+      buttonColor = customTheme.button.color;
+      background = customTheme.background.value;
+      buttonFontColor = customTheme.button.fontColor;
+    }
+
     const dispatch = createEventDispatcher();
 
     let color = '';
@@ -488,13 +500,13 @@
         <div class="flex w-full justify-around">
 
           <!-- current BG -->
-          <div class="flex flex-col justify-start items-center space-y-4">
+          <div class=" flex flex-col justify-start items-center space-y-4">
             <p class="font-input-mono text-secondary-content text-[0.75rem]">Current {mode}</p>
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div 
               on:mouseenter={() => currentBackgroundHover = true} 
               on:mouseleave={() => currentBackgroundHover = false} 
-              class="w-40 h-16 rounded-xl shadow-md relative {dynamicBG}">
+              class="w-40 h-16 rounded-xl shadow-md relative bg-{mode === 'background' ? background : (mode === 'fontColor' ? fontColor : (mode === 'buttonColor' ? buttonColor : (mode === 'buttonFontColor' ? buttonFontColor : 'primary')))}">
               {#if currentBackgroundHover}
               <!-- delete button -->
                 <button on:click={handleDelete} class="bg-info absolute -top-4 -right-2 p-2">
