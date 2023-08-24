@@ -1085,3 +1085,27 @@ error:
             buttonFontColor ✅   
 
 major w
+
+
+now that edit page is reactive lets check on the livepreview
+
+livepreview reactivity:
+
+            bg ❌
+            fontColor ❌
+            font ❌
+            buttonstyle ✅
+            buttoncolor ✅
+            buttonFontColor ✅  
+
+
+
+
+
+new vim cmd:
+change all instances after cursor
+
+:.,$s/old/new/g
+
+. === current line
+$ === end of file
