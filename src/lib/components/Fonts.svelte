@@ -35,7 +35,9 @@
         // update font in db
         batch.set(doc(db, "users", $user!.uid), {
             customTheme: {
-                font: chosenFont
+                font: {
+                    family: chosenFont
+                }
             }
         }, { merge: true });
 
@@ -48,25 +50,7 @@
         saveFont();
     }
 
-    async function saveFontColor() {
-        console.log('saving font color: ', chosenColor);
-
-        const batch = writeBatch(db);
-
-        batch.set(doc(db, "users", $user!.uid), {
-            customTheme: {
-                fontColor: chosenColor
-            }
-        }, { merge: true });
-
-        await batch.commit();
-        chosenFont = '';
-    }
-
-    const handleColorSelect = (selectedColor: string) => {
-        chosenColor = selectedColor;
-        saveFont();
-    }
+    
 </script>
 
     <h3 class="font-input-mono m-auto text-center text-primary-content">Select Font</h3>

@@ -965,3 +965,38 @@ edit page reactivity finginds
     just jotting this down incase
 
     i want to record all of the changes that i make so i can see what the heck im doing
+
+    also deleted the handlefontcolor select
+    the font component jsut saves the font
+
+    hmmmmmmmmmm
+
+    mental htinking note
+    just a thought
+
+    since font component is cosmetic
+    maybe i should just have all of the save functions in a saveFunctions.ts file?????????
+    thinking emoji
+
+
+    i changed the shape of what the fontsavve function does
+    from:
+    customTHeme: {
+        font: chosenfont
+    }
+    to:
+    customTHeme: {
+        font: {
+            fontfamily: chosenFont
+        }
+    }
+
+
+
+
+issue note notice issue that i noticed:
+
+elven doesnt display correctly on the font dropdown but i know for a fakt that 'font-elven' works as a tailwind class so i must go back and fix this
+elven is a very important font to my users
+
+font now svaes correctly
