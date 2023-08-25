@@ -96,7 +96,6 @@
   }
 
   onMount (() => {
-    showDndMessage = true;
 
     if (data && data.customTheme) {
       updateTheme(customTheme);
@@ -246,7 +245,7 @@ class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-g
     <div class="mx-auto  mt-16 mb-4 flex justify-center max-w-sm relative">
         {#if showChangePfp}
           <div 
-            in:fly={{ y: 10, duration: 500, easing: backIn }}
+            in:fly={{ y: -100, duration: 500, easing: backOut }}
             out:blur={{ duration: 3000, easing: cubicOut, amount: 100 }}
             class="z-20 btn-info bg-opacity-25 absolute -top-10 right-1/2 translate-x-1/2 border-2 ">
 
@@ -265,15 +264,22 @@ class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-g
         
         src={photoURL ?? "/sonic.jpeg"}
         alt="photoURL"
-        class={`mx-auto h-20 w-20 duration-500 transform transition-all ease-[backOut] ${showChangePfp ? 'scale-x-[3] scale-y-75' : 'border-transparent'}`}
+        class={`mx-auto h-20 w-20 duration-200 transform transition-all ease-[backOut] ${showChangePfp ? 'scale-x-[3] scale-y-75 filter sepia' : ''}`}
       />
 
         </button>
 
         {#if showChangePfpModal}
+        <div 
+        in:fade
+        out:fade
+        class="w-screen h-screen fixed top-0 left-0 bg-primary bg-opacity-50 ">
+
 
           <div 
-            class="m-auto fixed top-40 left-1/2 -translate-x-1/2 bg-white card-body">
+            in:blur
+            out:fly={{ y: -1000, duration: 500, easing: backIn}}
+            class="m-auto z-50 fixed top-1/3 left-1/2 -translate-x-1/2 bg-{background} w-1/2 p-8">
 
           <input
 
@@ -295,6 +301,7 @@ class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-g
           </div>
 
       
+        </div>
         
         {/if}
     </div>
@@ -346,7 +353,7 @@ class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-g
 
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div 
-        class="group relative">
+        class="group relative -z-10">
         <UserLink 
         iconURL={item.iconURL} 
         title={item.title} 

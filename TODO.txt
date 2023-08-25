@@ -1198,3 +1198,40 @@ o
 more notes:
 
 transition into the fullscreen live preview
+
+fix the pfp upload
+add gradients
+image bg will be kooool
+
+edit links in one at a time
+
+
+8.25.23
+fullscreen live preview transitions in!
+    phone preview is already mounted so i have to make sure that:
+        not mounted when screen size is small
+        clicking the preview button 👀 mounts it
+gradient options
+    :save choice 1 then choice 2?
+    or different color choice flow?
+        style with tailwind to hex conversions
+    once i do that i can figure out where else to add gradients?
+    buttons? oiutlines? shadows
+handle image backgrounds
+    let user select positions
+        cover / contain / stretch
+    let user select styles
+        brightness? contrast? opacity? color filter?
+hover link changes bg?
+    color preview: glowing? content preview?
+links shifted to the right on large breakpoint
+    content preview on the left
+saving new styles as data objects
+    updating CustomTheme interface
+color picker 
+    preview divs on top of colorpicker
+resolve dnd message positioning
+    daisy ui presets have good options
+    find good placement
+    use cookies to only show message 1x/day (any more than taht is annoying)
+
