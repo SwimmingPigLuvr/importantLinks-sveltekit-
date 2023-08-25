@@ -36,7 +36,7 @@
       buttonFontColorHex = convert(buttonFontColor);
     }
 
-    $: if (customTheme.button.textEffect) {
+    $: if (customTheme?.button?.textEffect) {
       buttonTextEffect = customTheme.button.textEffect.effect;
       buttonTextEffectHover = customTheme.button.textEffect.onHover;
     }

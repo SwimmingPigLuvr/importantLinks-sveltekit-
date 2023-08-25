@@ -28,7 +28,7 @@
     let buttonColor: string;
     let buttonFontColor: string;
 
-    $: if (customTheme) {
+    $: if (customTheme?.font && customTheme?.button && customTheme?.background) {
       fontColor = customTheme.font.color;
       buttonColor = customTheme.button.color;
       background = customTheme.background.value;
@@ -63,12 +63,28 @@
   export const customBG = writable('');
   $: dynamicBG = `bg-${$customBG}`;
 
+  if (!$user || !$user.uid) {
+  console.error('User or user ID is missing');
+}
+
+if (!customTheme) {
+  console.error('Custom theme is missing');
+}
+if (!customTheme.background) {
+  console.error('Custom theme Background is missing');
+}
+if (!customTheme.button) {
+  console.error('Custom theme Button is missing');
+}
+if (!customTheme.font) {
+  console.error('Custom theme Font is missing');
+}
 
     async function saveChoice(deletion = false, customTheme: CustomTheme) {
 
       console.log("saving choice: ", mode);
 
-      const userRef = doc(db, "users", $user!.uid);
+      const userRef = doc(db, `users/${$user!.uid}`);
       const batch = writeBatch(db);
 
       let dataToSave: { customTheme: CustomTheme } = {
@@ -139,7 +155,7 @@
       }
 
       // update the bg property inside the theme object
-      batch.set(doc(db, "users", $user!.uid), dataToSave, { merge: true });
+      batch.set(doc(db, `users/${$user!.uid}`), dataToSave, { merge: true });
 
       await batch.commit();
 

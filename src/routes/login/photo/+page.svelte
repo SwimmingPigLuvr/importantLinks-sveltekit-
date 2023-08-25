@@ -20,7 +20,7 @@
             const result = await uploadBytes(storageRef, file);
             const url = await getDownloadURL(result.ref);
 
-            await updateDoc(doc(db, "users", $user!.uid), { photoURL: url });
+            await updateDoc(doc(db, `users/${$user!.uid}`), { photoURL: url });
             uploadSuccess = true;
         } catch (error) {
             console.error('an error occurred while attempting to upload the file: ', error);
@@ -62,6 +62,8 @@
                     <p class="text-success-content">uploaded successfully</p>
                 </div>
             {/if}
+
+            <!-- guide user to next page -->
             <a class="btn btn-secondary w-3/5 m-auto mt-6" href="/login/theme">choose theme <span class="text-[2rem]">👉</span></a>
 
 

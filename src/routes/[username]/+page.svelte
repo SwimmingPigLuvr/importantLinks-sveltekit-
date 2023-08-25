@@ -28,6 +28,7 @@
   // declare customTheme vars
   let font: string;
   let fontColor: string;
+  let backgroundStyle: "image" | "solid" | "gradient";
   let background: string;
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
@@ -51,12 +52,13 @@
     theme = data.theme;    
 
     // set customTheme vars
-    font = customTheme.font.family;
+    font = customTheme?.font?.family;
     fontColor = customTheme?.font?.color;
 
 
     // the style of backgorund will effect how we apply it
     // we only need the string value rn
+    backgroundStyle = customTheme?.background?.style;
     background = customTheme?.background?.value;
 
     // buttons
@@ -76,11 +78,7 @@
 
   }
    
-  let rose = 'rose-500';
-
-    
-
-    const roseHex = convert(rose);
+ 
 
     // convert the pesky classes that tailwind is too lazy to let me use
 
@@ -124,8 +122,8 @@
 </svelte:head>
 
 <main 
-style={`color: ${fontColorHex}`}
-class={`bg-${background? background : 'rose-700'} font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
+style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background});` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+class={`font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 
   <!-- PFP -->

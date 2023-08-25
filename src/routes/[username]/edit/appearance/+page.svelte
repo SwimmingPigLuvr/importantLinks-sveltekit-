@@ -6,9 +6,11 @@
   import { db, user, userData, storage } from "$lib/firebase";
   import { setTheme, type CustomTheme, defaultTheme } from "$lib/theme";
   import { doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
+  import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+
   import { flip } from "svelte/animate";
   import { backIn, backOut } from "svelte/easing";
-  import { fade, slide } from "svelte/transition";
+  import { fade, slide, blur } from "svelte/transition";
   import { updateTheme } from "$lib/themeStore";
   import type { PageData } from "./$types";
   import Nav from "$lib/components/Nav.svelte";
@@ -212,14 +214,53 @@
 
   // img upload
   let files: FileList;
-  let showForm = false;
-  let uploadSuccess = false;
-  let uploading = false;
-  let previewURL: string;
+  let showBackgroundImageForm = false;
 
-  async function uploadBackground(e: SubmitEvent) {
-    const userRef = doc(db, "users/appearance", $user!.uid)
+  function toggleBackgroundImageForm() {
+    showBackgroundImageForm = !showBackgroundImageForm;
   }
+  
+  let previewURL: string;
+  let uploading = false;
+  let uploadSuccess = false;
+
+  async function uploadBackground(e: any) {
+    uploadSuccess = false;
+    uploading = true;
+
+    console.log('uploading bg image');
+
+    const batch = writeBatch(db);
+
+    try {
+      const file = e.target.files[0];
+      previewURL = URL.createObjectURL(file);
+      const storageRef = ref(storage, `users/${$user!.uid}/background.png`);
+      const result = await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(result.ref);
+
+      batch.set(doc(db, `users/${$user!.uid}`), { 
+        customTheme: {
+          background: {
+            style: 'image',
+            value: url
+          }
+        }
+      }, { merge: true });
+
+      await batch.commit();
+
+      uploadSuccess = true;
+    } catch (error) {
+      console.error('background upload error: something went wrong: ', error);
+    } finally {
+      uploading = false;
+    }
+
+  }
+
+
+
 
   let glow = 'glow';
   let glowHover = 'glowHover';
@@ -329,13 +370,70 @@
 
 
 
-    <!-- image -->
+    <!-- img upload -->
+
+    <!-- click button -->
+    <!-- image upload modal appears -->
+    <!-- use same method as login/photos -->
+          <!-- desription of method -->
+            <!-- title -->
+            <!-- image previewUrl: background: { style: image, value: url } ? background.value : 'fallbackWallpaper.png' -->
+            <!-- daisy ui: choose File: filename.png -->
+                <!-- *click that -->
+                <!-- one click choose background -->
+                <!-- uploading bar -> upload success -->
+                <!-- choose style: contain | cover | stretch -->
+
 
     <div>
-      <button class="filter grayscale hover:grayscale-0 btn border-none w-[150px] min-h-[300px] flex flex-col justify-start py-4">
+      <button 
+        on:click={() => toggleBackgroundImageForm()}
+        class="filter grayscale hover:grayscale-0 btn border-none w-[150px] min-h-[300px] flex flex-col justify-start py-4">
         <img src="{$userData?.photoURL}" alt="pfp" class="w-[100%] h-[100%]">
       </button>
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Upload Image</h3>
+<!-- form here -->
+      {#if showBackgroundImageForm}
+      <form 
+      in:blur
+      out:slide
+      class="max-w-screen-md w-full">
+        <div class="form-control w-full max-w-xs my-10 mx-auto text-center">
+            <img 
+                src="{previewURL ?? $userData?.photoURL ?? "/sonic.jpeg"}" 
+                alt="photoURL"
+                width="256"
+                height="256"
+                class="mx-auto"
+            />
+            <label for="photoURL" class="label">
+                <span class="label-text"></span>
+            </label>
+            <input
+                on:change={uploadBackground}
+                name="photoURL"
+                type="file"
+                class="file-input file-input-bordered w-full max-w-xs"
+                accept="image/png, image/jpeg, image/gif, image/webp"
+            />
+            {#if uploading}
+                <p class="text-info-content mt-6">uploading...</p>
+                <progress class="progress progress-secondary w-56 mt-2 m-auto" />
+            {/if}
+            {#if uploadSuccess}
+                <div class="bg-success rounded-md p-2 mt-6 w-3/4 m-auto">
+                    <p class="text-success-content">uploaded successfully</p>
+                </div>
+            {/if}
+
+        </div>
+    </form>
+
+
+
+
+      {/if}
+<!-- end form here -->
     </div>
 
 

@@ -48,6 +48,7 @@
   let font: string;
   let fontColor: string;
   let background: string;
+  let backgroundStyle: "gradient" | "image" | "solid";
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
@@ -69,6 +70,7 @@
     font = customTheme.font.family;
     fontColor = customTheme.font.color;
     background = customTheme.background.value;
+    backgroundStyle = customTheme.background.style;
     buttonStyle = customTheme.button.style;
     buttonColor = customTheme.button.color;
     buttonFontColor = customTheme.button.fontColor;
@@ -97,6 +99,8 @@
 
   onMount (() => {
 
+    console.log('bg check: ', background);
+    
     if (data && data.customTheme) {
       updateTheme(customTheme);
       console.log('themeupdated 🍨', $themeStore);
@@ -117,7 +121,7 @@
           const result = await uploadBytes(storageRef, file);
           const url = await getDownloadURL(result.ref);
 
-          await updateDoc(doc(db, "users", $user!.uid), { photoURL: url });
+          await updateDoc(doc(db,  `users/${$user!.uid}`), { photoURL: url });
           uploadSuccess = true;
       } catch (error) {
           console.error('an error occurred while attempting to upload the file: ', error);
@@ -128,7 +132,7 @@
 
   // save bio
   function saveBio() {
-    const userRef = doc(db, "users", $user!.uid);
+    const userRef = doc(db, `users/${$user!.uid}`);
 
     updateDoc(userRef, {bio: bio });
     console.log('updated bio: ', bio)
@@ -166,7 +170,7 @@
 
   // add link
   async function addLink(e: SubmitEvent) {
-    const userRef = doc(db, "users", $user!.uid);
+    const userRef = doc(db, `users/${$user!.uid}`);
 
     // upload icon
     uploadSuccess = false;
@@ -210,7 +214,7 @@
   // rearrange links in DB
   function sortList(e: CustomEvent) {
     const newList = e.detail;
-    const userRef = doc(db, "users", $user!.uid);
+    const userRef = doc(db, `users/${$user!.uid}`);
     setDoc(userRef, { links: newList }, { merge: true });
   }
 
@@ -230,7 +234,7 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex}`}
+style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background});` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
 class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-gothic'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 

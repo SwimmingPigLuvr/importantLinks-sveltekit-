@@ -91,12 +91,12 @@ export interface CustomTheme {
 export const defaultTheme: CustomTheme = {
   background: {
     style: 'solid',
-    value: 'accent'
+    value: 'sky-500'
   },
   button: {
     style: 'circleFill',
-    color: 'primary',
-    fontColor: 'primary-content',
+    color: 'lime-500',
+    fontColor: 'slate-200',
     textEffect: {
       effect: 'none',
       onHover: false
@@ -104,11 +104,11 @@ export const defaultTheme: CustomTheme = {
   },
   font: {
     family: 'input-mono',
-    color: 'black'
+    color: 'slate-800'
   }
 };
 
-export function convert(colorName: string): string | undefined {
+export function convert(colorName: string = 'lime-400'): string | undefined {
   const [color, shade] = colorName.split('-');
   return (colors as any)[color]?.[shade];
 };

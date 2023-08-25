@@ -16,17 +16,21 @@
   export let links: any[] = [];
   export let theme: string = '';
 
-  let background = '';
-  let font = '';
-  let fontColor = '';
+  let background: string;
+  let backgroundStyle: "gradient" | "solid" | "image";
+  let backgroundHex: string | undefined;
+  let font: string;
+  let fontColor: string;
   let fontColorHex: string | undefined;
 
-  $: if (customTheme) {
+  $: if (customTheme && customTheme?.background && customTheme?.font) {
     background = customTheme.background.value;
+    backgroundStyle = customTheme.background.style;
     font = customTheme.font.family;
-    fontColor = customTheme.font.color;
+    fontColor = customTheme?.font?.color;
 
     fontColorHex = convert(fontColor);
+    backgroundHex = convert(background);
   }
 
 
@@ -98,7 +102,7 @@
     <div 
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
         data-theme={theme}
-        style="{showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'}" 
+        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background});` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg-{background? background : 'secondary'} flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">

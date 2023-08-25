@@ -32,7 +32,7 @@
         const batch = writeBatch(db);
 
         // update font in db
-        batch.set(doc(db, "users", $user!.uid), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
             customTheme: {
                 font: {
                     family: chosenFont

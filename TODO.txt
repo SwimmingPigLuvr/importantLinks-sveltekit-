@@ -1169,7 +1169,7 @@ $ === end of file
 
 
 
-current todo currently
+✅current todo currently
 
 make sure the current colors are upto date on the colorpicker
 
@@ -1207,6 +1207,39 @@ edit links in one at a time
 
 
 8.25.23
+first mission: image backgrounds
+    function looks clean:
+        next step:
+            set up form and functions correctly to handle upload
+            login/photo has the form out already
+            but appearance page should only show form when selected
+
+        update db target
+        customTheme.background.style && .value
+
+    console error:
+        Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'family')
+        at $$self.$$.update (LivePreview.svelte:26:29)
+
+        investigaate: 
+
+        UserLink.svelte:39 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'textEffect') userlink line 39
+
+        everytime i fix one. another pops up
+        i guess i have to ask like this
+            if (customTheme?.background)
+
+            lets see if this fixes everything
+
+
+            background image function deletes everything
+
+
+second mission: text effects
+
+main background mission: dont overdesign.
+    get site hosted
+
 fullscreen live preview transitions in!
     phone preview is already mounted so i have to make sure that:
         not mounted when screen size is small
@@ -1226,6 +1259,7 @@ hover link changes bg?
     color preview: glowing? content preview?
 links shifted to the right on large breakpoint
     content preview on the left
+
 saving new styles as data objects
     updating CustomTheme interface
 color picker 
@@ -1234,4 +1268,67 @@ resolve dnd message positioning
     daisy ui presets have good options
     find good placement
     use cookies to only show message 1x/day (any more than taht is annoying)
+let user create and save themes
+choosing preset themes should overwrite all customizations
+let user know 
+    when they have to be signed in to view something
+    edit page: cant edit someone elses page
+once everything is kosher
+    move all functions into saveFunctions.ts:
+        saveFunctions, colorpicker, image uploads
+        the best components dont have redundant functions found in other files
 
+
+side quests:
+    practice typing
+        accuracy > speed
+    learn new vim cmds
+        make workflow faster => make life easier
+
+        jump up to line that i want without having to use trackpad
+            number of lines + j / k (too long to count lines)
+            something quicker:
+                figure it out
+
+            choose second option from intellisence
+
+    weird error under (doc(db, "users", $user!.uid), { photoURL: url})
+    maybe use bakgtics
+    doc(db, `users/${$user!.uid}`)
+        this gets rid of the error message but let's see if it breaks anything?
+        no breaks yet! i think it's complete
+        so before i add anohter function to upload the bg lets fix the others
+
+
+    cleanup unused imports they're all over this place
+
+
+    await updateDoc(doc(db, `users/${$user!.uid}`), { photoURL: url })
+    this saves to user.photoURL
+
+    but for the background let's save to 
+        await updateDoc(doc(db, `users/${$user!.uid}`), { backgorund: style: 'image', value: url })
+
+
+
+fixed everything by changing the save fucntion to write bacth instead of update Doc
+
+
+now make sure that userbg shows in the page
+
+
+conditionally apply the bg based on the style
+
+ill need to use <style> instead of tailwind class for gradient
+and possible the image
+
+
+upload functions workt
+
+styles are applied correctyl
+
+now need to use positioning styles:
+    prompt user to select position
+    save selection as new data field background: { style: image, value: url, position: 'fit' | 'cover' | 'contain' | '...etc' }
+    update the custom theme
+    make sure new saving functions don't mess everything up
