@@ -122,7 +122,7 @@
 </svelte:head>
 
 <main 
-style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background});` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
 class={`font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 

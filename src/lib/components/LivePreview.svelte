@@ -102,7 +102,7 @@
     <div 
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
         data-theme={theme}
-        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background});` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg-{background? background : 'secondary'} flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">

@@ -1207,7 +1207,7 @@ edit links in one at a time
 
 
 8.25.23
-first mission: image backgrounds
+✅first mission: image backgrounds
     function looks clean:
         next step:
             set up form and functions correctly to handle upload
@@ -1332,3 +1332,13 @@ now need to use positioning styles:
     save selection as new data field background: { style: image, value: url, position: 'fit' | 'cover' | 'contain' | '...etc' }
     update the custom theme
     make sure new saving functions don't mess everything up
+    then make sure to set vars
+    let backgroundPosition = customTheme.background.position;
+
+
+just throwing in the bg doesn't look cool at all. default should be 100% 100%
+
+
+positioning of the bg selector is off
+
+also change the previews for the color picker to be on top of the collors

@@ -52,7 +52,7 @@
 
     $: gradientClass = `bg-gradient-to-b from-${gradientColor1} to-${gradientColor2}`;
 
-    let currentBackground = '';
+    let currentBackground: string;
     let chosenBackground = '';
 
     let chosenValue = '';
@@ -181,7 +181,59 @@ if (!customTheme.font) {
     in:slide={{ duration: 1000, easing: cubicInOut }}
     out:slide={{ duration: 1000, easing: cubicInOut }}
     class="mt-10 z-50 pb-4 mx-auto flex flex-col space-y-4">
+<!-- current color -->
+    <div class="w-full flex items-start space-x-8 p-3 -mt-10 -mb-2">
+        <!-- gradient picker -->
+        {#if mode === 'gradient'}
+            <div class="{gradientClass} w-40 h-16 rounded-xl shadow-md "></div>
+            <div class="w-40 h-16 rounded-xl shadow-md  bg-{gradientColor1}"></div>
+            <div class="w-40 h-16 rounded-xl shadow-md  bg-{gradientColor2}"></div>
+            <p class="font-input-mono text-{color} text-center text-[1rem]">{gradientColor1} to {gradientColor2}</p>
+        {:else}
+        <!-- preview -->
+        <div class="flex w-full justify-start space-x-8">
 
+          <!-- current BG -->
+          <div class=" flex flex-col justify-start items-start space-y-2">
+            <p class="font-input-mono text-secondary-content text-[0.75rem]">Current {mode}</p>
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div 
+              on:mouseenter={() => currentBackgroundHover = true} 
+              on:mouseleave={() => currentBackgroundHover = false} 
+              class="w-40 h-16 rounded-xl shadow-md relative bg-{mode === 'background' ? background : (mode === 'fontColor' ? fontColor : (mode === 'buttonColor' ? buttonColor : (mode === 'buttonFontColor' ? buttonFontColor : 'primary')))}">
+              {#if currentBackgroundHover}
+              <!-- delete button -->
+                <button on:click={handleDelete} class="bg-info absolute -top-4 -right-2 p-2">
+                  <p class="text-xs text-info-content">Delete</p>
+                </button>
+              {/if}
+            </div>
+            <p class="font-input-mono text-secondary-content text-[1rem]">
+              {#if mode === 'background'}
+                {background}
+              {:else if mode === 'fontColor'}
+                {fontColor}
+              {:else if mode === 'buttonColor'}
+                {buttonColor}
+              {:else if mode === 'buttonFontColor'}
+                {buttonFontColor}
+              {/if}
+            </p>
+            
+            
+          </div>
+
+          
+
+          <!-- new BG -->
+          <div class="flex flex-col justify-end items-start space-y-2">
+            <p class="font-input-mono text-secondary-content text-[0.75rem]">New {mode}</p>
+            <div class="w-40 h-16 rounded-xl shadow-md bg-{color}"></div>
+            <p class="font-input-mono text-secondary-content text-[1rem]">{color}</p>
+          </div>
+        </div>
+        {/if}
+    </div>
     <h3 class="font-input-mono">Choose {mode}</h3>
 
 
@@ -503,49 +555,7 @@ if (!customTheme.font) {
 
 
 
-<!-- current color -->
-    <div class="w-full flex items-end space-x-8 p-3">
-        <!-- gradient picker -->
-        {#if mode === 'gradient'}
-            <div class="{gradientClass} w-40 h-16 rounded-xl shadow-md "></div>
-            <div class="w-40 h-16 rounded-xl shadow-md  bg-{gradientColor1}"></div>
-            <div class="w-40 h-16 rounded-xl shadow-md  bg-{gradientColor2}"></div>
-            <p class="font-input-mono text-{color} text-center text-[1rem]">{gradientColor1} to {gradientColor2}</p>
-        {:else}
-        <!-- preview -->
-        <div class="flex w-full justify-around">
 
-          <!-- current BG -->
-          <div class=" flex flex-col justify-start items-center space-y-4">
-            <p class="font-input-mono text-secondary-content text-[0.75rem]">Current {mode}</p>
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div 
-              on:mouseenter={() => currentBackgroundHover = true} 
-              on:mouseleave={() => currentBackgroundHover = false} 
-              class="w-40 h-16 rounded-xl shadow-md relative bg-{mode === 'background' ? background : (mode === 'fontColor' ? fontColor : (mode === 'buttonColor' ? buttonColor : (mode === 'buttonFontColor' ? buttonFontColor : 'primary')))}">
-              {#if currentBackgroundHover}
-              <!-- delete button -->
-                <button on:click={handleDelete} class="bg-info absolute -top-4 -right-2 p-2">
-                  <p class="text-xs text-info-content">Delete</p>
-                </button>
-              {/if}
-            </div>
-            <p class="font-input-mono text-secondary-content text-[1rem]">{currentBackground}</p>
-            
-            
-          </div>
-
-          
-
-          <!-- new BG -->
-          <div class="flex flex-col justify-end items-center space-y-4">
-            <p class="font-input-mono text-secondary-content text-[0.75rem]">New {mode}</p>
-            <div class="w-40 h-16 rounded-xl shadow-md bg-{color}"></div>
-            <p class="font-input-mono text-secondary-content text-[1rem]">{color}</p>
-          </div>
-        </div>
-        {/if}
-    </div>
 
 </div>
 

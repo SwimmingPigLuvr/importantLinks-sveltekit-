@@ -234,7 +234,8 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background});` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+
 class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-gothic'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
