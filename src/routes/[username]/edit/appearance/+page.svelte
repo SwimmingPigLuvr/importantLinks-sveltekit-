@@ -7,10 +7,9 @@
   import { setTheme, type CustomTheme, defaultTheme } from "$lib/theme";
   import { doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-
   import { flip } from "svelte/animate";
-  import { backIn, backOut } from "svelte/easing";
-  import { fade, slide, blur } from "svelte/transition";
+  import { backIn, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
+  import { fade, slide, blur, fly } from "svelte/transition";
   import { updateTheme } from "$lib/themeStore";
   import type { PageData } from "./$types";
   import Nav from "$lib/components/Nav.svelte";
@@ -32,6 +31,7 @@
   let font: string;
   let fontColor: string;
   let background: string;
+  let backgroundStyle: 'gradient' | 'image' | 'solid'
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
@@ -57,6 +57,7 @@
 
     // the style of backgorund will effect how we apply it
     // we only need the string value rn
+    backgroundStyle = customTheme?.background?.style;
     background = customTheme?.background?.value;
 
     // buttons
@@ -105,6 +106,19 @@
     setTheme(selectedTheme);
   }
   // save theme
+
+  let name: string;
+
+  async function saveCustomTheme(name: string, customTheme: CustomTheme) {
+    console.log('saving customTheme: ', name + ': ', + customTheme);
+
+    const batch = writeBatch(db);
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      [name]: customTheme
+    }, { merge: true });
+
+    await batch.commit();
+  }
 
 
   // save button style
@@ -340,29 +354,30 @@
     <!-- backgrounds -->
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Background</h2>
 
-
+    <!-- backgrounds container -->
     <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
-    <div class="flex overflow-auto space-x-2">
-
-
-    <!-- solid color -->
-    <div>
-      <button 
-        on:click={() => toggleShowColorPicker()} 
-        class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
-      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Solid Color</h3>
-    </div>
-
-
-
-
-
-    <!-- gradient -->
       
-    <div>
-      <button class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
-      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
-    </div>
+      <!-- bg styles -->
+      <div class="flex space-x-2">
+
+
+        <!-- solid color -->
+        <div>
+          <button 
+            on:click={() => toggleShowColorPicker()} 
+            class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
+          <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Solid Color</h3>
+        </div>
+
+
+
+
+
+      <!-- gradient -->
+      <div>
+        <button class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
+        <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
+      </div>
 
 
 
@@ -392,12 +407,17 @@
         <img src="{$userData?.photoURL}" alt="pfp" class="w-[100%] h-[100%]">
       </button>
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Upload Image</h3>
-<!-- form here -->
+    </div>
+
+
+    
+    </div>
+    <!-- form here -->
       {#if showBackgroundImageForm}
       <form 
-      in:blur
-      out:slide
-      class="max-w-screen-md w-full">
+      in:slide={{ duration: 1000, easing: cubicInOut }}
+      out:slide={{ duration: 1000, easing: cubicInOut }}
+      class="">
         <div class="form-control w-full max-w-xs my-10 mx-auto text-center">
             <img 
                 src="{previewURL ?? $userData?.photoURL ?? "/sonic.jpeg"}" 
@@ -434,11 +454,6 @@
 
       {/if}
 <!-- end form here -->
-    </div>
-
-
-    
-    </div>
 
     {#if showColorPicker && !showGradientPicker}
       <ColorPicker mode={'background'} customTheme={customTheme}/>
@@ -523,14 +538,7 @@
       <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Font</h2>
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
-        {#if fontDropdown}
-      <!-- svelte-ignore missing-declaration -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div id="fonts" class="mt-8">
-          <Fonts />
-        </div>
-      {/if}
+        
         <h3 class="font-input-mono text-white my-2">Font</h3>
         <button on:click|preventDefault={() => toggleFontDropdown()} class="btn group border-neutral-200 shadow shadow-neutral-200 bg-white h-20 flex items-center justify-start space-x-4">
           <div class="bg-neutral-200 w-12 h-12 rounded-sm items-center justify-center flex">
@@ -538,7 +546,14 @@
           </div>
           <p class="font-{font} group-hover:text-neutral-200 text-[1.5rem] text-black">{font}</p>
         </button>
- 
+ {#if fontDropdown}
+      <!-- svelte-ignore missing-declaration -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div id="fonts" class="mt-8">
+          <Fonts />
+        </div>
+      {/if}
       <h3 class="font-input-mono text-white my-2">Font Color</h3>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div 
@@ -554,13 +569,63 @@
     {/if}
 
 
+</div>
     
+<!-- fonts -->
+<h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Save Custom Theme</h2>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="bg-secondary font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
 
+  
+  
+  <h3 class="font-input-mono text-white my-2">Background</h3>
+  <!-- preview -->
+  <div class={`bg-${background ? `${background} h-10 w-10` : 'lime-400'} h-20 w-40 rounded-md`}></div>
+  <div class="flex flex-col">
+    <div class="p-2 flex space-x-2">
+      <h4 class="text-white">Style</h4>
+      <p class="text-[1rem] text-black">{backgroundStyle}</p>
+    </div>
+    {#if backgroundStyle === 'image'}
+    <div class="p-2 flex space-x-2">
+      <h4 class="text-white">URL</h4>
+      <p class="text-[0.6rem] text-black">{background}</p>
+    </div>
+    {:else if backgroundStyle === 'solid'}
+    <div class="p-2 flex space-x-2">
+      <h4 class="text-white">Value</h4>
+      <p class="text-[1rem] text-black">{background}</p>
+    </div>
+    {/if}
+    
+  </div>
+  <h3 class="font-input-mono text-white my-2">Font</h3>
+  <p class="font-{font} text-[1.5rem] text-black">{font}</p>
+<!-- svelte-ignore missing-declaration -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div id="fonts" class="mt-8">
+  </div>
+<h3 class="font-input-mono text-white my-2">Font Color</h3>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div 
+  style={`color: ${fontColorHex}`}
+  class="w-10 h-10 bg-{fontColor} rounded-md"></div>
+
+<div>
+
+
+</div> 
+
+<label for="Custom Theme Name"></label>
+<input type="text" bind:value={name}>
+<button 
+on:click={() => saveCustomTheme(name, customTheme)}
+class="btn">Save Theme</button>
 
      
     
  
-</div>
 
 <a href="#top" class="fixed bottom-3 right-3 text-[3rem]">
   👆

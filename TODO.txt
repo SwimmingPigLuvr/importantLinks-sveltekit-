@@ -1342,3 +1342,16 @@ just throwing in the bg doesn't look cool at all. default should be 100% 100%
 positioning of the bg selector is off
 
 also change the previews for the color picker to be on top of the collors
+
+
+session 2
+august 25 6PM
+
+save customThemes
+
+input theme name
+saveTheme button => calls saveCustomTheme(name: string, customTheme: CustomTheme)
+
+customTheme shows at front of themes array
+
+

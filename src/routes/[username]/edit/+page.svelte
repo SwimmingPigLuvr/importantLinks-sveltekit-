@@ -252,7 +252,7 @@ class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-g
           <div 
             in:fly={{ y: -100, duration: 500, easing: backOut }}
             out:blur={{ duration: 3000, easing: cubicOut, amount: 100 }}
-            class="z-20 btn-info bg-opacity-25 absolute -top-10 right-1/2 translate-x-1/2 border-2 ">
+            class="z-20 btn-info bg-opacity-25 absolute -top-8 right-1/2 translate-x-1/2 border-2">
 
             <p class="text-secondary-content p-2 px-4">Change PFP</p>
           </div>
@@ -269,7 +269,7 @@ class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-g
         
         src={photoURL ?? "/sonic.jpeg"}
         alt="photoURL"
-        class={`mx-auto h-20 w-20 duration-200 transform transition-all ease-[backOut] ${showChangePfp ? 'scale-x-[3] scale-y-75 filter sepia' : ''}`}
+        class={`mx-auto h-20 w-20 duration-500 transform transition-all ease-[backOut] ${showChangePfp ? 'scale-x-[2] scale-y-50 filter invert' : ''}`}
       />
 
         </button>
