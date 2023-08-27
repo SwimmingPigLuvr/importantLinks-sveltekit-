@@ -1355,3 +1355,23 @@ saveTheme button => calls saveCustomTheme(name: string, customTheme: CustomTheme
 customTheme shows at front of themes array
 
 
+
+this sumple function saves a new customTheme with a name
+
+async function saveCustomTheme(name: string, customTheme: CustomTheme) {
+    console.log('saving customTheme: ', name + ': ', + customTheme);
+
+    const batch = writeBatch(db);
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      [name]: customTheme
+    }, { merge: true });
+
+    await batch.commit();
+  }
+
+
+  im going to edit it to save into an array
+
+  now im going to populate the themes arrary with these data.userthemes[]
+
+

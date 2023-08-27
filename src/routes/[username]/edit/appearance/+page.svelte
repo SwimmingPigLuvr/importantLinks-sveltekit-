@@ -3,9 +3,9 @@
   import Fonts from "$lib/components/Fonts.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
-  import { db, user, userData, storage } from "$lib/firebase";
+  import { db, user, userData, storage, userTheme } from "$lib/firebase";
   import { setTheme, type CustomTheme, defaultTheme } from "$lib/theme";
-  import { doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
+  import { doc, getDoc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { flip } from "svelte/animate";
   import { backIn, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
@@ -35,6 +35,8 @@
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
+
+  let userThemes: CustomTheme[] = [];
   
   // hex vars
   let fontColorHex: string | undefined;
@@ -49,6 +51,8 @@
     links = $userData.links;
     customTheme = $userData.customTheme;
     theme = $userData.theme;    
+    userThemes = [...userThemes, ...$userData.userThemes];
+    console.log('userthemes: ', userThemes);
 
     // set customTheme vars
     font = customTheme?.font?.family;
@@ -112,12 +116,19 @@
   async function saveCustomTheme(name: string, customTheme: CustomTheme) {
     console.log('saving customTheme: ', name + ': ', + customTheme);
 
-    const batch = writeBatch(db);
-    batch.set(doc(db, `users/${$user!.uid}`), {
-      [name]: customTheme
-    }, { merge: true });
+    const userRef = doc(db, `users/${$user!.uid}`);
 
-    await batch.commit();
+    const docSnapshot = await getDoc(userRef);
+    const userData = docSnapshot.data();
+    let userThemes = userData?.userThemes || [];
+
+    userThemes.push({
+      [name]: customTheme
+    });
+
+    await updateDoc(userRef, {
+      userThemes: userThemes
+    });
   }
 
 
@@ -224,6 +235,8 @@
       'cyberpunk',
       'lemonade'
   ];
+
+  let allThemes = userThemes.concat(themes)
 
 
   // img upload
