@@ -1375,3 +1375,12 @@ async function saveCustomTheme(name: string, customTheme: CustomTheme) {
   now im going to populate the themes arrary with these data.userthemes[]
 
 
+
+  august 27
+  restrict theme names to certain amount of characters
+
+
+  hover animation on themes with image bgs (match the other themes)
+  
+
+

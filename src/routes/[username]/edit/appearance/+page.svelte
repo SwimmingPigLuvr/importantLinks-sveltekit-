@@ -51,7 +51,9 @@
     links = $userData.links;
     customTheme = $userData.customTheme;
     theme = $userData.theme;    
-    userThemes = [...userThemes, ...$userData.userThemes];
+    userThemes = $userData.userThemes;
+
+    const uniqueThemeName = Object.keys(userThemes[1])[0];
     console.log('userthemes: ', userThemes);
 
     // set customTheme vars
@@ -236,7 +238,10 @@
       'lemonade'
   ];
 
-  let allThemes = userThemes.concat(themes)
+  let allThemes = userThemes.concat(themes);
+  console.log('allthemes: ', allThemes);
+  console.log('themse: ', themes);
+  console.log('userthemes: ', userThemes);
 
 
   // img upload
@@ -326,6 +331,38 @@
       </a>
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
       </div>
+
+      <!-- user made themes -->
+      {#each userThemes as userTheme, index}
+      <div class="">
+        {#each Object.keys(userTheme) as key}
+        {#if userTheme[key]}
+          <button 
+        on:click|preventDefault={() => handleThemeSelect(theme)} 
+        style={`color: ${fontColorHex}; ${userTheme[key].background.style === 'image' ? `background-image: url(${userTheme[key].background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme[key].background.style === 'solid' ? `background-color: ${convert(userTheme[key].background.value)}` : '')}`}
+        class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
+          <div class={`font-${userTheme[key].font.family} flex flex-col items-center font`}>
+            <!-- pfp -->
+            <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+            <!-- Username -->
+            <p class="text-[0.5rem]">@{$userData?.username}</p>
+            <!-- bio -->
+            <p class="text-[0.33rem]">{$userData?.bio}</p>
+          </div>
+            <!-- links -->
+            <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+            <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+            <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+        </button>
+        {/if}
+          <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{key}</h3>
+        {/each}
+
+        
+      </div> 
+      {/each}
+
+      <!-- prebuilt Themes -->
       {#each themes as theme}
       <div class="">
 
@@ -348,7 +385,7 @@
           <div class="bg-secondary w-full h-4"></div>
           <div class="bg-secondary w-full h-4"></div>
         </button>
-      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2" data-theme={theme}>{theme}</h3>
+      <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2 bg-opacity-0" data-theme={theme}>{theme}</h3>
       </div>
       {/each}
     </div>
@@ -587,54 +624,19 @@
 <!-- fonts -->
 <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Save Custom Theme</h2>
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="bg-secondary font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
+<div class="bg-secondary space-y-4 font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
 
   
-  
-  <h3 class="font-input-mono text-white my-2">Background</h3>
-  <!-- preview -->
-  <div class={`bg-${background ? `${background} h-10 w-10` : 'lime-400'} h-20 w-40 rounded-md`}></div>
-  <div class="flex flex-col">
-    <div class="p-2 flex space-x-2">
-      <h4 class="text-white">Style</h4>
-      <p class="text-[1rem] text-black">{backgroundStyle}</p>
-    </div>
-    {#if backgroundStyle === 'image'}
-    <div class="p-2 flex space-x-2">
-      <h4 class="text-white">URL</h4>
-      <p class="text-[0.6rem] text-black">{background}</p>
-    </div>
-    {:else if backgroundStyle === 'solid'}
-    <div class="p-2 flex space-x-2">
-      <h4 class="text-white">Value</h4>
-      <p class="text-[1rem] text-black">{background}</p>
-    </div>
-    {/if}
-    
-  </div>
-  <h3 class="font-input-mono text-white my-2">Font</h3>
-  <p class="font-{font} text-[1.5rem] text-black">{font}</p>
-<!-- svelte-ignore missing-declaration -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div id="fonts" class="mt-8">
-  </div>
-<h3 class="font-input-mono text-white my-2">Font Color</h3>
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div 
-  style={`color: ${fontColorHex}`}
-  class="w-10 h-10 bg-{fontColor} rounded-md"></div>
-
-<div>
+  <label for="Custom Theme Name">Theme Name</label>
+<input type="text" bind:value={name} class="p-4 rounded-md" placeholder="Enter Theme Name">
+<button 
+on:click={() => saveCustomTheme(name, customTheme)}
+class="btn">Save Theme</button>
 
 
 </div> 
 
-<label for="Custom Theme Name"></label>
-<input type="text" bind:value={name}>
-<button 
-on:click={() => saveCustomTheme(name, customTheme)}
-class="btn">Save Theme</button>
+
 
      
     
