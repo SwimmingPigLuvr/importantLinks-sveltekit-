@@ -677,6 +677,28 @@ class="btn">Save Theme</button>
     transition: opacity 1s ease-out;
 }
 
+.my-theme {
+  position: relative;
+  width: 200px;  /* Set to your desired width */
+  height: 200px;  /* Set to your desired height */
+}
+
+.my-theme::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('your-image-url.jpg'); /* Set your image URL here */
+  opacity: 0.5;  /* Initial opacity set to 50% */
+  z-index: -1;  /* Place it behind the content */
+}
+
+.my-theme:hover::before {
+  opacity: 1;  /* Opacity set to 100% on hover */
+}
+
   
   </style>
 
