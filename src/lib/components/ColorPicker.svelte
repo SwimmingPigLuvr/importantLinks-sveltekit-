@@ -24,15 +24,24 @@
     export let mode = '';
 
     let fontColor: string;
+    let fontOpacity: number;
     let background: string;
+    let backgroundOpacity: number;
     let buttonColor: string;
+    let buttonOpacity: number;
     let buttonFontColor: string;
+    let buttonFontOpacity: number;
+    let opacity: number = 100;
 
     $: if (customTheme?.font && customTheme?.button && customTheme?.background) {
       fontColor = customTheme.font.color;
+      fontOpacity = customTheme.font.opacity;
       buttonColor = customTheme.button.color;
       background = customTheme.background.value;
+      buttonOpacity = customTheme.button.opacity;
       buttonFontColor = customTheme.button.fontColor;
+      buttonFontOpacity = customTheme.button.fontOpacity;
+      backgroundOpacity = customTheme.background.opacity;
     }
 
     const dispatch = createEventDispatcher();
@@ -120,33 +129,38 @@ if (!customTheme.font) {
         case 'background':
           dataToSave.customTheme.background = {
               style: 'solid',
-              value: chosenValue
+              value: chosenValue,
+              opacity: opacity
           };
           currentBackground = chosenValue;
           break;
         case 'gradient':
           dataToSave.customTheme.background = {
               style: 'gradient',
-              value: chosenValue
+              value: chosenValue,
+              opacity: opacity
           };
           currentGradient = chosenValue;
           break;
         case 'buttonColor':
           dataToSave.customTheme.button = {
               ...dataToSave.customTheme.button,
-              color: chosenValue
+              color: chosenValue,
+              opacity: opacity
           };
           break;
         case 'buttonFontColor':
           dataToSave.customTheme.button = {
               ...dataToSave.customTheme.button,
-              fontColor: chosenValue
+              fontColor: chosenValue,
+              fontOpacity: opacity
           };
           break;
         case 'fontColor':
           dataToSave.customTheme.font = {
               ...dataToSave.customTheme.font,
-              color: chosenValue
+              color: chosenValue,
+              opacity: opacity
           };
           break;
         default: 
@@ -182,7 +196,7 @@ if (!customTheme.font) {
     out:slide={{ duration: 1000, easing: cubicInOut }}
     class="mt-10 z-50 pb-4 mx-auto flex flex-col space-y-4">
 <!-- current color -->
-    <div class="w-full flex items-start space-x-8 p-3 -mt-10 -mb-2">
+    <div class="w-full flex items-start mt-3 mb-6">
         <!-- gradient picker -->
         {#if mode === 'gradient'}
             <div class="{gradientClass} w-40 h-16 rounded-xl shadow-md "></div>
@@ -191,7 +205,9 @@ if (!customTheme.font) {
             <p class="font-input-mono text-{color} text-center text-[1rem]">{gradientColor1} to {gradientColor2}</p>
         {:else}
         <!-- preview -->
-        <div class="flex w-full justify-start space-x-8">
+        <div class="flex flex-col w-full justify-start space-y-8">
+
+          <div class="flex space-x-8">
 
           <!-- current BG -->
           <div class=" flex flex-col justify-start items-start space-y-2">
@@ -220,7 +236,6 @@ if (!customTheme.font) {
               {/if}
             </p>
             
-            
           </div>
 
           
@@ -231,7 +246,24 @@ if (!customTheme.font) {
             <div class="w-40 h-16 rounded-xl shadow-md bg-{color}"></div>
             <p class="font-input-mono text-secondary-content text-[1rem]">{color}</p>
           </div>
+          
+          </div>
+
+          <div class="my-10 flex-col">
+            <input type="range" min="0" max="100" bind:value={opacity} class="range range-primary w-1/3" /> 
+          <div class="form-control">
+            <label for="opacity" class="label">
+              <span class="label-text font-input-mono">Opacity</span>
+            </label>
+            <label class="input-group">
+              <input type="text" min="0" max="100" id="opacity" bind:value={opacity} class="input input-bordered" />
+              <span>%</span>
+            </label>
+          </div>
+          </div>
+
         </div>
+
         {/if}
     </div>
     <h3 class="font-input-mono">Choose {mode}</h3>

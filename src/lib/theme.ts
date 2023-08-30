@@ -4,69 +4,104 @@ import { collection, doc, onSnapshot } from "firebase/firestore";
 import colors from "tailwindcss/colors";
 
 export const buttonStyles = {
+  squareHardShadow: {
+    buttonRadius: "none",
+    fill: false,
+    outline: false,
+    shadow: false,
+    hardShadow: true,
+  },
+  roundHardShadow: {
+    buttonRadius: "[0.5rem]",
+    fill: false,
+    outline: false,
+    shadow: false,
+    hardShadow: true,
+  },
+  circleHardShadow: {
+    buttonRadius: "full",
+    fill: false,
+    outline: false,
+    shadow: false,
+    hardShadow: true,
+  },
   squareFill: {
     buttonRadius: "none",
     fill: true,
     outline: false,
     shadow: false,
+    hardShadow: false,
   },
   roundFill: {
     buttonRadius: "[0.5rem]",
     fill: true,
     outline: false,
     shadow: false,
+    hardShadow: false,
   },
   circleFill: {
     buttonRadius: "full",
     fill: true,
     outline: false,
     shadow: false,
+    hardShadow: false,
   },
   squareOutline: {
     buttonRadius: "none",
     outline: true,
     fill: false,
     shadow: false,
+    hardShadow: false,
   },
   roundOutline: {
     buttonRadius: "[0.5rem]",
     outline: true,
     fill: false,
     shadow: false,
+    hardShadow: false,
   },
   circleOutline: {
     buttonRadius: "full",
     outline: true,
     fill: false,
     shadow: false,
+    hardShadow: false,
   },
   squareShadow: {
     buttonRadius: "none",
     shadow: true,
     fill: false,
     outline: false,
+    hardShadow: false,
   },
   roundShadow: {
     buttonRadius: "[0.5rem]",
     shadow: true,
     fill: false,
     outline: false,
+    hardShadow: false,
   },
   circleShadow: {
     buttonRadius: "full",
     shadow: true,
     fill: false,
     outline: false,
+    hardShadow: false,
   },
 };
 
 export interface CustomTheme {
   background: {
     style: 'image' | 'gradient' | 'solid',
-    value: string
+    value: string,
+    opacity: number
   };
   button: {
-    style: | "squareFill"
+    style: 
+    | "squareHardShadow"
+    | "roundHardShadow"
+    | "circleHardShadow"
+    | "squareFill"
     | "roundFill"
     | "circleFill"
     | "squareOutline"
@@ -76,7 +111,9 @@ export interface CustomTheme {
     | "roundShadow"
     | "circleShadow",
     color: string,
+    opacity: number,
     fontColor: string,
+    fontOpacity: number,
     textEffect: {
       effect: 'none' | 'glow' | 'gradient' | 'highlight',
       onHover: boolean
@@ -85,18 +122,22 @@ export interface CustomTheme {
   font: {
     family: string,
     color: string,
+    opacity: number
   }
 }
 
 export const defaultTheme: CustomTheme = {
   background: {
     style: 'solid',
-    value: 'sky-500'
+    value: 'sky-500',
+    opacity: 100
   },
   button: {
     style: 'circleFill',
     color: 'lime-500',
+    opacity: 100,
     fontColor: 'slate-200',
+    fontOpacity: 100,
     textEffect: {
       effect: 'none',
       onHover: false
@@ -104,14 +145,25 @@ export const defaultTheme: CustomTheme = {
   },
   font: {
     family: 'input-mono',
-    color: 'slate-800'
+    color: 'slate-800',
+    opacity: 100
   }
 };
 
-export function convert(colorName: string = 'lime-400'): string | undefined {
+export function convert(colorName: string = 'lime-400'): string {
   const [color, shade] = colorName.split('-');
   return (colors as any)[color]?.[shade];
 };
+
+export function concatOpacity(hex: string, opacity: number): string {
+  if (opacity >= 0 && opacity <= 99) {
+    // If opacity is a single digit, prepend a '0' for formatting.
+    const paddedOpacity = opacity < 10 ? '0' + opacity.toString() : opacity.toString();
+    return hex.concat(paddedOpacity);
+  } else {
+    return hex.concat('FF');
+  }
+}
 
 export const themeStore = writable(defaultTheme);
 

@@ -1381,6 +1381,68 @@ async function saveCustomTheme(name: string, customTheme: CustomTheme) {
 
 
   hover animation on themes with image bgs (match the other themes)
-  
 
 
+  save background function is saving the bg to all backgrounds of the customTheme arrays
+
+  also need to make a function for selecting custom theme and applying that right away
+
+  notes upload bg function overwrites data for user themes
+
+
+  nothing is difficult
+  everything is within reach
+
+
+
+
+
+august 29
+
+append opacity to hex colors
+
+function append (hex, opacity) {
+    yields #Hex + (00 - FF)
+}
+
+
+raw userdata
+livePreview toggles between user data.
+that way they can see everything they have selected.
+2 item carousel would be cool
+use nerd emoji to signify
+
+add previews so user knows whats what
+
+data preview
+pfp
+username
+bio
+theme:
+    background:
+        style
+        value
+        opacity
+    button:
+        style
+        color
+        opacity
+        fontColor
+        fontOpacity
+        textEffect:
+            effect
+            onHover
+    font:
+        family
+        color
+        opacity 
+userThemes
+
+see if concat function works
+goal: to set opacity for different color values across my project
+
+trying to force a result form this function
+but should i simplify it?
+
+right now to get the hex with opacity i have to
+    convert the tailwind to a hex: string | undefined

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import UserLink from "./UserLink.svelte";
-    import { fly } from "svelte/transition";
+    import { fly, blur, fade, slide } from "svelte/transition";
     import { backOut } from "svelte/easing";
   import { convert, type CustomTheme } from "$lib/theme";
   import Page from "../../routes/+page.svelte";
@@ -22,12 +22,15 @@
   let font: string;
   let fontColor: string;
   let fontColorHex: string | undefined;
+  let buttonColor: string;
 
   $: if (customTheme && customTheme?.background && customTheme?.font) {
     background = customTheme.background.value;
     backgroundStyle = customTheme.background.style;
     font = customTheme.font.family;
     fontColor = customTheme?.font?.color;
+
+    buttonColor = customTheme?.button?.color;
 
     fontColorHex = convert(fontColor);
     backgroundHex = convert(background);
@@ -36,12 +39,17 @@
 
   
 
+  let showData = false;
   let showPreview = false;
 
   let mounted = false;
     
   function togglePreview() {
     showPreview = !showPreview;
+  }
+
+  function toggleShowData() {
+    showData = !showData;
   }
 
   $: previewMode = !showPreview;
@@ -74,21 +82,37 @@
 </script>
 
 <!-- toggle button -->
-<button 
-  on:click={() => {
-    togglePreview();
-    console.log('showPreview? ', showPreview);
-  }}
-  class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-1/2 bg-info hover:bg-accent duration-300 ease-in-out transition-all transform font-totally-gothic text-5xl p-4 px-8 rounded-full">
+<div 
+class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-1/3 bg-info hover:bg-accent duration-300 ease-in-out transition-all transform font-totally-gothic text-5xl p-6 px-8 rounded-full">
+  <button 
+    on:click={() => {
+      togglePreview();
+      console.log('showPreview? ', showPreview);
+    }}>
     <p class="m-auto">
       {#if !showPreview}
         👀
       {:else}
-         🙈
+         <div class="tooltip tooltip-success" data-tip="Back">
+          <button>🙈</button>
+         </div>
+         <div class="tooltip tooltip-info" data-tip={`${showData ? 'Hide Data' : 'Data'}`}>
+          <button
+            on:click|stopPropagation={() => {
+              toggleShowData();
+              console.log('showData? ', showData);
+            }}>🤓</button>
+         </div>
       {/if}
     </p>
   </button>
+</div>
 <!-- end toggle button -->
+
+<!-- view data button -->
+
+
+<!-- end view data button -->
 
 
   
@@ -106,6 +130,12 @@
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg-{background? background : 'secondary'} flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
+
+    <!-- preview container -->
+    {#if !showData}
+    <div
+      in:blur={{ delay: 300, amount: 100, duration: 1000, easing: backOut }}
+    >
 
       <div 
       style={`color: ${fontColorHex}`}
@@ -130,6 +160,24 @@
             </li>
           {/each}
         </ul>
+      </div>
+      {:else}
+      <!-- data container -->
+      <div
+        in:fade={{duration: 1000, easing: backOut}}
+        out:fade={{duration: 1000, easing: backOut}}
+        class="bg-{buttonColor} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen">
+          <!-- data -->
+          <div>
+
+          </div>
+
+      </div>
+      {/if}
+
+
+
+
             </div>
         </div>
     </div>

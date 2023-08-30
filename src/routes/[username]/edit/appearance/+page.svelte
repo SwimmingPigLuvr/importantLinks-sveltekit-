@@ -168,7 +168,9 @@
     // update textEffect
     batch.set(doc(db, "users", $user!.uid), {
       customTheme: {
-        textEffect: textEffect
+        button: { 
+          textEffect: textEffect 
+        }
       }
     } , { merge: true });
 
@@ -271,14 +273,10 @@
       const result = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(result.ref);
 
-      batch.set(doc(db, `users/${$user!.uid}`), { 
-        customTheme: {
-          background: {
-            style: 'image',
-            value: url
-          }
-        }
-      }, { merge: true });
+      const updatedBackground = { ...customTheme, background: { style: 'image', value: url } };
+
+
+      batch.update(doc(db, 'users', $user!.uid), { "customTheme.background.style": 'image', "customTheme.background.value": url });
 
       await batch.commit();
 
@@ -544,6 +542,14 @@
           <button on:click|preventDefault={() => handleButtonSelect('roundShadow')}  class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full mb-4"></button>
           <button on:click|preventDefault={() => handleButtonSelect('circleShadow')} class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full mb-4 rounded-full"></button>
         </div>
+
+          <!-- hardShadow -->
+          <h3 class="font-input-mono text-white my-2">Hard Shadow</h3>
+        <div class="flex flex-wrap justify-between">
+          <button on:click|preventDefault={() => handleButtonSelect('squareHardShadow')} class="btn hardShadow bg-opacity-0 w-full rounded-none mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('roundHardShadow')}  class="btn hardShadow bg-opacity-0 w-full mb-4"></button>
+          <button on:click|preventDefault={() => handleButtonSelect('circleHardShadow')} class="btn hardShadow bg-opacity-0 w-full mb-4 rounded-full"></button>
+        </div>
             
   <!-- colors -->
   <div class="flex justify-start space-x-8">
@@ -576,8 +582,8 @@
         class="btn w-1/3 rounded-md mb-4">
         Glow
       </button>
-      <button on:click|preventDefault={() => handleTextEffectSelect('highligh', false)} class="btn w-1/3 rounded-md mb-4">Highlight</button>
-      <button on:click|preventDefault={() => handleButtonSelect('gradient', false)} class="btn w-1/4 rounded-md mb-4">Gradient</button>
+      <button on:click|preventDefault={() => handleTextEffectSelect('highlight', false)} class="btn w-1/3 rounded-md mb-4">Highlight</button>
+      <button on:click|preventDefault={() => handleTextEffectSelect('gradient', false)} class="btn w-1/4 rounded-md mb-4">Gradient</button>
     </div>
   
       
