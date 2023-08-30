@@ -1471,3 +1471,48 @@ shade === 'lime',
 value === 400
 
 buttonColor = shade + value
+
+
+todo
+implement new color selection
+
+color picker still exists but its less in the way
+
+color div (far left) is built with convert(shade + value) + opacity appended
+
+
+the inputs can update the db on change
+todo
+
+create update functions:
+    updateButtonShade
+    updateButtonValue
+    updateButtonOpacity
+
+show color picker discretely below relevant options
+right now it is too far below
+too much scrolling
+
+
+right now the buttonCOlor is split into buttonShade and buttonValue
+so buttonColor = buttonShade.concat(buttonValue.toString())
+
+so changing 1 value should apply this
+
+but im not sure if buttonColor can be constructed from these 2 if these 2 are coming form a split
+
+
+next steps
+shade + value drop down should reflect the shades and values
+
+aha!
+
+splitting buttonColor yeilds buttonShade and buttonValue as strings but i have buttonValue as a number
+let's change this and hope i stop getting yelled at
+
+buttonValue is perpetually undefined
+
+
+getting rid of the default buttonValue = '400' just saved my ass
+
+

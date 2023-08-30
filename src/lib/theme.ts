@@ -155,13 +155,13 @@ export function convert(colorName: string = 'lime-400'): string {
   return (colors as any)[color]?.[shade];
 };
 
-export function concatOpacity(hex: string, opacity: number): string {
+export function concatOpacity(hex: string | undefined, opacity: number): string {
   if (opacity >= 0 && opacity <= 99) {
     // If opacity is a single digit, prepend a '0' for formatting.
     const paddedOpacity = opacity < 10 ? '0' + opacity.toString() : opacity.toString();
-    return hex.concat(paddedOpacity);
+    return hex?.concat(paddedOpacity) ?? '';
   } else {
-    return hex.concat('FF');
+    return hex?.concat('FF') ?? '';
   }
 }
 

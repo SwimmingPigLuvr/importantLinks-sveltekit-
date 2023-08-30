@@ -14,6 +14,7 @@
   import type { PageData } from "./$types";
   import Nav from "$lib/components/Nav.svelte";
   import colors from "tailwindcss/colors";
+  import { convert, concatOpacity } from "$lib/theme";
 
   let textEffect: {effect: string, onHover: boolean};
 
@@ -41,7 +42,15 @@
 
   // new color flow
   let shade: string = 'lime';
-  let value: number = 400;
+  let value: number;
+  let opacity: number = 100;
+
+  // button shade value opacity
+  let buttonShade: string = 'lime';
+  let buttonValue: string = '400';
+  let buttonOpacity: number = 100;
+
+  let tempButtonColor: string;
 
   let userThemes: CustomTheme[] = [];
   
@@ -50,6 +59,9 @@
   let backgroundHex: string | undefined;
   let buttonColorHex: string | undefined;
   let buttonFontColorHex: string | undefined;
+
+  // complicated vars lol
+  let bchwo: string;
 
   $: if ($userData) {
     username = $userData.username;
@@ -84,17 +96,24 @@
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
 
+    // split color strings
+
+    // append opacity
+    bchwo = concatOpacity(buttonColorHex, buttonOpacity);
+
   }
 
   $: if (data && data.customTheme) {
     updateTheme(customTheme);
   }
 
+  // delete this: will be imported from theme.ts
   // convert tailwind to hex
-  function convert(colorName: string): string | undefined {
-    const [color, shade] = colorName.split('-');
-    return (colors as any)[color]?.[shade];
-  }
+
+  // function convert(colorName: string): string | undefined {
+  //   const [color, shade] = colorName.split('-');
+  //   return (colors as any)[color]?.[shade];
+  // }
 
   let mode = '';
 
@@ -328,6 +347,42 @@
     } finally {
       uploading = false;
     }
+
+  }
+
+  async function updateButtonShade(buttonShade: string, buttonValue: string) {
+    console.log('updating button shade: ', buttonShade);
+    console.log('updating button value: ', buttonValue);
+
+    // combine buttonshade and button value
+    tempButtonColor = buttonShade + '-' + buttonValue.toString();
+    console.log('new button color: ', tempButtonColor);
+
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+            button: {
+              color: tempButtonColor
+            }
+        }
+    }, { merge: true });
+
+    await batch.commit();
+    tempButtonColor = '';
+
+
+  }
+
+  function updateButtonValue() {
+    console.log('updating button shade: ', buttonValue);
+
+  }
+
+  function updateButtonOpacity() {
+    console.log('updating button shade: ', buttonOpacity);
+
 
   }
 
@@ -593,53 +648,82 @@
           <button on:click|preventDefault={() => handleButtonSelect('circleHardShadow')} class="btn hardShadow bg-opacity-0 w-full mb-4 rounded-full"></button>
         </div>
             
-  <!-- colors -->
+  <!-- container -->
   <div class="flex flex-col justify-start space-y-4">
 
-      <label for="Button Color" class="label">
-        <div id="Button Color" class="join mt-10">
+    <!-- button color + opacity -->
+    <div class="flex justify-start space-x-10 mt-8">
+
+      <!-- button color -->
+      <div>
+        <label for="Button Color" class="label">
           <span class="label-text font-input-mono">Button Color</span>
-          <button on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} class="btn w-1/4 bg-{buttonColor} rounded-md"></button>
-          <select bind:value={shade} class="select select-bordered">
-            <option>Slate</option>
-            <option>Gray</option>
-            <option>Zinc</option>
-            <option>Neutral</option>
-            <option>Stone</option>
-            <option>Red</option>
-            <option>Orange</option>
-            <option>Amber</option>
-            <option>Yellow</option>
-            <option>Lime</option>
-            <option>Green</option>
-            <option>Emerald</option>
-            <option>Teal</option>
-            <option>Cyan</option>
-            <option>Sky</option>
-            <option>Blue</option>
-            <option>Indigo</option>
-            <option>Violet</option>
-            <option>Purple</option>
-            <option>Fuchsia</option>
-            <option>Pink</option>
-            <option>Rose</option>
-          </select>
-          <select class="select select-bordered w-full max-w-xs">
-            <option>{value}</option>
-            <option>50</option>
-            <option>100</option>
-            <option>200</option>
-            <option>300</option>
-            <option>400</option>
-            <option>500</option>
-            <option>600</option>
-            <option>700</option>
-            <option>800</option>
-            <option>900</option>
-            <option>950</option>
-          </select>
+        </label>      
+        <div id="Button Color" class="join">
+
+            <!-- show buttoncolor / clikc for color picker -->
+            <button 
+              style={`background-color: ${bchwo? bchwo : 'white'}`}
+              on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} 
+              class="btn w-1/4 rounded-md"></button>
+
+            <!-- select shade -->
+            <select bind:value={buttonShade} on:change={() => updateButtonShade(buttonShade, buttonValue)} class="select select-bordered">
+              <option>slate</option>
+              <option>gray</option>
+              <option>zinc</option>
+              <option>neutral</option>
+              <option>stone</option>
+              <option>red</option>
+              <option>orange</option>
+              <option>amber</option>
+              <option>yellow</option>
+              <option>lime</option>
+              <option>green</option>
+              <option>emerald</option>
+              <option>teal</option>
+              <option>cyan</option>
+              <option>sky</option>
+              <option>blue</option>
+              <option>indigo</option>
+              <option>violet</option>
+              <option>purple</option>
+              <option>fuchsia</option>
+              <option>pink</option>
+              <option>rose</option>
+            </select>
+
+            <!-- select value -->
+            <select bind:value={buttonValue} on:change={() => updateButtonValue()} class="select select-bordered">
+              <option>50</option>
+              <option>100</option>
+              <option>200</option>
+              <option>300</option>
+              <option>400</option>
+              <option>500</option>
+              <option>600</option>
+              <option>700</option>
+              <option>800</option>
+              <option>900</option>
+              <option>950</option>
+            </select>
         </div>
-      </label>      
+      </div>
+
+      <!-- opacity -->
+      <div class="form-control">
+        <label for="opacity" class="label">
+          <span class="label-text font-input-mono">Opacity</span>
+        </label>
+        <label class="input-group">
+          <input type="text" min="0" max="100" id="opacity" bind:value={opacity} on:change={() => updateButtonOpacity()} class="input input-bordered w-1/2" />
+          <span>%</span>
+        </label>
+      </div>
+    </div>
+
+
+
 
       <!-- button font color -->
     <div>
@@ -652,7 +736,7 @@
 
 
 
-    
+
     <!-- font size -->
     <div class="form-control">
       <label for="Font Size" class="label">
