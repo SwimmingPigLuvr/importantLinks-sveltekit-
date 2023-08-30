@@ -1446,3 +1446,28 @@ but should i simplify it?
 
 right now to get the hex with opacity i have to
     convert the tailwind to a hex: string | undefined
+
+goal: keep adding more style options without it getting messy
+
+
+styles to add:
+
+font size
+glowing text
+gradients, gradient directions
+
+changes in data:
+    keep everything in objects that make sense
+
+
+
+use drop down to select color and save
+
+
+example of new color selection:
+
+buttonColor === 'lime-400',
+shade === 'lime',
+value === 400
+
+buttonColor = shade + value

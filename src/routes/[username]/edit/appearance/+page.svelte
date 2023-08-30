@@ -29,12 +29,19 @@
   
   // declare customTheme vars
   let font: string;
+  let fontSize: number = 1;
   let fontColor: string;
   let background: string;
   let backgroundStyle: 'gradient' | 'image' | 'solid'
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
+  let buttonFontSize: number = 1;
+
+
+  // new color flow
+  let shade: string = 'lime';
+  let value: number = 400;
 
   let userThemes: CustomTheme[] = [];
   
@@ -104,6 +111,41 @@
 
     await batch.commit();
     chosenTheme = '';
+  }
+
+  async function changeFontSize() {
+    console.log('changing font size to: ', fontSize);
+
+    const batch = writeBatch(db);
+    batch.set(doc(db, "users", $user!.uid), {
+      customTheme: {
+        ...customTheme,
+        font: {
+          ...font,
+          family: font,
+          size: fontSize,
+        }
+      }
+    }, {merge: true});
+
+    await batch.commit();
+  }
+
+  async function changeButtonFontSize() {
+    console.log('changing buttonFontsize to: ', buttonFontSize);
+
+    const batch = writeBatch(db);
+    batch.set(doc(db, "users", $user!.uid), {
+      customTheme: {
+        ...customTheme,
+        button: {
+          ...button,
+          fontSize: buttonFontSize
+        }
+      }
+    }, { merge: true })
+
+    await batch.commit();
   }
 
   const handleThemeSelect = (selectedTheme: string) => {
@@ -552,18 +594,74 @@
         </div>
             
   <!-- colors -->
-  <div class="flex justify-start space-x-8">
+  <div class="flex flex-col justify-start space-y-4">
+
+      <label for="Button Color" class="label">
+        <div id="Button Color" class="join mt-10">
+          <span class="label-text font-input-mono">Button Color</span>
+          <button on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} class="btn w-1/4 bg-{buttonColor} rounded-md"></button>
+          <select bind:value={shade} class="select select-bordered">
+            <option>Slate</option>
+            <option>Gray</option>
+            <option>Zinc</option>
+            <option>Neutral</option>
+            <option>Stone</option>
+            <option>Red</option>
+            <option>Orange</option>
+            <option>Amber</option>
+            <option>Yellow</option>
+            <option>Lime</option>
+            <option>Green</option>
+            <option>Emerald</option>
+            <option>Teal</option>
+            <option>Cyan</option>
+            <option>Sky</option>
+            <option>Blue</option>
+            <option>Indigo</option>
+            <option>Violet</option>
+            <option>Purple</option>
+            <option>Fuchsia</option>
+            <option>Pink</option>
+            <option>Rose</option>
+          </select>
+          <select class="select select-bordered w-full max-w-xs">
+            <option>{value}</option>
+            <option>50</option>
+            <option>100</option>
+            <option>200</option>
+            <option>300</option>
+            <option>400</option>
+            <option>500</option>
+            <option>600</option>
+            <option>700</option>
+            <option>800</option>
+            <option>900</option>
+            <option>950</option>
+          </select>
+        </div>
+      </label>      
+
+      <!-- button font color -->
     <div>
-      <h3 class="font-input-mono text-white my-2 text-xs">Button Color</h3>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} class="btn w-40 h-10 bg-{buttonColor} rounded-md"></div>
+      <label for="Button Font Color" class="label">
+        <span class="label-text font-input-mono">Font Color</span>
+      </label>
+      <button on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonFontColor'}} class="btn w-1/4 bg-{buttonFontColor} rounded-md"></button>
     </div>
-    <div>
-      <h3 class="font-input-mono text-white my-2 text-xs">Button Font Color</h3>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonFontColor'}} class="btn w-40 h-10 bg-{buttonFontColor} rounded-md"></div>
+
+
+
+
+    
+    <!-- font size -->
+    <div class="form-control">
+      <label for="Font Size" class="label">
+        <span class="label-text font-input-mono">Font Size</span>
+      </label>
+      <label class="input-group">
+        <input type="number" min="0" max="100" id="fontSize" bind:value={fontSize} on:change={() => changeFontSize()} class="input input-bordered w-1/2" />
+        <span>Rem</span>
+      </label>
     </div>
 
   </div>
@@ -610,12 +708,30 @@
           <Fonts />
         </div>
       {/if}
-      <h3 class="font-input-mono text-white my-2">Font Color</h3>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div 
+      <div class="flex space-x-8 mt-4">
+
+        <div class="flex flex-col">
+          <label for="Font Color" class="label">
+            <span class="label-text font-input-mono">Font Color</span>
+          </label>
+      <button 
         on:click={() => {toggleShowFontColorPicker(); mode = 'fontColor'}} 
         style={`color: ${fontColorHex}`}
-        class="w-10 h-10 bg-{fontColor} rounded-md"></div>
+        class="btn w-full bg-{fontColor} rounded-md"></button>
+        </div>
+
+        <!-- font size -->
+        <div class="form-control">
+          <label for="Font Size" class="label">
+            <span class="label-text font-input-mono">Font Size</span>
+          </label>
+          <label class="input-group">
+            <input type="number" min="0" max="100" id="fontSize" bind:value={fontSize} on:change={() => changeFontSize()} class="input input-bordered w-1/2" />
+            <span>Rem</span>
+          </label>
+        </div>
+
+      </div>
       
     <div>
 
