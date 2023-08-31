@@ -1515,4 +1515,76 @@ buttonValue is perpetually undefined
 
 getting rid of the default buttonValue = '400' just saved my ass
 
+now i need to implement the update value and update opacity functions
 
+
+functions are updating perfectly
+but the default inputs should reflect the values in the db
+
+
+right now if i get the shade and values from splitting the buttonCOlor it does nothing
+thats because the reactive conditional keeps it stuck on the values from the db
+
+i can create a temp value but then idk how to separate it
+because i have to use bind:value
+
+can i use a default value to show the cureent ones form the db?
+
+and bind the active values?
+
+
+handle update values function?
+
+this function passes different values into the update function. based on the binded values
+
+here is a perfect template:
+
+const handleColorSelect = (selectedValue: string) => {
+    chosenValue = selectedValue;
+    saveChoice(false, customTheme);
+  };
+
+  ill rewrite it as 
+
+const handleUpdateButtonColor = (buttonShade: string, buttonValue: string) => {
+    const [tempBS, tempBV] = [buttonShade, buttonValue];
+    updateButtonColor(tempBS, tempBV)
+}
+
+
+right now the update functions work perfectly. infact i can probably delete the handlers
+
+tempted to leave them and move on to somehting else
+
+todo:
+    ✅delete unneccessary handler functions
+    set up color selections:
+        ✅button color
+        ✅button font
+        background
+            everthing is set up kosher:
+                need to do:
+                    add note that bg opacity preview might look different depending on value of colors behind the preview!
+                        use Daisy ui hover data thing
+                    use bgchwo to reflect background with opacity in the following pages/components
+                        ✅livePreview
+                        routes/username
+                        routes/username/edit
+        font
+    fix outline border sizing issue    
+    fill buttons are white. doesn't listen to db button color
+    let user select button color + border / shadow color
+    figure out how to apply custom themes
+
+    email hannah about geting cameras
+
+
+
+
+
+
+    
+
+
+additional content:
+    embedded songs/videos (soundcloud, yt)

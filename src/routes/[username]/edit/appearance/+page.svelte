@@ -45,12 +45,28 @@
   let value: number;
   let opacity: number = 100;
 
-  // button shade value opacity
+
+  // background shade + value + opacity
+  let bgShade: string = 'sky';
+  let bgValue: string = '600';
+  let bgOpacity: number = 100;
+
+  // button shade value opacity 
   let buttonShade: string = 'lime';
   let buttonValue: string = '400';
   let buttonOpacity: number = 100;
 
+  // button font shade, value, opacity
+  let buttonFontShade: string = 'slate';
+  let buttonFontValue: string = '50';
+  let buttonFontOpacity: number = 100;
+
+
+
+  let tempBackgroundColor: string;
+
   let tempButtonColor: string;
+  let tempButtonFontColor: string;
 
   let userThemes: CustomTheme[] = [];
   
@@ -61,7 +77,17 @@
   let buttonFontColorHex: string | undefined;
 
   // complicated vars lol
+  // bg color hex w opacity
+  let bgchwo: string;
+
+  // button color hex w opacity
   let bchwo: string;
+
+  // button font color hex w opacity
+  let bfchwo: string;
+
+  // font color hex w opacity
+  let fchwo: string;
 
   $: if ($userData) {
     username = $userData.username;
@@ -96,10 +122,14 @@
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
 
-    // split color strings
+    // [buttonShade, buttonValue] = buttonColor.split('-');
 
-    // append opacity
+    // append opacities
+    bgchwo = concatOpacity(backgroundHex, bgOpacity)
+
     bchwo = concatOpacity(buttonColorHex, buttonOpacity);
+
+    bfchwo = concatOpacity(buttonFontColorHex, buttonFontOpacity);
 
   }
 
@@ -261,12 +291,18 @@
   let showGradientPicker = false;
   let showButtonColorPicker = false;
   let showFontColorPicker = false;
+
+  let showColorSelection: boolean = false;
   
   function toggleShowColorPicker() {
     if (showGradientPicker) {
       showGradientPicker = false;
     }
     showColorPicker = !showColorPicker;
+  }
+
+  function toggleShowColorSelection() {
+    showColorSelection = !showColorSelection;
   }
 
 
@@ -350,7 +386,34 @@
 
   }
 
-  async function updateButtonShade(buttonShade: string, buttonValue: string) {
+  async function updateBackgroundColor(bgShade: string, bgValue: string) {
+    console.log('updating bg shade: ', bgShade);
+    console.log('updating bg value: ', bgValue);
+
+    // combine buttonshade and button value
+    tempBackgroundColor = bgShade + '-' + bgValue.toString();
+    console.log('new bg color: ', tempBackgroundColor);
+
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+            background: {
+              style: 'solid',
+              value: tempBackgroundColor,
+              opacity: bgOpacity
+            }
+        }
+    }, { merge: true });
+
+    await batch.commit();
+    tempBackgroundColor = '';
+
+
+  }
+
+  async function updateButtonColor(buttonShade: string, buttonValue: string) {
     console.log('updating button shade: ', buttonShade);
     console.log('updating button value: ', buttonValue);
 
@@ -375,13 +438,81 @@
 
   }
 
-  function updateButtonValue() {
-    console.log('updating button shade: ', buttonValue);
+  async function updateButtonFontColor(buttonFontShade: string, buttonFontValue: string) {
+    console.log('updating button font shade: ', buttonFontShade);
+    console.log('updating button font value: ', buttonFontValue);
+
+    // combine buttonshade and button value
+    tempButtonFontColor = buttonFontShade + '-' + buttonFontValue.toString();
+    console.log('new button font color: ', tempButtonFontColor);
+
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+            button: {
+              fontColor: tempButtonFontColor
+            }
+        }
+    }, { merge: true });
+
+    await batch.commit();
+    tempButtonFontColor = '';
+
 
   }
 
-  function updateButtonOpacity() {
-    console.log('updating button shade: ', buttonOpacity);
+  async function updateBackgroundOpacity() {
+    console.log('updating background opacity: ', bgOpacity);
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        background: {
+          opacity: bgOpacity
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+
+
+  }
+
+  async function updateButtonOpacity() {
+    console.log('updating button opacity: ', buttonOpacity);
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        button: {
+          opacity: buttonOpacity
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+
+
+  }
+
+  async function updateButtonFontOpacity() {
+    console.log('updating button font opacity: ', buttonFontOpacity);
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        button: {
+          fontOpacity: buttonFontOpacity
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
 
 
   }
@@ -509,27 +640,15 @@
         <!-- solid color -->
         <div>
           <button 
-            on:click={() => toggleShowColorPicker()} 
+            on:click={() => toggleShowColorSelection()} 
             class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
           <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Solid Color</h3>
         </div>
-
-
-
-
-
       <!-- gradient -->
       <div>
         <button class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
         <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
       </div>
-
-
-
-
-
-
-
     <!-- img upload -->
 
     <!-- click button -->
@@ -554,9 +673,86 @@
       <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Upload Image</h3>
     </div>
 
-
-    
     </div>
+
+<!-- color selection is right below background styles -->
+{#if showColorSelection}
+<div 
+  in:slide={{duration: 1000, easing: backOut}}
+  out:slide={{duration: 400, easing: backIn}}
+  class="flex justify-start space-x-10 mt-8 ">
+
+  <!-- background color -->
+  <div>
+    <label for="Background Color" class="label">
+      <span class="label-text font-input-mono">Background Color</span>
+    </label>      
+    <div id="Background Color" class="join">
+
+        <!-- show buttoncolor / clikc for color picker -->
+        <button 
+          style={`background-color: ${bgchwo? bgchwo : 'white'}`}
+          on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
+          class="btn w-1/4 rounded-md"></button>
+
+        <!-- select shade -->
+        <select placeholder={bgShade} bind:value={bgShade} on:change={() => updateBackgroundColor(bgShade, bgValue)} class="select select-bordered">
+          <option>slate</option>
+          <option>gray</option>
+          <option>zinc</option>
+          <option>neutral</option>
+          <option>stone</option>
+          <option>red</option>
+          <option>orange</option>
+          <option>amber</option>
+          <option>yellow</option>
+          <option>lime</option>
+          <option>green</option>
+          <option>emerald</option>
+          <option>teal</option>
+          <option>cyan</option>
+          <option>sky</option>
+          <option>blue</option>
+          <option>indigo</option>
+          <option>violet</option>
+          <option>purple</option>
+          <option>fuchsia</option>
+          <option>pink</option>
+          <option>rose</option>
+        </select>
+
+        <!-- select value -->
+        <select bind:value={bgValue} on:change={() => updateBackgroundColor(bgShade, bgValue)} class="select select-bordered">
+          <option>50</option>
+          <option>100</option>
+          <option>200</option>
+          <option>300</option>
+          <option>400</option>
+          <option>500</option>
+          <option>600</option>
+          <option>700</option>
+          <option>800</option>
+          <option>900</option>
+          <option>950</option>
+        </select>
+    </div>
+  </div>
+
+  <!-- opacity -->
+  <div class="form-control">
+    <label for="opacity" class="label">
+      <span class="label-text font-input-mono">Opacity</span>
+    </label>
+    <label class="input-group">
+      <input type="text" min="0" max="100" id="opacity" bind:value={bgOpacity} on:change={() => updateBackgroundOpacity()} class="input input-bordered w-1/2" />
+      <span>%</span>
+    </label>
+  </div>
+</div>
+{/if}
+
+
+
     <!-- form here -->
       {#if showBackgroundImageForm}
       <form 
@@ -651,8 +847,10 @@
   <!-- container -->
   <div class="flex flex-col justify-start space-y-4">
 
+
+    <!-- color select -->
     <!-- button color + opacity -->
-    <div class="flex justify-start space-x-10 mt-8">
+    <div class="flex justify-start space-x-10 mt-8 ">
 
       <!-- button color -->
       <div>
@@ -668,7 +866,7 @@
               class="btn w-1/4 rounded-md"></button>
 
             <!-- select shade -->
-            <select bind:value={buttonShade} on:change={() => updateButtonShade(buttonShade, buttonValue)} class="select select-bordered">
+            <select placeholder={buttonShade} bind:value={buttonShade} on:change={() => updateButtonColor(buttonShade, buttonValue)} class="select select-bordered">
               <option>slate</option>
               <option>gray</option>
               <option>zinc</option>
@@ -694,7 +892,7 @@
             </select>
 
             <!-- select value -->
-            <select bind:value={buttonValue} on:change={() => updateButtonValue()} class="select select-bordered">
+            <select bind:value={buttonValue} on:change={() => updateButtonColor(buttonShade, buttonValue)} class="select select-bordered">
               <option>50</option>
               <option>100</option>
               <option>200</option>
@@ -716,7 +914,7 @@
           <span class="label-text font-input-mono">Opacity</span>
         </label>
         <label class="input-group">
-          <input type="text" min="0" max="100" id="opacity" bind:value={opacity} on:change={() => updateButtonOpacity()} class="input input-bordered w-1/2" />
+          <input type="text" min="0" max="100" id="opacity" bind:value={buttonOpacity} on:change={() => updateButtonOpacity()} class="input input-bordered w-1/2" />
           <span>%</span>
         </label>
       </div>
@@ -726,12 +924,75 @@
 
 
       <!-- button font color -->
-    <div>
-      <label for="Button Font Color" class="label">
-        <span class="label-text font-input-mono">Font Color</span>
-      </label>
-      <button on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonFontColor'}} class="btn w-1/4 bg-{buttonFontColor} rounded-md"></button>
-    </div>
+      <div class="flex justify-start space-x-10 mt-8 ">
+
+        <!-- button color -->
+        <div>
+          <label for="Button Font Color" class="label">
+            <span class="label-text font-input-mono">Button Font Color</span>
+          </label>      
+          <div id="Button Font Color" class="join">
+  
+              <!-- show buttoncolor / clikc for color picker -->
+              <button 
+                style={`background-color: ${bfchwo? bfchwo : 'white'}`}
+                on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonFontColor'}} 
+                class="btn w-1/4 rounded-md"></button>
+  
+              <!-- select shade -->
+              <select placeholder={buttonFontShade} bind:value={buttonFontShade} on:change={() => updateButtonFontColor(buttonFontShade, buttonFontValue)} class="select select-bordered">
+                <option>slate</option>
+                <option>gray</option>
+                <option>zinc</option>
+                <option>neutral</option>
+                <option>stone</option>
+                <option>red</option>
+                <option>orange</option>
+                <option>amber</option>
+                <option>yellow</option>
+                <option>lime</option>
+                <option>green</option>
+                <option>emerald</option>
+                <option>teal</option>
+                <option>cyan</option>
+                <option>sky</option>
+                <option>blue</option>
+                <option>indigo</option>
+                <option>violet</option>
+                <option>purple</option>
+                <option>fuchsia</option>
+                <option>pink</option>
+                <option>rose</option>
+              </select>
+  
+              <!-- select value -->
+              <select bind:value={buttonFontValue} on:change={() => updateButtonFontColor(buttonFontShade, buttonFontValue)} class="select select-bordered">
+                <option>50</option>
+                <option>100</option>
+                <option>200</option>
+                <option>300</option>
+                <option>400</option>
+                <option>500</option>
+                <option>600</option>
+                <option>700</option>
+                <option>800</option>
+                <option>900</option>
+                <option>950</option>
+              </select>
+          </div>
+        </div>
+  
+        <!-- opacity -->
+        <div class="form-control">
+          <label for="opacity" class="label">
+            <span class="label-text font-input-mono">Opacity</span>
+          </label>
+          <label class="input-group">
+            <input type="text" min="0" max="100" id="opacity" bind:value={buttonFontOpacity} on:change={() => updateButtonFontOpacity()} class="input input-bordered w-1/2" />
+            <span>%</span>
+          </label>
+        </div>
+      </div>
 
 
 
