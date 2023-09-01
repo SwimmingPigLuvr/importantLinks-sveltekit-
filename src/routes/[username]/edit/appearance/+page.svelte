@@ -524,8 +524,28 @@
 
     await batch.commit();
     tempButtonShadowColor = '';
+  }
+
+  async function updateBorderColor(buttonBorderShade: string, buttonBorderValue: string) {
+
+    // combine buttonshade and button value
+    tempButtonBorderColor = buttonBorderShade + '-' + buttonBorderValue.toString();
+    console.log('new outline color: ', tempButtonBorderColor);
 
 
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+            button: {
+              color: buttonColor,
+              outline: tempButtonBorderColor,
+            }
+        }
+    }, { merge: true });
+
+    await batch.commit();
+    tempButtonBorderColor = '';
   }
 
 
@@ -666,13 +686,28 @@
     }, { merge: true });
 
     await batch.commit();
+  }
 
+  async function updateBorderOpacity() {
+    console.log('updating border opacity: ', buttonBorderOpacity);
 
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        button: {
+          outlineOpacity: buttonBorderOpacity
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
   }
 
 
 
 
+// text effects
   let glow = 'glow';
   let glowHover = 'glowHover';
   let highlight = 'highlight';
@@ -693,91 +728,83 @@
 />
 
 <main class="flex flex-col">
-
-  
-
-<div id="top" class="flex flex-col my-20  md:max-w-[62%]">
-<h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Themes</h2>
-
-  <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
+  <div id="top" class="flex flex-col my-20  md:max-w-[62%]">
+    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Themes</h2>
+    <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
     <!-- themes -->
-    <div class="flex overflow-auto space-x-2">
-      <!-- custom -->
-      <div>
+      <div class="flex overflow-auto space-x-2">
+        <!-- custom -->
+        <div>
+          <a href="#custom" class="btn bg-white border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
+            <p class="max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="font-gin">Create </span><span class="font-totally-gothic">Custom </span><span class="font-typewriter">Theme </span></p>
+          </a>
+          <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
+        </div>
 
-      <a href="#custom" class="btn bg-white border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
-        <p class="max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="font-gin">Create </span><span class="font-totally-gothic">Custom </span><span class="font-typewriter">Theme </span></p>
-      </a>
-      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
-      </div>
-
-      <!-- user made themes -->
-      {#each userThemes as userTheme, index}
-      <div class="">
-        {#each Object.keys(userTheme) as key}
-        {#if userTheme[key]}
-          <button 
-        on:click|preventDefault={() => handleThemeSelect(theme)} 
-        style={`color: ${fontColorHex}; ${userTheme[key].background.style === 'image' ? `background-image: url(${userTheme[key].background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme[key].background.style === 'solid' ? `background-color: ${convert(userTheme[key].background.value)}` : '')}`}
-        class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
-          <div class={`font-${userTheme[key].font.family} flex flex-col items-center font`}>
-            <!-- pfp -->
-            <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
-            <!-- Username -->
-            <p class="text-[0.5rem]">@{$userData?.username}</p>
-            <!-- bio -->
-            <p class="text-[0.33rem]">{$userData?.bio}</p>
-          </div>
-            <!-- links -->
-            <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
-            <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
-            <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
-        </button>
-        {/if}
-          <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{key}</h3>
+        <!-- user made themes -->
+        {#each userThemes as userTheme, index}
+          <div class="">
+            {#each Object.keys(userTheme) as key}
+              {#if userTheme[key]}
+                <button 
+                  on:click|preventDefault={() => handleThemeSelect(theme)} 
+                  style={`color: ${fontColorHex}; ${userTheme[key].background.style === 'image' ? `background-image: url(${userTheme[key].background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme[key].background.style === 'solid' ? `background-color: ${convert(userTheme[key].background.value)}` : '')}`}
+                  class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
+                    <div class={`font-${userTheme[key].font.family} flex flex-col items-center font`}>
+                      <!-- pfp -->
+                      <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+                      <!-- Username -->
+                      <p class="text-[0.5rem]">@{$userData?.username}</p>
+                      <!-- bio -->
+                      <p class="text-[0.33rem]">{$userData?.bio}</p>
+                    </div>
+                    <!-- links -->
+                    <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+                    <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+                    <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+                </button>
+                {/if}
+              <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{key}</h3>
+            {/each}
+          </div> 
         {/each}
 
-        
-      </div> 
-      {/each}
-
-      <!-- prebuilt Themes -->
-      {#each themes as theme}
-      <div class="">
-
-        <button 
-        on:click|preventDefault={() => handleThemeSelect(theme)} 
-        class="btn bg-primary border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4"
-        class:btn-secondary={theme === chosenTheme}
-        data-theme={theme}>
-        <div class="flex flex-col items-center">
-
-          <!-- pfp -->
-          <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
-          <!-- Username -->
-          <p class="text-[0.5rem]">@{$userData?.username}</p>
-          <!-- bio -->
-          <p class="text-[0.33rem]">{$userData?.bio}</p>
-        </div>
-          <!-- links -->
-          <div class="bg-secondary w-full h-4"></div>
-          <div class="bg-secondary w-full h-4"></div>
-          <div class="bg-secondary w-full h-4"></div>
-        </button>
-      <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2 bg-opacity-0" data-theme={theme}>{theme}</h3>
+        <!-- prebuilt Themes -->
+        {#each themes as theme}
+          <div class="">
+            <button 
+              on:click|preventDefault={() => handleThemeSelect(theme)} 
+              class="btn bg-primary border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4"
+              class:btn-secondary={theme === chosenTheme}
+              data-theme={theme}>
+                <div class="flex flex-col items-center">
+                  <!-- pfp -->
+                  <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+                  <!-- Username -->
+                  <p class="text-[0.5rem]">@{$userData?.username}</p>
+                  <!-- bio -->
+                  <p class="text-[0.33rem]">{$userData?.bio}</p>
+                </div>
+                <!-- links -->
+                <div class="bg-secondary w-full h-4"></div>
+                <div class="bg-secondary w-full h-4"></div>
+                <div class="bg-secondary w-full h-4"></div>
+            </button>
+            <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2 bg-opacity-0" data-theme={theme}>{theme}</h3>
+          </div>
+        {/each}
       </div>
-      {/each}
+    </div>
+
+  <div class="my-4">
+
+    <h2 id="custom" class="m-2 p-2 font-input-mono text-[1.5rem]">Custom Appearance</h2>
+    <div class="m-auto mb-6 px-6">
+      <p class="font-input-mono">Completely customize your swimmingPig profile. 
+        Change your background with colors, gradients and images. 
+        Choose a button style, change the typeface and more.</p>
     </div>
   </div>
-<div class="my-4">
-
-  <h2 id="custom" class="m-2 p-2 font-input-mono text-[1.5rem]">Custom Appearance</h2>
-  <div class="m-auto mb-6 px-6">
-    <p class="font-input-mono">Completely customize your swimmingPig profile. 
-      Change your background with colors, gradients and images. 
-      Choose a button style, change the typeface and more.</p>
-  </div>
-</div>
 
 
     <!-- backgrounds -->
@@ -802,19 +829,7 @@
         <button class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
         <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
       </div>
-    <!-- img upload -->
-
-    <!-- click button -->
-    <!-- image upload modal appears -->
-    <!-- use same method as login/photos -->
-          <!-- desription of method -->
-            <!-- title -->
-            <!-- image previewUrl: background: { style: image, value: url } ? background.value : 'fallbackWallpaper.png' -->
-            <!-- daisy ui: choose File: filename.png -->
-                <!-- *click that -->
-                <!-- one click choose background -->
-                <!-- uploading bar -> upload success -->
-                <!-- choose style: contain | cover | stretch -->
+    
 
 
     <div>
@@ -828,84 +843,84 @@
 
     </div>
 
-<!-- color selection is right below background styles -->
-{#if showColorSelection}
-<div 
-  in:slide={{duration: 1000, easing: backOut}}
-  out:slide={{duration: 400, easing: backIn}}
-  class="flex justify-start space-x-10 mt-8 ">
+    <!-- color selection is right below background styles -->
+    {#if showColorSelection}
+    <div 
+      in:slide={{duration: 1000, easing: backOut}}
+      out:slide={{duration: 400, easing: backIn}}
+      class="flex justify-start space-x-10 mt-8 ">
 
-  <!-- background color -->
-  <div>
-    <label for="Background Color" class="label">
-      <span class="label-text font-input-mono">Background Color</span>
-    </label>      
-    <div id="Background Color" class="join">
+      <!-- background color -->
+      <div>
+        <label for="Background Color" class="label">
+          <span class="label-text font-input-mono">Background Color</span>
+        </label>      
+        <div id="Background Color" class="join">
 
-        <!-- show buttoncolor / clikc for color picker -->
-        <button 
-          style={`background-color: ${bgchwo? bgchwo : 'white'}`}
-          on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
-          class="btn w-1/4 rounded-md"></button>
+            <!-- show buttoncolor / clikc for color picker -->
+            <button 
+              style={`background-color: ${bgchwo? bgchwo : 'white'}`}
+              on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
+              class="btn w-1/4 rounded-md"></button>
 
-        <!-- select shade -->
-        <select placeholder={bgShade} bind:value={bgShade} on:change={() => updateBackgroundColor(bgShade, bgValue)} class="select select-bordered">
-          <option>slate</option>
-          <option>gray</option>
-          <option>zinc</option>
-          <option>neutral</option>
-          <option>stone</option>
-          <option>red</option>
-          <option>orange</option>
-          <option>amber</option>
-          <option>yellow</option>
-          <option>lime</option>
-          <option>green</option>
-          <option>emerald</option>
-          <option>teal</option>
-          <option>cyan</option>
-          <option>sky</option>
-          <option>blue</option>
-          <option>indigo</option>
-          <option>violet</option>
-          <option>purple</option>
-          <option>fuchsia</option>
-          <option>pink</option>
-          <option>rose</option>
-        </select>
+            <!-- select shade -->
+            <select placeholder={bgShade} bind:value={bgShade} on:change={() => updateBackgroundColor(bgShade, bgValue)} class="select select-bordered">
+              <option>slate</option>
+              <option>gray</option>
+              <option>zinc</option>
+              <option>neutral</option>
+              <option>stone</option>
+              <option>red</option>
+              <option>orange</option>
+              <option>amber</option>
+              <option>yellow</option>
+              <option>lime</option>
+              <option>green</option>
+              <option>emerald</option>
+              <option>teal</option>
+              <option>cyan</option>
+              <option>sky</option>
+              <option>blue</option>
+              <option>indigo</option>
+              <option>violet</option>
+              <option>purple</option>
+              <option>fuchsia</option>
+              <option>pink</option>
+              <option>rose</option>
+            </select>
 
-        <!-- select value -->
-        <select bind:value={bgValue} on:change={() => updateBackgroundColor(bgShade, bgValue)} class="select select-bordered">
-          <option>50</option>
-          <option>100</option>
-          <option>200</option>
-          <option>300</option>
-          <option>400</option>
-          <option>500</option>
-          <option>600</option>
-          <option>700</option>
-          <option>800</option>
-          <option>900</option>
-          <option>950</option>
-        </select>
+            <!-- select value -->
+            <select bind:value={bgValue} on:change={() => updateBackgroundColor(bgShade, bgValue)} class="select select-bordered">
+              <option>50</option>
+              <option>100</option>
+              <option>200</option>
+              <option>300</option>
+              <option>400</option>
+              <option>500</option>
+              <option>600</option>
+              <option>700</option>
+              <option>800</option>
+              <option>900</option>
+              <option>950</option>
+            </select>
+        </div>
+      </div>
+
+      <!-- opacity -->
+      <div class="form-control">
+        <label for="opacity" class="label">
+          <span class="label-text font-input-mono">Opacity</span>
+        </label>
+        <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
+
+        <label class="input-group">
+            <input type="text" min="0" max="100" id="opacity" bind:value={bgOpacity} on:change={() => updateBackgroundOpacity()} class="input input-bordered w-1/2" />
+          <span>%</span>
+        </label>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <!-- opacity -->
-  <div class="form-control">
-    <label for="opacity" class="label">
-      <span class="label-text font-input-mono">Opacity</span>
-    </label>
-    <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
-
-    <label class="input-group">
-        <input type="text" min="0" max="100" id="opacity" bind:value={bgOpacity} on:change={() => updateBackgroundOpacity()} class="input input-bordered w-1/2" />
-      <span>%</span>
-    </label>
-    </div>
-  </div>
-</div>
-{/if}
+    {/if}
 
 
 
@@ -1151,7 +1166,7 @@
       </div>
 
     <!-- buttonshadowcolor -->
-    {#if buttonShadow}
+    {#if buttonShadow !== ''}
     <div class="flex justify-start space-x-10 mt-8 ">
 
       <!-- button shadow color -->
@@ -1221,7 +1236,82 @@
         </label>
       </div>
     </div>
+    {/if}
     <!-- buttonshadowcolor -->
+
+    <!-- buttonOutlineColor -->
+    {#if buttonBorder !== ''}
+    <div class="flex justify-start space-x-10 mt-8 ">
+
+      <!-- button outline color -->
+      <div>
+        <label for="Outline Color" class="label">
+          <span class="label-text font-input-mono">Outline Color</span>
+        </label>      
+        <div id="Outline Color" class="join">
+
+            <!-- show outline color / clikc for color picker -->
+            <button 
+              style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
+              on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
+              class="btn w-1/4 rounded-md"></button>
+
+            <!-- select shade -->
+            <select placeholder={buttonBorderShade} bind:value={buttonBorderShade} on:change={() => updateBorderColor(buttonBorderShade, buttonBorderValue)} class="select select-bordered">
+              <option>slate</option>
+              <option>gray</option>
+              <option>zinc</option>
+              <option>neutral</option>
+              <option>stone</option>
+              <option>red</option>
+              <option>orange</option>
+              <option>amber</option>
+              <option>yellow</option>
+              <option>lime</option>
+              <option>green</option>
+              <option>emerald</option>
+              <option>teal</option>
+              <option>cyan</option>
+              <option>sky</option>
+              <option>blue</option>
+              <option>indigo</option>
+              <option>violet</option>
+              <option>purple</option>
+              <option>fuchsia</option>
+              <option>pink</option>
+              <option>rose</option>
+            </select>
+
+            <!-- select value -->
+            <select bind:value={buttonBorderValue} on:change={() => updateBorderColor(buttonBorderShade, buttonBorderValue)} class="select select-bordered">
+              <option>50</option>
+              <option>100</option>
+              <option>200</option>
+              <option>300</option>
+              <option>400</option>
+              <option>500</option>
+              <option>600</option>
+              <option>700</option>
+              <option>800</option>
+              <option>900</option>
+              <option>950</option>
+            </select>
+        </div>
+      </div>
+
+      <!-- opacity -->
+      <div class="form-control">
+        <label for="opacity" class="label">
+          <span class="label-text font-input-mono">Opacity</span>
+        </label>
+        <label class="input-group">
+          <input type="text" min="0" max="100" id="opacity" bind:value={buttonBorderOpacity} on:change={() => updateBorderOpacity()} class="input input-bordered w-1/2" />
+          <span>%</span>
+        </label>
+      </div>
+    </div>
+    {/if}
+    <!-- buttonOutlineColor -->
 
 
 
@@ -1239,8 +1329,8 @@
     </div>
 
   
-<div>
-  </div>
+
+    </div>
     {#if showButtonColorPicker}
       <ColorPicker mode={mode} customTheme={customTheme}/>
     {/if}
@@ -1261,6 +1351,7 @@
     </div>
   
       
+      </div>
   
 
       <!-- fonts -->
