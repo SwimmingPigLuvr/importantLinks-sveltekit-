@@ -114,6 +114,10 @@ export interface CustomTheme {
     opacity: number;
     fontColor: string;
     fontOpacity: number;
+    outline: string;
+    outlineOpacity: number;
+    shadow: string;
+    shadowOpacity: number;
     textEffect: {
       effect: "none" | "glow" | "gradient" | "highlight";
       onHover: boolean;

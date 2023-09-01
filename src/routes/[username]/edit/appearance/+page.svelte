@@ -523,7 +523,7 @@
     }, { merge: true });
 
     await batch.commit();
-    tempButtonShadowColor = '';
+    // tempButtonShadowColor = '';
   }
 
   async function updateBorderColor(buttonBorderShade: string, buttonBorderValue: string) {
@@ -545,7 +545,7 @@
     }, { merge: true });
 
     await batch.commit();
-    tempButtonBorderColor = '';
+    // tempButtonBorderColor = '';
   }
 
 

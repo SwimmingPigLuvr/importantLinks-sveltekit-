@@ -1586,9 +1586,9 @@ todo:
 
     september 1th
 
-    how to add button color to shadow/hardshadow/outline?
-    just save the buttoncolor as usual then pull up another selector for the shadow/hardshadow/outline color
-        update the save button style function to handle cases of outline/shadow/hardshadow
+    ✅how to add button color to shadow/hardshadow/outline?
+    ✅just save the buttoncolor as usual then pull up another selector for the shadow/hardshadow/outline color
+        ✅update the save button style function to handle cases of outline/shadow/hardshadow
             update: add new values:
                 customTheme: {
                     button: {
@@ -1666,3 +1666,61 @@ additional content:
 
 current todo 
     handleBUttonShadowColors
+
+
+
+i probably have to make all of these color selectors into a component if i want to show the color choices
+
+shouldn't be hard just need to pass in the relevant data and see what happens lol
+
+
+current todo separate shadow / outline styles from the button color styles
+    hex values are already set up 😎 thank God
+    need to
+        add these styles to the userlink component the same way that id did with the other ones
+
+
+
+default value is defaulting alright
+
+        but but but but choosing hardshadow style deletes the shadow value
+
+        hardshadow functions deletes the hardshadow value??
+        shadow value is needed for styling the color it's very imbortant
+
+        this is because the save button style uses tempButtonShadowColor / tempButtonBorderColor to style it but
+        these temp values are set to '' before they are called in the previous function
+
+        solution:
+            just keep the tempcolors?? and see what happens 
+                everything is saving correctly.
+
+            next step to see if my solution worked well
+                update ui to reflect the values in the db
+                    hit the userlinks component
+
+                    userLink checklist
+                    
+                    ✅ Button Color
+                    ✅ Button Font Color
+                    ✅ Border Color
+                        ✅ Color
+                        ✅ Opacity
+                    ✅ Shadow Color
+                        ✅ Color
+                        ✅ Opacity
+
+
+                        boom got it. forgot to update value based on the db so they just defaulted to lime
+
+
+now that everything is good to go let's see if i can add a border and a buttoncolor && add a shadow and a button color
+
+
+fills without borders need invisible borders so they the children don't get squeezed squeezed
+
+
+
+livepreview mobile fullscreen:
+    the link sapacing is kinda off
+        FIX IT

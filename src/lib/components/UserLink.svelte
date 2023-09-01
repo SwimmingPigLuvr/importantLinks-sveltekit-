@@ -25,10 +25,22 @@
     let buttonTextEffectHover = false;
     let buttonColorHex: string | undefined;
     let buttonFontColorHex: string | undefined;
+
+    let buttonBorder: string;
+    let buttonShadow: string;
+    let buttonBorderOpacity: number;
+    let buttonShadowOpacity: number;
+    let buttonBorderHex: string | undefined;
+    let buttonShadowHex: string | undefined;
+
     // button color hex w opacity
     let bchwo: string | undefined;
     // button font color hex w opacity
     let bfchwo: string | undefined;
+    // border
+    let buttonBorderHexWithOpacity: string;
+    // shadow
+    let buttonShadowHexWithOpacity: string;
 
     // buttons
     $: if (customTheme && customTheme.button) {
@@ -40,15 +52,28 @@
       buttonOpacity = customTheme.button.opacity;
       buttonFontOpacity = customTheme.button.fontOpacity;
 
+      buttonBorderOpacity = customTheme.button.outlineOpacity;
+      buttonShadowOpacity = customTheme.button.shadowOpacity;
+
+      buttonShadow = customTheme.button.shadow;
+      buttonBorder = customTheme.button.outline;
+
+
 
       // convert tailwind to hex
       buttonColorHex = convert(buttonColor);
       buttonFontColorHex = convert(buttonFontColor);
 
+      buttonBorderHex = convert(buttonBorder);
+      buttonShadowHex = convert(buttonShadow);
+
       // button color hex w opacity
       bchwo = concatOpacity(buttonColorHex, buttonOpacity);
       // font color
       bfchwo = concatOpacity(buttonFontColorHex, buttonFontOpacity);
+
+      buttonBorderHexWithOpacity = concatOpacity(buttonBorderHex, buttonBorderOpacity);
+      buttonShadowHexWithOpacity = concatOpacity(buttonShadowHex, buttonShadowOpacity);
 
     }
 
@@ -84,23 +109,16 @@
   }
   
 </script>
-
-     <!-- if fill then bg-{buttonColor ? {buttonColor} : 'secondary'}, -->
-
-
-
-     <!-- todo make the conditional styles neccessary to apply: -->
-     <!-- buttonColorHex to the border and shadow of outline and shadow -->
-
+      <!-- put this back in the a href style if need be good luk -->
+      <!-- ${fill ? `background-color: ${bchwo};` : ''} -->
 
 <a 
   href="{url}" 
     class:hardShadow={hardShadow}
-    style={`
-      ${shadow ? `box-shadow: 0 10px 20px  -12px ${bchwo};` : ''}
-      ${outline ? `border: 3px solid ${bchwo};` : ''}
-      ${fill ? `background-color: ${bchwo};` : ''}
-      ${hardShadow ? `box-shadow: 10px 10px 0px ${bchwo}; border: 2px solid ${bchwo};` : ''}
+    style={`background-color: ${bchwo}; border: 3px solid transparent;
+      ${shadow ? `box-shadow: 0 10px 20px  -12px ${buttonShadowHexWithOpacity};` : ''}
+      ${outline ? `border: 3px solid ${buttonBorderHexWithOpacity};` : ''}
+      ${hardShadow ? `box-shadow: 10px 10px 0px ${buttonShadowHexWithOpacity}; border: 2px solid ${buttonShadowHexWithOpacity};` : ''}
     `}    
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-0  
@@ -118,8 +136,8 @@
     
     <!-- Link title -->
     <p 
-      style={`color: ${bfchwo ? bfchwo : bchwo};` + (previewMode ? `transform: translateX(-1rem); font-size: 1rem;` : 'transform: translateX(-1.6rem);')}
-      class='font-{buttonFont} {previewMode ? 'text-[0.88rem]' : 'text-[1.5rem]'} herby '>{title}
+      style={`color: ${bfchwo ? bfchwo : 'orange-600'};` + (previewMode ? `transform: translateX(-1rem); font-size: 1rem;` : 'transform: translateX(-1.6rem);')}
+      class='font-{buttonFont} {previewMode ? 'text-[0.5rem]' : 'text-[1rem]'} herby '>{title}
     </p>
     <!-- empty element -->
     <div class="right"></div>
