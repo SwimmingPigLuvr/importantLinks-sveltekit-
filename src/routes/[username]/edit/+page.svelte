@@ -10,7 +10,7 @@
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import { fade, fly, slide, blur } from "svelte/transition";
   import { backIn, backInOut, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
-  import { themeStore } from "$lib/theme";
+  import { concatOpacity, themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
   import colors from "tailwindcss/colors";
   import { updateTheme } from "$lib/themeStore";
@@ -54,10 +54,13 @@
   let buttonFontColor: string;
 
   // hexes 
+  let bgOpacity: number = 100;
   let backgroundHex: string | undefined;
   let fontColorHex: string | undefined;
   let buttonColorHex: string | undefined;
   let buttonFontColorHex: string | undefined;
+
+  let bgchwo: string;
 
   $: if ($userData) {
     username = $userData.username;
@@ -70,6 +73,7 @@
     font = customTheme.font.family;
     fontColor = customTheme.font.color;
     background = customTheme.background.value;
+    bgOpacity = customTheme.background.opacity;
     backgroundStyle = customTheme.background.style;
     buttonStyle = customTheme.button.style;
     buttonColor = customTheme.button.color;
@@ -80,6 +84,8 @@
     fontColorHex = fontColor ? convert(fontColor) : undefined;
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+
+    bgchwo = concatOpacity(backgroundHex, bgOpacity);
 
   }
 
@@ -234,7 +240,7 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
 
 class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-gothic'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 

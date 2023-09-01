@@ -92,76 +92,80 @@ export const buttonStyles = {
 
 export interface CustomTheme {
   background: {
-    style: 'image' | 'gradient' | 'solid',
-    value: string,
-    opacity: number
+    style: "image" | "gradient" | "solid";
+    value: string;
+    opacity: number;
   };
   button: {
-    style: 
-    | "squareHardShadow"
-    | "roundHardShadow"
-    | "circleHardShadow"
-    | "squareFill"
-    | "roundFill"
-    | "circleFill"
-    | "squareOutline"
-    | "roundOutline"
-    | "circleOutline"
-    | "squareShadow"
-    | "roundShadow"
-    | "circleShadow",
-    color: string,
-    opacity: number,
-    fontColor: string,
-    fontOpacity: number,
+    style:
+      | "squareHardShadow"
+      | "roundHardShadow"
+      | "circleHardShadow"
+      | "squareFill"
+      | "roundFill"
+      | "circleFill"
+      | "squareOutline"
+      | "roundOutline"
+      | "circleOutline"
+      | "squareShadow"
+      | "roundShadow"
+      | "circleShadow";
+    color: string;
+    opacity: number;
+    fontColor: string;
+    fontOpacity: number;
     textEffect: {
-      effect: 'none' | 'glow' | 'gradient' | 'highlight',
-      onHover: boolean
-    }
+      effect: "none" | "glow" | "gradient" | "highlight";
+      onHover: boolean;
+    };
   };
   font: {
-    family: string,
-    color: string,
-    opacity: number
-  }
+    family: string;
+    color: string;
+    opacity: number;
+  };
 }
 
 export const defaultTheme: CustomTheme = {
   background: {
-    style: 'solid',
-    value: 'sky-500',
-    opacity: 100
+    style: "solid",
+    value: "sky-500",
+    opacity: 100,
   },
   button: {
-    style: 'circleFill',
-    color: 'lime-500',
+    style: "circleFill",
+    color: "lime-500",
     opacity: 100,
-    fontColor: 'slate-200',
+    fontColor: "slate-200",
     fontOpacity: 100,
     textEffect: {
-      effect: 'none',
-      onHover: false
-    }
+      effect: "none",
+      onHover: false,
+    },
   },
   font: {
-    family: 'input-mono',
-    color: 'slate-800',
-    opacity: 100
-  }
+    family: "input-mono",
+    color: "slate-800",
+    opacity: 100,
+  },
 };
 
-export function convert(colorName: string = 'lime-400'): string {
-  const [color, shade] = colorName.split('-');
+export function convert(colorName: string = "lime-400"): string {
+  const [color, shade] = colorName.split("-");
   return (colors as any)[color]?.[shade];
-};
+}
 
-export function concatOpacity(hex: string | undefined, opacity: number): string {
+export function concatOpacity(
+  hex: string | undefined,
+  opacity: number,
+): string {
   if (opacity >= 0 && opacity <= 99) {
     // If opacity is a single digit, prepend a '0' for formatting.
-    const paddedOpacity = opacity < 10 ? '0' + opacity.toString() : opacity.toString();
-    return hex?.concat(paddedOpacity) ?? '';
+    const paddedOpacity =
+      opacity < 10 ? "0" + opacity.toString() : opacity.toString();
+    return hex?.concat(paddedOpacity) ?? "";
   } else {
-    return hex?.concat('FF') ?? '';
+    return hex?.concat("FF") ?? "";
   }
 }
 

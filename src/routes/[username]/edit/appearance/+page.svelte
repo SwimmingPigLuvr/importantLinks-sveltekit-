@@ -51,6 +51,9 @@
   let bgValue: string = '600';
   let bgOpacity: number = 100;
 
+
+
+
   // button shade value opacity 
   let buttonShade: string = 'lime';
   let buttonValue: string = '400';
@@ -61,12 +64,36 @@
   let buttonFontValue: string = '50';
   let buttonFontOpacity: number = 100;
 
+  // button border shade, value, opacity
+  let buttonBorder: string;
+  let buttonBorderShade: string = 'lime';
+  let buttonBorderValue: string = '50';
+  let buttonBorderOpacity: number = 100;
+
+  // button shadow shade value opacity
+  let buttonShadow: string;
+  let buttonShadowShade: string = 'slate';
+  let buttonShadowValue: string = '950';
+  let buttonShadowOpacity: number = 100;
+
+
+
+
+  // font shade value opacity
+  let fontShade: string = 'zinc';
+  let fontValue: string = '50';
+  let fontOpacity: number = 100;
+
 
 
   let tempBackgroundColor: string;
 
   let tempButtonColor: string;
   let tempButtonFontColor: string;
+  let tempButtonBorderColor: string = 'lime-500';
+  let tempButtonShadowColor: string = 'lime-400';
+
+  let tempFontColor: string;
 
   let userThemes: CustomTheme[] = [];
   
@@ -75,6 +102,8 @@
   let backgroundHex: string | undefined;
   let buttonColorHex: string | undefined;
   let buttonFontColorHex: string | undefined;
+  let buttonBorderHex: string | undefined;
+  let buttonShadowHex: string | undefined;
 
   // complicated vars lol
   // bg color hex w opacity
@@ -85,6 +114,12 @@
 
   // button font color hex w opacity
   let bfchwo: string;
+
+  // button border
+  let buttonBorderHexWithOpacity: string;
+
+  // button shadow color with opacity
+  let buttonShadowHexWithOpacity: string;
 
   // font color hex w opacity
   let fchwo: string;
@@ -115,21 +150,31 @@
     buttonStyle = customTheme?.button?.style;
     buttonColor = customTheme?.button?.color;
     buttonFontColor = customTheme?.button?.fontColor;
+    buttonBorder = customTheme?.button?.outline;
+    buttonShadow = customTheme?.button?.shadow;
 
     // convert these to hex codes
     backgroundHex = background ? convert(background) : undefined;
     fontColorHex = fontColor ? convert(fontColor) : undefined;
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+    buttonShadowHex = buttonShadow ? convert(buttonShadow) : undefined;
+    buttonBorderHex = buttonBorder ? convert(buttonBorder) : undefined;
 
     // [buttonShade, buttonValue] = buttonColor.split('-');
 
     // append opacities
-    bgchwo = concatOpacity(backgroundHex, bgOpacity)
+    bgchwo = concatOpacity(backgroundHex, bgOpacity);
+
+    fchwo = concatOpacity(fontColorHex, fontOpacity);
 
     bchwo = concatOpacity(buttonColorHex, buttonOpacity);
 
     bfchwo = concatOpacity(buttonFontColorHex, buttonFontOpacity);
+
+    buttonBorderHexWithOpacity = concatOpacity(buttonBorderHex, buttonBorderOpacity);
+    buttonShadowHexWithOpacity = concatOpacity(buttonShadowHex, buttonShadowOpacity);
+
 
   }
 
@@ -228,23 +273,42 @@
   // save button style
   let chosenButtonStyle = '';
 
+
+
   async function saveButtonStyle() {
     console.log('saving button style: ', chosenButtonStyle);
 
     const batch = writeBatch(db);
 
-    // update buttonStyle
-    batch.set(doc(db, "users", $user!.uid), {
+    let dataToSave = {
       customTheme: {
         button: {
-          style: chosenButtonStyle
+          style: chosenButtonStyle,
+          shadow: '',
+          outline: ''
         }
       }
-    }, { merge: true });
+    };
+
+    // update buttonStyle
+
+    if (chosenButtonStyle.endsWith('Shadow')) {
+      dataToSave.customTheme.button.shadow = tempButtonShadowColor;
+    } else if (chosenButtonStyle.endsWith('Outline')) {
+      dataToSave.customTheme.button.outline = tempButtonBorderColor;
+    } 
+
+
+    batch.set(doc(db, "users", $user!.uid), dataToSave, { merge: true });
 
     await batch.commit();
     chosenButtonStyle = '';
+    
+    
   }
+
+
+
 
   const handleButtonSelect = (selectedButton: string) => {
     chosenButtonStyle = selectedButton;
@@ -438,6 +502,33 @@
 
   }
 
+  async function updateShadowColor(buttonShadowShade: string, buttonShadowValue: string) {
+    console.log('updating shadow shade: ', buttonShadowShade);
+    console.log('updating shadow value: ', buttonShadowValue);
+
+    // combine buttonshade and button value
+    tempButtonShadowColor = buttonShadowShade + '-' + buttonShadowValue.toString();
+    console.log('new shadow color: ', tempButtonShadowColor);
+
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+            button: {
+              color: buttonColor,
+              shadow: tempButtonShadowColor,
+            }
+        }
+    }, { merge: true });
+
+    await batch.commit();
+    tempButtonShadowColor = '';
+
+
+  }
+
+
   async function updateButtonFontColor(buttonFontShade: string, buttonFontValue: string) {
     console.log('updating button font shade: ', buttonFontShade);
     console.log('updating button font value: ', buttonFontValue);
@@ -459,6 +550,32 @@
 
     await batch.commit();
     tempButtonFontColor = '';
+
+
+  }
+
+  async function updateFontColor(fontShade: string, fontValue: string) {
+    console.log('updating font shade: ', fontShade);
+    console.log('updating font value: ', fontValue);
+
+    // combine buttonshade and button value
+    tempFontColor = fontShade + '-' + fontValue.toString();
+    console.log('new font color: ', tempFontColor);
+
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+            font: {
+              color: tempFontColor,
+              opacity: fontOpacity
+            }
+        }
+    }, { merge: true });
+
+    await batch.commit();
+    tempFontColor = '';
 
 
   }
@@ -508,6 +625,42 @@
       customTheme: {
         button: {
           fontOpacity: buttonFontOpacity
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+
+
+  }
+
+  async function updateFontOpacity() {
+    console.log('updating font opacity: ', fontOpacity);
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        font: {
+          opacity: fontOpacity
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+
+
+  }
+
+  async function updateShadowOpacity() {
+    console.log('updating shadow opacity: ', buttonShadowOpacity);
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        button: {
+          shadowOpacity: buttonShadowOpacity
         }
       }
     }, { merge: true });
@@ -743,10 +896,13 @@
     <label for="opacity" class="label">
       <span class="label-text font-input-mono">Opacity</span>
     </label>
+    <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
+
     <label class="input-group">
-      <input type="text" min="0" max="100" id="opacity" bind:value={bgOpacity} on:change={() => updateBackgroundOpacity()} class="input input-bordered w-1/2" />
+        <input type="text" min="0" max="100" id="opacity" bind:value={bgOpacity} on:change={() => updateBackgroundOpacity()} class="input input-bordered w-1/2" />
       <span>%</span>
     </label>
+    </div>
   </div>
 </div>
 {/if}
@@ -794,7 +950,7 @@
 
 
       {/if}
-<!-- end form here -->
+      <!-- end form here -->
 
     {#if showColorPicker && !showGradientPicker}
       <ColorPicker mode={'background'} customTheme={customTheme}/>
@@ -994,6 +1150,79 @@
         </div>
       </div>
 
+    <!-- buttonshadowcolor -->
+    {#if buttonShadow}
+    <div class="flex justify-start space-x-10 mt-8 ">
+
+      <!-- button shadow color -->
+      <div>
+        <label for="Shadow Color" class="label">
+          <span class="label-text font-input-mono">Shadow Color</span>
+        </label>      
+        <div id="Shadow Color" class="join">
+
+            <!-- show shadow color / clikc for color picker -->
+            <button 
+              style={`background-color: ${buttonShadowHexWithOpacity? buttonShadowHexWithOpacity : 'white'}`}
+              on:click={() => {toggleShowButtonColorPicker(); mode = 'shadowColor'}} 
+              class="btn w-1/4 rounded-md"></button>
+
+            <!-- select shade -->
+            <select placeholder={buttonShadowShade} bind:value={buttonShadowShade} on:change={() => updateShadowColor(buttonShadowShade, buttonShadowValue)} class="select select-bordered">
+              <option>slate</option>
+              <option>gray</option>
+              <option>zinc</option>
+              <option>neutral</option>
+              <option>stone</option>
+              <option>red</option>
+              <option>orange</option>
+              <option>amber</option>
+              <option>yellow</option>
+              <option>lime</option>
+              <option>green</option>
+              <option>emerald</option>
+              <option>teal</option>
+              <option>cyan</option>
+              <option>sky</option>
+              <option>blue</option>
+              <option>indigo</option>
+              <option>violet</option>
+              <option>purple</option>
+              <option>fuchsia</option>
+              <option>pink</option>
+              <option>rose</option>
+            </select>
+
+            <!-- select value -->
+            <select bind:value={buttonShadowValue} on:change={() => updateShadowColor(buttonShadowShade, buttonShadowValue)} class="select select-bordered">
+              <option>50</option>
+              <option>100</option>
+              <option>200</option>
+              <option>300</option>
+              <option>400</option>
+              <option>500</option>
+              <option>600</option>
+              <option>700</option>
+              <option>800</option>
+              <option>900</option>
+              <option>950</option>
+            </select>
+        </div>
+      </div>
+
+      <!-- opacity -->
+      <div class="form-control">
+        <label for="opacity" class="label">
+          <span class="label-text font-input-mono">Opacity</span>
+        </label>
+        <label class="input-group">
+          <input type="text" min="0" max="100" id="opacity" bind:value={buttonShadowOpacity} on:change={() => updateShadowOpacity()} class="input input-bordered w-1/2" />
+          <span>%</span>
+        </label>
+      </div>
+    </div>
+    <!-- buttonshadowcolor -->
+
 
 
 
@@ -1009,6 +1238,8 @@
       </label>
     </div>
 
+  
+<div>
   </div>
     {#if showButtonColorPicker}
       <ColorPicker mode={mode} customTheme={customTheme}/>
@@ -1030,7 +1261,6 @@
     </div>
   
       
-      </div>
   
 
       <!-- fonts -->
@@ -1055,26 +1285,86 @@
       {/if}
       <div class="flex space-x-8 mt-4">
 
-        <div class="flex flex-col">
+        <!-- font color selection -->
+        <div 
+          in:slide={{duration: 1000, easing: backOut}}
+          out:slide={{duration: 400, easing: backIn}}
+          class="flex justify-start space-x-10 mt-8 ">
+
+        <!-- background color -->
+        <div>
           <label for="Font Color" class="label">
             <span class="label-text font-input-mono">Font Color</span>
-          </label>
-      <button 
-        on:click={() => {toggleShowFontColorPicker(); mode = 'fontColor'}} 
-        style={`color: ${fontColorHex}`}
-        class="btn w-full bg-{fontColor} rounded-md"></button>
+          </label>      
+          <div id="Font Color" class="join">
+
+              <!-- show fontColor / clikc for color picker -->
+              <button 
+                style={`background-color: ${fchwo? fchwo : 'white'}`}
+                on:click={() => {toggleShowColorPicker(); mode = 'fontColor'}} 
+                class="btn w-1/4 rounded-md"></button>
+
+              <!-- select shade -->
+              <select placeholder={fontShade} bind:value={fontShade} on:change={() => updateFontColor(fontShade, fontValue)} class="select select-bordered">
+                <option>slate</option>
+                <option>gray</option>
+                <option>zinc</option>
+                <option>neutral</option>
+                <option>stone</option>
+                <option>red</option>
+                <option>orange</option>
+                <option>amber</option>
+                <option>yellow</option>
+                <option>lime</option>
+                <option>green</option>
+                <option>emerald</option>
+                <option>teal</option>
+                <option>cyan</option>
+                <option>sky</option>
+                <option>blue</option>
+                <option>indigo</option>
+                <option>violet</option>
+                <option>purple</option>
+                <option>fuchsia</option>
+                <option>pink</option>
+                <option>rose</option>
+              </select>
+
+              <!-- select value -->
+              <select bind:value={fontValue} on:change={() => updateFontColor(fontShade, fontValue)} class="select select-bordered">
+                <option>50</option>
+                <option>100</option>
+                <option>200</option>
+                <option>300</option>
+                <option>400</option>
+                <option>500</option>
+                <option>600</option>
+                <option>700</option>
+                <option>800</option>
+                <option>900</option>
+                <option>950</option>
+              </select>
+          </div>
         </div>
 
-        <!-- font size -->
+        <!-- font opacity -->
         <div class="form-control">
-          <label for="Font Size" class="label">
-            <span class="label-text font-input-mono">Font Size</span>
+          <label for="opacity" class="label">
+            <span class="label-text font-input-mono">Opacity</span>
           </label>
+
           <label class="input-group">
-            <input type="number" min="0" max="100" id="fontSize" bind:value={fontSize} on:change={() => changeFontSize()} class="input input-bordered w-1/2" />
-            <span>Rem</span>
+              <input type="text" min="0" max="100" id="opacity" bind:value={fontOpacity} on:change={() => updateFontOpacity()} class="input input-bordered w-1/2" />
+            <span>%</span>
           </label>
         </div>
+      </div>
+        <!-- font color selection -->
+
+        
+
+        <!-- font size -->
+        
 
       </div>
       

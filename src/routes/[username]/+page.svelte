@@ -7,7 +7,7 @@
   import { blur, fly, slide } from "svelte/transition";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { themeStore, updateTheme } from "$lib/themeStore";
-  import { convert, type CustomTheme } from "$lib/theme";
+  import { concatOpacity, convert, type CustomTheme } from "$lib/theme";
   import colors from 'tailwindcss/colors';
   import type { LinkData } from "$lib/firebase";
   import { page } from "$app/stores";
@@ -30,7 +30,7 @@
   let fontColor: string;
   let backgroundStyle: "image" | "solid" | "gradient";
   let background: string;
-  let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
 
@@ -42,6 +42,9 @@
 
   let buttonTextEffect: 'none' | 'glow' | 'gradient' | 'highlight';
   let buttonTextEffectHover: boolean;
+
+  let bgOpacity: number = 100;
+  let bgchwo: string;
 
   $: if (data) {
     bio = data.bio;
@@ -60,6 +63,7 @@
     // we only need the string value rn
     backgroundStyle = customTheme?.background?.style;
     background = customTheme?.background?.value;
+    bgOpacity = customTheme?.background?.opacity;
 
     // buttons
     buttonStyle = customTheme?.button?.style;
@@ -75,6 +79,8 @@
     fontColorHex = fontColor ? convert(fontColor) : undefined;
     buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
     buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
+
+    bgchwo = concatOpacity(backgroundHex, bgOpacity);
 
   }
    
@@ -122,7 +128,7 @@
 </svelte:head>
 
 <main 
-style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${backgroundHex};` : '')}`}
+style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
 class={`font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 
@@ -140,7 +146,7 @@ class={`font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] 
 
   <!-- BIO -->
   <p 
-    class={`text-[1rem] p-2 font-${font} bg-${background}`}
+    class={`text-[1rem] p-2 font-${font}`}
   >
     {bio ?? "no bio"}
   </p>

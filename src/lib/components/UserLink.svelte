@@ -99,7 +99,7 @@
     style={`
       ${shadow ? `box-shadow: 0 10px 20px  -12px ${bchwo};` : ''}
       ${outline ? `border: 3px solid ${bchwo};` : ''}
-      ${fill ? `background-color: ${bfchwo};` : ''}
+      ${fill ? `background-color: ${bchwo};` : ''}
       ${hardShadow ? `box-shadow: 10px 10px 0px ${bchwo}; border: 2px solid ${bchwo};` : ''}
     `}    
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
@@ -119,7 +119,7 @@
     <!-- Link title -->
     <p 
       style={`color: ${bfchwo ? bfchwo : bchwo};` + (previewMode ? `transform: translateX(-1rem); font-size: 1rem;` : 'transform: translateX(-1.6rem);')}
-      class='font-{buttonFont} herby  text-[2rem]'>{title}
+      class='font-{buttonFont} {previewMode ? 'text-[0.88rem]' : 'text-[1.5rem]'} herby '>{title}
     </p>
     <!-- empty element -->
     <div class="right"></div>

@@ -1561,22 +1561,90 @@ todo:
     set up color selections:
         ✅button color
         ✅button font
-        background
+        ✅background
             everthing is set up kosher:
                 need to do:
-                    add note that bg opacity preview might look different depending on value of colors behind the preview!
-                        use Daisy ui hover data thing
                     use bgchwo to reflect background with opacity in the following pages/components
                         ✅livePreview
-                        routes/username
-                        routes/username/edit
+                        ✅routes/username
+                        ✅routes/username/edit
         font
+            make sure that font with hex and opacity is reflected whereever bio is neccessary
+
+            figure out why the other update functions save a new color perfeclty but font is stuck on green-500
+
+
     fix outline border sizing issue    
     fill buttons are white. doesn't listen to db button color
     let user select button color + border / shadow color
     figure out how to apply custom themes
 
+    buttonFill is using buttonFont color instead of button color ez fix
+
     email hannah about geting cameras
+
+
+    september 1th
+
+    how to add button color to shadow/hardshadow/outline?
+    just save the buttoncolor as usual then pull up another selector for the shadow/hardshadow/outline color
+        update the save button style function to handle cases of outline/shadow/hardshadow
+            update: add new values:
+                customTheme: {
+                    button: {
+                        style: squareHardShadow
+                        color: buttonColor
+                        shadowColor: shadowColor
+                    }
+                }
+
+                todo foro this todo
+
+                init buttonShadowColor vars
+                buttonShadowColor
+                buttonShadowShade
+                buttonShadowValue
+                buttonShadowHexWithOpacity
+                buttonShadowHex
+                buttonShadowHexWithOpacity
+
+                if buttonShadow
+                create button shadow selection div
+                    bind value & bind shadow
+                    bind opacity
+
+                add handlefunctions
+
+                if buttonStyle ends with shadow => show shadow selections
+                if buttonStyle ends with outline => show outline selections 
+
+
+                db looks good
+                functions look good
+                need to update ui to reflect new styles then let user choose colors for sttyles
+
+
+            if there are any problems with the other case of saving a normally filled button then in that case ill save shadowcolor as ''
+
+    in the case of chooseing outlines: set the button color to nothing, but give the option of choosing a value
+    so that they can have a border and fill
+    same with shadow
+
+    hardShadow can be filled from the get go
+
+
+
+    get rid of font size options
+    fix border issue:
+        solution to try:
+            links with out border will have and invisible border. so that the content stays the same
+
+
+    customThemes all have the same bg???
+    theme should overwrite styles
+    squareHardShadow isn't applying
+
+    (populate data page with data :')
 
 
 
@@ -1588,3 +1656,13 @@ todo:
 
 additional content:
     embedded songs/videos (soundcloud, yt)
+
+    o
+
+
+
+
+
+
+current todo 
+    handleBUttonShadowColors
