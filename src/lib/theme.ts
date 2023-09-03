@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
-import { db, user, userTheme } from "$lib/firebase";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { db, storage, user, userData, userTheme } from "$lib/firebase";
+import { collection, doc, onSnapshot, writeBatch, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import colors from "tailwindcss/colors";
 
 export const buttonStyles = {
@@ -140,6 +141,10 @@ export const defaultTheme: CustomTheme = {
     style: "circleFill",
     color: "lime-500",
     opacity: 100,
+    outline: '',
+    outlineOpacity: 0,
+    shadow: '',
+    shadowOpacity: 0,
     fontColor: "slate-200",
     fontOpacity: 100,
     textEffect: {
@@ -171,6 +176,12 @@ export function concatOpacity(
   } else {
     return hex?.concat("FF") ?? "";
   }
+}
+
+
+
+export async function updateOpacity(mode: string, opacity: number) {
+  // update the opacity please
 }
 
 export const themeStore = writable(defaultTheme);

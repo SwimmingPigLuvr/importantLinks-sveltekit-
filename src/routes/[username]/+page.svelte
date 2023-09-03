@@ -157,7 +157,7 @@ class={`font-${font? font : 'herb'} -z-20 h-screen fixed top-0 left-0 w-[100vw] 
     {#each links as item, index (item.id) }
       <li 
       in:fly={{ y: -10, duration: 200, easing: backOut, delay: (index * 300)}}
-      class="m-auto p-2">
+      class="m-auto py-[0.5rem]">
         <UserLink 
           iconURL={item.iconURL} 
           title={item.title} 

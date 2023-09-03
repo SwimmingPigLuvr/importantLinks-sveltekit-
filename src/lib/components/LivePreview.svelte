@@ -5,6 +5,7 @@
     import { backOut } from "svelte/easing";
   import { concatOpacity, convert, type CustomTheme } from "$lib/theme";
   import Page from "../../routes/+page.svelte";
+  import { userData } from "$lib/firebase";
 
   // customTHeme prop
   export let customTheme: CustomTheme;
@@ -41,6 +42,8 @@
     backgroundHex = convert(background);
 
     bgchwo = concatOpacity(backgroundHex, bgOpacity);
+
+    // add all the styles here
 
 
   }
@@ -159,7 +162,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
         <!-- links -->
         <ul>
           {#each links as link}
-            <li class="m-auto py-[0.33rem]">
+            <li class="m-auto py-[0.5rem]">
               <UserLink 
                 iconURL={link.iconURL} 
                 title={link.title}
@@ -175,10 +178,25 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
       <div
         in:fade={{duration: 1000, easing: backOut}}
         out:fade={{duration: 1000, easing: backOut}}
-        class="bg-{buttonColor} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen">
+        class="bg-{buttonColor} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen flex">
           <!-- data -->
-          <div>
+          <div class="m-auto">
+            <h1 class="font-{font} text-[2rem]">Data</h1>
+            <!-- name pfp bio -->
+            <div class="">
+              <p>username: {username}</p>
+              <p>bio: {bio}</p>
+              <!-- pfp -->
+              <div>
+                <p>pfp:</p>
+                <img src="{photoURL}" alt="">
+              </div>
+            </div>
+            <!-- theme -->
+            <p>theme: {theme}</p>
+            <p>background: {background}</p>
 
+            <!-- styles -->
           </div>
 
       </div>

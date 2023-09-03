@@ -17,6 +17,8 @@ make sure that theme is saved to firestore
 
 
 
+
+
 make sure that the html is using the user's saved theme as the theme, 
 not the selected theme
 
@@ -1724,3 +1726,126 @@ fills without borders need invisible borders so they the children don't get sque
 livepreview mobile fullscreen:
     the link sapacing is kinda off
         FIX IT
+
+        DONE ✅
+
+
+add data viewer to livepreview even if it's not in fullscreen
+
+
+appearance page:
+
+    on refresh. userData isn't take into account???
+
+
+
+need a better solution to the displayed data in the inputs
+
+i really want to display the curretn data in the db without funcing everything up
+
+let's give the normal homepage some more space betweeen links just a tiny bit
+
+
+there should be no discrepencies between the livepreview fullscreen mobile mode preview
+and the actual homepage
+o
+
+
+
+usingo the userdata store instead of importing a customtheme prop evertyime
+
+now i need to go back and delete unneccessary livepreview props
+
+how to make a color selection component *thinking emoji 🤔
+
+
+
+what's neccessary?
+html
+vars? functions?
+
+    feautures that need color selection
+        background -> BG
+        font -> F
+        buttonColor -> BC
+        buttonShadow -> BS
+        buttonBorder -> BB
+        buttonFont -> BF
+            what vars does each need?
+                color: 'lime-400' === `value + '-' + shade`
+                value: 'lime'
+                shade: '400'
+                opacity: 100
+                hex: #A3E635 === convert(tailwindClass)
+                hex with opacity: #A3E635FF === concatOpacity(color, opacity) 
+            what html elements does each need?
+                preview: button that displays hex with opacity
+                    style={`background-color: ${hexWithOpacity}`}
+                    on:click={() => colorPickerToggle()}
+                valueSelection: dropdown that shows each value at a shade of 500
+                    bind:value={value} 
+                    on:change={() => handleColorSelection(value, shade)}
+                shadeSelection: dropdown that shows each shade of the current value
+                    bind:value={shade}
+                    on:change={() => handleColorSelection(value, shade)}
+                opacityInput: number / text input that takes opacity
+                    bind:value={opacity}
+                    on:change={() => handleOpacitySelection(opacity)}
+
+
+    functoins
+        updateColor(mode, value, shade) {
+            
+        }
+
+        updateOpacity(mode, opacity) {
+
+        }
+
+
+    so i cannot figure out how to make the updateColor function inside of the theme.ts
+    [but ill just keep it in the appearance page. that's the only one that will neeed it. :']
+
+    function should be straightforward.
+        Questions:
+            will the temp var be tricky depending on the styles?
+
+
+    current work september 2:
+
+        updating update functions into 2 functions:
+            updateColor
+            updateOpacity
+        updating names
+            using consistency
+            changes:
+                [bg, bc, bs, bb, bf, fc] for [background, buttonColor, buttonShadow, buttonBorder, buttonFont, fontColor]
+                outline -> border
+                using consistent naming to easily find vars and keep track of them
+
+
+
+    september 3 456Am
+
+
+
+
+
+side notes:
+    add styles:
+        linkStyle:
+            link: normal
+            contentBlock: big
+        hover behavior:
+            change bg: color / image
+            translate x / y
+            color
+            link preview: on the side
+        buttonStyles:
+            yayoBorder 😎
+    livePreview link titles:
+        too big?
+    link sizes?
+        less padding?
+        font size?
+        shadow tightness?
