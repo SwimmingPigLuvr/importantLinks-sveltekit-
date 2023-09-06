@@ -15,7 +15,7 @@
     export let title = 'some cool title';
     export let previewMode = false;
 
-    let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow"  = 'squareFill';
+    let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow"  = 'squareFill';
     let buttonColor: string;
     let buttonOpacity: number;
     let buttonFont: string;
@@ -52,11 +52,11 @@
       buttonOpacity = customTheme.button.opacity;
       buttonFontOpacity = customTheme.button.fontOpacity;
 
-      buttonBorderOpacity = customTheme.button.outlineOpacity;
+      buttonBorderOpacity = customTheme.button.borderOpacity;
       buttonShadowOpacity = customTheme.button.shadowOpacity;
 
       buttonShadow = customTheme.button.shadow;
-      buttonBorder = customTheme.button.outline;
+      buttonBorder = customTheme.button.border;
 
 
 
@@ -91,7 +91,7 @@
     
     let buttonRadius = '';
     let fill = false;
-    let outline = false;
+    let border = false;
     let shadow = false;
     let hardShadow = false;
 
@@ -102,7 +102,7 @@
     let style = buttonStyles[buttonStyle];
     buttonRadius = style.buttonRadius;
     fill = style.fill;
-    outline = style.outline;
+    border = style.border;
     shadow = style.shadow;
     hardShadow = style.hardShadow;
     console.log(`Button style: ${buttonStyle}`);
@@ -117,13 +117,13 @@
     class:hardShadow={hardShadow}
     style={`background-color: ${bchwo}; border: 3px solid transparent;
       ${shadow ? `box-shadow: 0 10px 20px  -12px ${buttonShadowHexWithOpacity};` : ''}
-      ${outline ? `border: 3px solid ${buttonBorderHexWithOpacity};` : ''}
+      ${border ? `border: 3px solid ${buttonBorderHexWithOpacity};` : ''}
       ${hardShadow ? `box-shadow: 10px 10px 0px ${buttonShadowHexWithOpacity}; border: 2px solid ${buttonShadowHexWithOpacity};` : ''}
     `}    
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-0  
      {fill ? `bg-${buttonColor ? 'lime-400' : 'secondary'}` : 'bg-opacity-0'}
-     {outline ? `border-2'}` : 'border-transparent'}
+     {border ? `border-2'}` : 'border-transparent'}
      {shadow ? 'shadow-xl' : 'shadow-none'}
      hover:translate-x-1 hover:translate-y-1 
      flex justify-between m-auto items-center no-underline">

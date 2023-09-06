@@ -10,12 +10,12 @@
 
     <!-- button outline color -->
     <div>
-      <label for="Outline Color" class="label">
-        <span class="label-text font-input-mono">Outline Color</span>
+      <label for="Border Color" class="label">
+        <span class="label-text font-input-mono">Border Color</span>
       </label>      
-      <div id="Outline Color" class="join">
+      <div id="Border Color" class="join">
 
-          <!-- show outline color / clikc for color picker -->
+          <!-- show border color / clikc for color picker -->
           <button 
             style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
             on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 

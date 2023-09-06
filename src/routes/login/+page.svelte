@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { auth, user } from "$lib/firebase";
+  import { auth, user, userData } from "$lib/firebase";
   import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
   import { backOut } from "svelte/easing";
 
@@ -26,10 +26,9 @@
 
 </script>
 
-<h2 class="text-neutral-content">LOGIN</h2>
 
 {#if $user}
-  <h2 class="card-title">Welcome, {$user.displayName}</h2>
+  <h2 class="card-title">Welcome, {$userData?.username? $userData.username : 'new user'}</h2>
   <p class="text-center text-success">You have been successfully logged in</p>
   <div>
     <button class="btn btn-error" on:click={signOutSSR}>sign out</button>
@@ -37,5 +36,6 @@
   </div>
 
 {:else}
+  <h2 class="text-neutral-content">Create Account</h2>
   <button class="btn bg-neutral text-neutral-content transform transition duration-500 ease-[backOut]" on:click={signInWithGoogle}>Sign in with Google</button>
 {/if}

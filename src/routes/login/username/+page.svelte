@@ -1,6 +1,7 @@
 <script lang="ts">
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import { db, user, userData } from "$lib/firebase";
+  import { dark, defaultTheme, light } from "$lib/theme";
   import { doc, getDoc, writeBatch } from "firebase/firestore";
 
   let username = "";
@@ -43,18 +44,20 @@
     console.log("confirming username", username);
     const batch = writeBatch(db);
     batch.set(doc(db, "usernames", username), { uid: $user?.uid });
-    batch.set(doc(db, "users", $user!.uid), {
+    batch.set(doc(db, `users/${$user!.uid}`), {
         username,
-        photoURL: $user?.photoURL ?? null,
+        photoURL: $user?.userData?.photoURL ?? null,
         published: true,
-        bio: 'asdfj jasdfjasdfjasdf ajasdjfasdjadsfj',
+        bio: 'this is my bio ;)',
         links: [
             {
-                title: 'test nft link',
+                title: 'Exo-Science.com',
                 url: 'https://exo-science.com',
                 icon: 'custom'
             }
-        ]
+        ],
+        customTheme: defaultTheme,
+        userThemes: [ light, dark ],
     });
 
     await batch.commit();

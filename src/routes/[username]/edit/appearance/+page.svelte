@@ -15,6 +15,23 @@
   import Nav from "$lib/components/Nav.svelte";
   import colors from "tailwindcss/colors";
   import { convert, concatOpacity } from "$lib/theme";
+  import { onMount } from "svelte";
+
+  let showBackUp: boolean = false;
+
+  function handleScroll() {
+    const windowHeight = document.documentElement.offsetHeight;
+    const windowBottom = windowHeight + window.pageYOffset;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    // check if scrolled past 60% of the page
+    if (windowBottom / documentHeight >= 0.8) {
+      showBackUp = true;
+    } else {
+      showBackUp = false;
+    }
+  }
+
 
   let textEffect: {effect: string, onHover: boolean};
 
@@ -128,8 +145,7 @@
     theme = $userData.theme;    
     userThemes = $userData.userThemes;
 
-    const uniqueThemeName = Object.keys(userThemes[1])[0];
-    console.log('userthemes: ', userThemes);
+    
 
     // set customTheme vars
     font = customTheme?.font?.family;
@@ -173,6 +189,11 @@
 
   }
 
+  $: if ($userData && $userData.userThemes && $userData.userThemes.length > 1) {
+    const uniqueThemeName = Object.keys(userThemes[1])[0];
+    console.log('userthemes: ', userThemes);
+  }
+
   $: if (data && data.customTheme) {
     updateTheme(customTheme);
   }
@@ -192,11 +213,19 @@
 
   async function saveTheme() {
     console.log('saving theme: ', chosenTheme);
+    const userRef = doc(db, `users/${$user!.uid}`);
+
+    const docSnapshot = await getDoc(userRef);
+    const userData = docSnapshot.data();
+    let userThemes = userData?.userThemes || [];
+
 
     const batch = writeBatch(db);
     batch.set(doc(db, "users", $user!.uid), {
       theme: chosenTheme
     }, { merge: true });
+
+
 
     await batch.commit();
     chosenTheme = '';
@@ -256,7 +285,8 @@
     let userThemes = userData?.userThemes || [];
 
     userThemes.push({
-      [name]: customTheme
+        ...customTheme,
+        name: name
     });
 
     await updateDoc(userRef, {
@@ -614,6 +644,9 @@
 
 </script>
 
+<svelte:window on:scroll={handleScroll} />
+
+
 <!-- put these props back incase hehe -->
 
 <!--   -->
@@ -643,13 +676,11 @@
         <!-- user made themes -->
         {#each userThemes as userTheme, index}
           <div class="">
-            {#each Object.keys(userTheme) as key}
-              {#if userTheme[key]}
                 <button 
-                  on:click|preventDefault={() => handleThemeSelect(theme)} 
-                  style={`color: ${fontColorHex}; ${userTheme[key].background.style === 'image' ? `background-image: url(${userTheme[key].background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme[key].background.style === 'solid' ? `background-color: ${convert(userTheme[key].background.value)}` : '')}`}
+                  on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
+                  style={`color: ${fontColorHex}; ${userTheme?.background?.style === 'image' ? `background-image: url(${userTheme?.background?.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme?.background?.style === 'solid' ? `background-color: ${convert(userTheme?.background?.value)}` : '')}`}
                   class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
-                    <div class={`font-${userTheme[key].font.family} flex flex-col items-center font`}>
+                    <div class={`font-${userTheme.font? userTheme.font.family : ''} flex flex-col items-center font`}>
                       <!-- pfp -->
                       <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
                       <!-- Username -->
@@ -658,13 +689,11 @@
                       <p class="text-[0.33rem]">{$userData?.bio}</p>
                     </div>
                     <!-- links -->
-                    <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
-                    <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
-                    <div class={`bg-${userTheme[key].button.color} w-full h-4`}></div>
+                    <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
+                    <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
+                    <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
                 </button>
-                {/if}
-              <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{key}</h3>
-            {/each}
+              <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{userTheme.name}</h3>
           </div> 
         {/each}
 
@@ -890,7 +919,7 @@
           <button on:click|preventDefault={() => handleButtonSelect('circleFill')} class="btn bg-primary border-none rounded-full w-full mb-4"></button>
         </div>
             
-          <!-- outline -->
+          <!-- border -->
           <h3 class="font-input-mono text-white my-2">Border</h3>
         <div class="flex flex-wrap justify-between">
           <button on:click|preventDefault={() => handleButtonSelect('squareBorder')} class="btn bg-opacity-0 border-primary border-2 w-full rounded-none mb-4"></button>
@@ -1373,9 +1402,15 @@ class="btn">Save Theme</button>
     
  
 
-<a href="#top" class="fixed bottom-3 right-3 text-[3rem]">
-  👆
-</a>
+{#if showBackUp}
+  <a 
+    in:blur
+    out:blur
+    href="#top" 
+    class="fixed bottom-3 z-50 right-3 text-[3rem]">
+    👆
+  </a>
+{/if}
 
 <Nav username={username} />
 

@@ -13,12 +13,6 @@ make sure that theme is saved to firestore
 
 
 
-
-
-
-
-
-
 make sure that the html is using the user's saved theme as the theme, 
 not the selected theme
 
@@ -1809,6 +1803,7 @@ vars? functions?
     function should be straightforward.
         Questions:
             will the temp var be tricky depending on the styles?
+                NO
 
 
     current work september 2:
@@ -1822,14 +1817,6 @@ vars? functions?
                 [bg, bc, bs, bb, bf, fc] for [background, buttonColor, buttonShadow, buttonBorder, buttonFont, fontColor]
                 outline -> border
                 using consistent naming to easily find vars and keep track of them
-
-
-
-    september 3 456Am
-
-
-
-
 
 side notes:
     add styles:
@@ -1849,3 +1836,131 @@ side notes:
         less padding?
         font size?
         shadow tightness?
+
+    september 3 456Am
+        changed all instances of outline to border
+            go into other files and change them as well
+
+        i didnt' quite create a new component for the colroSelector. but I
+            consolidated all of the update functions into
+                updateColor() && updateOpacity()
+
+
+
+clearing db and making new users to see what's broken:
+
+    logged in with personal email
+        username: swimming
+            console error: 
+                +page.svelte:35 Uncaught (in promise) FirebaseError: Invalid document reference. Document references must have an even number of segments, but usernames has 1.
+                doesn't break anything so ignore for now
+            
+        given a weird template page with shitty styles
+            fix this.
+            make it pop from the moment the users creates a page
+        no guidance
+            give them arrows to direct them to customize the appearance
+
+    pages don't work because they are relying on the db values to style but there is no default. perhaps i should let customTheme === defaultTheme
+
+
+
+    log in page:
+        log in / register
+        need to have it streamlined for existing users.
+
+        existing users:
+            sign in:
+                view page? -> routes/[username]
+                    button that is a cool preview of their page
+                edit information? routes/[username]/edit
+                    button that is a closeup of their profile? bio? etc
+                customize appearance? routes/[username]/appearance
+                    something that reflects themes
+
+        new users:
+            register with gmail:
+                welcome user: prompt through account creation:
+                    username -> photo -> theme -> editPage -> appearancePage
+
+
+
+checking for the userthemes on a new user nullishly because they dont have any custom themes from the ri
+
+
+
+/Users/dylannevell/dev/fireship/svelte/myapp/src/routes/login/username/+page.svelte
+Expected "}" but found ";"
+ 58 |          ],
+ 59 |          customTheme |  defaultTheme,
+ 60 |          userThemes |  [ light, dark ];
+    |                                     ^
+ 61 |      });
+
+
+
+title lengths for links can be much longer ;l
+
+
+weird thing happening with the themes array
+
+all the elements of the default themes: light + dark are showing up in the array
+name, name, bg, bg...etc
+probably has to do with the update to the CustomTHeme type: name: string
+
+todo
+
+update name saving on customThemes
+select theme switches theme
+make sure that theme names are unique
+
+set theme function: 
+    select for theme by name
+    apply styles to customTheme in db
+
+update save theme function
+    currentyl when a theme is saved it just says unidentified in the themes array
+    so i need to check the title uniquness, save the name correctly, and allow for selecting by name
+    also save theme function should take you back to the top so you can see the saved theme
+
+this little 👆 is small potatoes
+
+
+save theme funtion should check the theme name. approve => then say "theme saved" then it should take you back up to the top after
+
+
+show buttonStyles in the theme selection
+that's a pretty important detail
+
+
+
+
+for theme in userThemes {
+    if data.theme === theme.name (
+        then theme.current = true
+    )
+    if theme.current === true {
+        pop to the front of the userThemes array
+    } 
+}
+
+
+
+handleTheme select function:
+    checks if name match anything from data.userThemes
+    applies all of the data from that theme
+
+
+let's figure out how to see the data from the chosenTheme and put it in the customTheme field
+
+    i do not need a current: boolean,
+    because i have the data.theme: string, field
+
+
+for theme in userThemes {
+    if ($userData.theme === theme.name) {
+        $userData.customTheme = {
+            theme
+        }
+    }
+}

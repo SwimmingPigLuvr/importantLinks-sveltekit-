@@ -4,66 +4,128 @@ import { collection, doc, onSnapshot, writeBatch, getDoc, setDoc, updateDoc } fr
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import colors from "tailwindcss/colors";
 
+export const light: CustomTheme = {
+  name: 'light',
+  current: false,
+  background: {
+    style: "solid",
+    value: "sky-50",
+    opacity: 100,
+  },
+  button: {
+    style: "circleBorder",
+    color: "zinc-200",
+    opacity: 100,
+    border: 'zinc-600',
+    borderOpacity: 0,
+    shadow: '',
+    shadowOpacity: 0,
+    fontColor: "zinc-800",
+    fontOpacity: 100,
+    textEffect: {
+      effect: "none",
+      onHover: false,
+    },
+  },
+  font: {
+    family: "input-mono",
+    color: "slate-800",
+    opacity: 100,
+  },
+
+};
+
+export const dark: CustomTheme = { 
+  name: 'dark',
+  current: false,
+  background: {
+    style: "solid",
+    value: "zinc-900",
+    opacity: 100,
+  },
+  button: {
+    style: "circleBorder",
+    color: "zinc-700",
+    opacity: 100,
+    border: 'zinc-500',
+    borderOpacity: 0,
+    shadow: '',
+    shadowOpacity: 0,
+    fontColor: "slate-200",
+    fontOpacity: 100,
+    textEffect: {
+      effect: "none",
+      onHover: false,
+    },
+  },
+  font: {
+    family: "input-mono",
+    color: "slate-400",
+    opacity: 100,
+  },
+
+}
+
 export const buttonStyles = {
   squareHardShadow: {
     buttonRadius: "none",
     fill: false,
-    outline: false,
+    border: false,
     shadow: false,
     hardShadow: true,
   },
   roundHardShadow: {
     buttonRadius: "[0.5rem]",
     fill: false,
-    outline: false,
+    border: false,
     shadow: false,
     hardShadow: true,
   },
   circleHardShadow: {
     buttonRadius: "full",
     fill: false,
-    outline: false,
+    border: false,
     shadow: false,
     hardShadow: true,
   },
   squareFill: {
     buttonRadius: "none",
     fill: true,
-    outline: false,
+    border: false,
     shadow: false,
     hardShadow: false,
   },
   roundFill: {
     buttonRadius: "[0.5rem]",
     fill: true,
-    outline: false,
+    border: false,
     shadow: false,
     hardShadow: false,
   },
   circleFill: {
     buttonRadius: "full",
     fill: true,
-    outline: false,
+    border: false,
     shadow: false,
     hardShadow: false,
   },
-  squareOutline: {
+  squareBorder: {
     buttonRadius: "none",
-    outline: true,
+    border: true,
     fill: false,
     shadow: false,
     hardShadow: false,
   },
-  roundOutline: {
+  roundBorder: {
     buttonRadius: "[0.5rem]",
-    outline: true,
+    border: true,
     fill: false,
     shadow: false,
     hardShadow: false,
   },
-  circleOutline: {
+  circleBorder: {
     buttonRadius: "full",
-    outline: true,
+    border: true,
     fill: false,
     shadow: false,
     hardShadow: false,
@@ -72,26 +134,28 @@ export const buttonStyles = {
     buttonRadius: "none",
     shadow: true,
     fill: false,
-    outline: false,
+    border: false,
     hardShadow: false,
   },
   roundShadow: {
     buttonRadius: "[0.5rem]",
     shadow: true,
     fill: false,
-    outline: false,
+    border: false,
     hardShadow: false,
   },
   circleShadow: {
     buttonRadius: "full",
     shadow: true,
     fill: false,
-    outline: false,
+    border: false,
     hardShadow: false,
   },
 };
 
 export interface CustomTheme {
+  name: string; 
+  current: boolean;
   background: {
     style: "image" | "gradient" | "solid";
     value: string;
@@ -105,9 +169,9 @@ export interface CustomTheme {
       | "squareFill"
       | "roundFill"
       | "circleFill"
-      | "squareOutline"
-      | "roundOutline"
-      | "circleOutline"
+      | "squareBorder"
+      | "roundBorder"
+      | "circleBorder"
       | "squareShadow"
       | "roundShadow"
       | "circleShadow";
@@ -115,8 +179,8 @@ export interface CustomTheme {
     opacity: number;
     fontColor: string;
     fontOpacity: number;
-    outline: string;
-    outlineOpacity: number;
+    border: string;
+    borderOpacity: number;
     shadow: string;
     shadowOpacity: number;
     textEffect: {
@@ -129,9 +193,12 @@ export interface CustomTheme {
     color: string;
     opacity: number;
   };
-}
+  }
+
 
 export const defaultTheme: CustomTheme = {
+  name: 'default',
+  current: false,
   background: {
     style: "solid",
     value: "sky-500",
@@ -141,8 +208,8 @@ export const defaultTheme: CustomTheme = {
     style: "circleFill",
     color: "lime-500",
     opacity: 100,
-    outline: '',
-    outlineOpacity: 0,
+    border: '',
+    borderOpacity: 0,
     shadow: '',
     shadowOpacity: 0,
     fontColor: "slate-200",
@@ -176,12 +243,6 @@ export function concatOpacity(
   } else {
     return hex?.concat("FF") ?? "";
   }
-}
-
-
-
-export async function updateOpacity(mode: string, opacity: number) {
-  // update the opacity please
 }
 
 export const themeStore = writable(defaultTheme);

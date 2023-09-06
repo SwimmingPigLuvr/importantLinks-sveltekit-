@@ -30,7 +30,7 @@
   let fontColor: string;
   let backgroundStyle: "image" | "solid" | "gradient";
   let background: string;
-  let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
 

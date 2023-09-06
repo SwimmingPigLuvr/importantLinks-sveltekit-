@@ -49,7 +49,7 @@
   let fontColor: string;
   let background: string;
   let backgroundStyle: "gradient" | "image" | "solid";
-  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareOutline" | "roundOutline" | "circleOutline" | "squareShadow" | "roundShadow" | "circleShadow";
+  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
 
@@ -170,7 +170,7 @@
 
   // verify url && title
   $: urlIsValid = $formData.url.match(/^(ftp|http|https):\/\/[^ "]+$/);
-  $: titleIsValid = $formData.title.length < 20 && $formData.title.length > 0;
+  $: titleIsValid = $formData.title.length < 100 && $formData.title.length > 0;
   $: formIsValid = urlIsValid && titleIsValid;
 
 
