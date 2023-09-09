@@ -4,7 +4,7 @@
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { db, user, userData, storage, userTheme } from "$lib/firebase";
-  import { setTheme, type CustomTheme, defaultTheme } from "$lib/theme";
+  import { setTheme, type CustomTheme, defaultTheme, emptyTheme } from "$lib/theme";
   import { doc, getDoc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { flip } from "svelte/animate";
@@ -50,7 +50,7 @@
   let fontSize: number = 1;
   let fontColor: string;
   let background: string;
-  let backgroundStyle: 'gradient' | 'image' | 'solid'
+  let backgroundStyle: 'gradient' | 'image' | 'solid';
   let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow";
   let buttonColor: string;
   let buttonFontColor: string;
@@ -102,8 +102,8 @@
 
   let tempButtonColor: string;
   let tempButtonFontColor: string;
-  let tempButtonBorderColor: string = 'lime-500';
-  let tempButtonShadowColor: string = 'lime-400';
+  let tempButtonBorderColor: string = 'zinc-950';
+  let tempButtonShadowColor: string = 'zinc-950';
 
   let tempFontColor: string;
 
@@ -225,6 +225,23 @@
       theme: chosenTheme
     }, { merge: true });
 
+    for (const theme of userThemes) {
+      if (chosenTheme === theme.name) {
+        batch.set(doc(db, "users", $user!.uid), {
+          customTheme: theme
+        }, { merge: true });
+      }
+    }
+
+    for (const theme of themes) {
+      if (chosenTheme === theme) {
+        console.log('theme: ', theme);
+        console.log('setting emptyTheme');
+        batch.set(doc(db, "users", $user!.uid), {
+          customTheme: emptyTheme
+        }, { merge: true });
+      }
+    }
 
 
     await batch.commit();
@@ -300,37 +317,41 @@
 
 
 
-  async function saveButtonStyle() {
-    console.log('saving button style: ', chosenButtonStyle);
+async function updateButtonStyle(batch, buttonStyle, shadowColor, borderColor) {
+  let buttonData = {
+    style: buttonStyle,
+    shadow: '',
+    border: '',
+    shadowOpacity: 0,
+    borderOpacity: 0,
+  };
 
-    const batch = writeBatch(db);
-
-    let dataToSave = {
-      customTheme: {
-        button: {
-          style: chosenButtonStyle,
-          shadow: '',
-          border: ''
-        }
-      }
-    };
-
-    // update buttonStyle
-
-    if (chosenButtonStyle.endsWith('Shadow')) {
-      dataToSave.customTheme.button.shadow = tempButtonShadowColor;
-    } else if (chosenButtonStyle.endsWith('Border')) {
-      dataToSave.customTheme.button.border = tempButtonBorderColor;
-    } 
-
-
-    batch.set(doc(db, "users", $user!.uid), dataToSave, { merge: true });
-
-    await batch.commit();
-    chosenButtonStyle = '';
-    
-    
+  if (buttonStyle.endsWith('Shadow')) {
+    buttonData.shadow = shadowColor;
+    buttonData.shadowOpacity = 100;
+  } else if (buttonStyle.endsWith('Border')) {
+    buttonData.border = borderColor;
+    buttonData.borderOpacity = 100;
   }
+
+  return {
+    customTheme: {
+      button: buttonData
+    }
+  };
+}
+
+async function saveButtonStyle() {
+  console.log('saving button style: ', chosenButtonStyle);
+
+  const batch = writeBatch(db);
+  const dataToSave = await updateButtonStyle(batch, chosenButtonStyle, tempButtonShadowColor, tempButtonBorderColor);
+
+  batch.set(doc(db, "users", $user!.uid), dataToSave, { merge: true });
+
+  await batch.commit();
+  chosenButtonStyle = '';
+}
 
 
 

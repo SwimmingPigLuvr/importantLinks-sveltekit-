@@ -13,6 +13,26 @@ make sure that theme is saved to firestore
 
 
 
+
+o
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 make sure that the html is using the user's saved theme as the theme, 
 not the selected theme
 
@@ -33,7 +53,7 @@ finish video series
 
 set link icons to images
 
-figure out best way to integrate custom themes:
+figure out best way to integrate custom G:
 font choices, colors, etc, stored on a users database
 
 
@@ -1964,3 +1984,172 @@ for theme in userThemes {
         }
     }
 }
+
+
+september 6
+
+    saveTheme:
+        use temp db object to save theme to see how it works
+        tempTheme: theme
+
+        tempTheme is saving the userThemes index previous to the one i want saved
+
+    fixed the issue no need to explain the fix tbh
+
+    theme's over customThemes?
+    also on saving a new customTheme the user should be take to the top of the page
+
+
+    new loop
+        check for a match between chosenTheme and a prebuilt theme
+        if there's a match -> data-theme="chosenTheme"
+            in order to apply this we must nullify all fields within the customTheme
+            that way the prebuilt theme takes over
+
+        for const theme in prebuiltThemes {
+            if chosenTheme === prebuiltTheme {
+                customTheme: emptyTheme
+            }
+        }
+            implementation:
+                create new type: emptyTheme
+                import emptyTheme
+                set customTheme to empty theme
+                easy
+
+
+
+possible problems with setting and empty theme?
+    none i can think of as long as user is still able to make other choices and add them.
+    this way works best becuase now they can have a blank state and even if they want to make one simple font change they can save it
+
+
+empty theme works but...
+    somewhere i have totally-gothic set as the default font.
+    buttons:
+        emptyTheme deletes the buttonStyle.
+            default daisy ui doesnt quite takeover
+            so we're left with no button at all
+            except in the livePreview
+                solution:
+                    iirc the btn class is what daisy uses to differentiate the button shapes between themes
+                    compare and contrast the livePreview? the livePreview looks really nice
+                    let's use all of the styles from the livepreview component because there might be a lot getting in the way
+
+                update: livepreview only keeps the buttonstyle before refresh. on refresh it's lost
+
+
+problems: 
+    users: 
+        if signed into spuds:
+            i can go to chuddie/edit/appearance.
+            but it still shows spuds data in the livepreview
+            it shouldn't let me be in at all.
+            the good thing is that only spuds can change the data in spuds db
+
+
+
+september 7
+
+    default button styles?
+        style: circleHardShadow
+        shadowColor: black
+
+    default border colors?
+        essentially we want something to be on the page 
+        without the user having to select a style and select a color
+        the less clicks the better
+
+
+the button styles are broken because i got rid of the buttonstyles type object from theme.ts
+    what to do
+        create another way to parse the buttonStyles from the data
+        in UserLink.svelte component
+
+            so far userLink has buttonStyle = customTheme.button.style
+
+                from this we need two things:
+                    radius + style
+                    example circleHardShadow: radius = circle, style = hardShadow.
+
+                        radius:
+                        square = none
+                        round = 0.5rem
+                        circle = full
+
+                    create function:
+
+                    parse style
+
+                    
+
+style is upadating in the database correctly but the style isn't showing up correctly
+
+the border opacity is 0 when i choose squareBorder.
+    let's simply set it to 100 whenever i choose a border style
+
+
+
+todo:
+    make sure all style selections are reactive
+    make sure daisy ui themes use daisy ui colors. (that way all of the colors work together)
+        in order to make the primary work i have to use the theme style in my emptyTheme
+            then jsut have the ui in userLink be able to process that style
+            
+
+
+buttonStyle compatabilities
+
+hardShadow doesn't work with any other style
+border + fill works
+shadow works with every one
+fill works with every one 
+    but clicking on the fill style should remove the opacities of other styles
+
+
+problem all hardShadow options are showing up as roundHardShadow
+
+
+if buttonstyle = theme when selecting a buttonstyle
+    no color should be applied
+
+    main goal: themes should have no color values! that way we can use the primary/secondary daisy ui
+
+
+feeling slow so i need to pick one task and break it down to every single task
+
+
+current task: 
+    handle button.style === 'theme'
+        let's let theme = circleHardShadow without the color value
+
+
+note: having a border and a HardShadow color looks cool
+
+
+something to think about
+something to consider
+somethings to ponder
+
+which combo of daisy ui styles to use for the page
+
+bg-primary
+buttons-accent
+border-primary-content
+shadows-secondary
+font-primary-content
+
+
+the style for the livepreview is close to what i want for the main page
+
+
+work on the theme later: alsdfaogefkasdpogknasd
+
+
+new button color selection
+
+toggle button that toggles the transparency from 0 / 100
+
+that way i can keep the button colors uniform
+
+every button can have a fill, border, shadow/hardShadow

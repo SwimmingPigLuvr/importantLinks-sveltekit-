@@ -48,8 +48,8 @@
   let font: string;
   let fontColor: string;
   let background: string;
-  let backgroundStyle: "gradient" | "image" | "solid";
-  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow";
+  let backgroundStyle: "gradient" | "image" | "solid" | '';
+  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow" | "";
   let buttonColor: string;
   let buttonFontColor: string;
 
@@ -242,7 +242,7 @@
 data-theme={theme}
 style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
 
-class={`bg-${background ? background : 'accent'} font-${font ? font : 'totally-gothic'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
+class={`bg-${background ? background : 'secondary-focus'} font-${font ? font : ''} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
   <!-- this is an authcheck to make sure  -->

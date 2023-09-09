@@ -6,7 +6,6 @@ import colors from "tailwindcss/colors";
 
 export const light: CustomTheme = {
   name: 'light',
-  current: false,
   background: {
     style: "solid",
     value: "sky-50",
@@ -37,7 +36,6 @@ export const light: CustomTheme = {
 
 export const dark: CustomTheme = { 
   name: 'dark',
-  current: false,
   background: {
     style: "solid",
     value: "zinc-900",
@@ -47,8 +45,8 @@ export const dark: CustomTheme = {
     style: "circleBorder",
     color: "zinc-700",
     opacity: 100,
-    border: 'zinc-500',
-    borderOpacity: 0,
+    border: 'zinc-200',
+    borderOpacity: 100,
     shadow: '',
     shadowOpacity: 0,
     fontColor: "slate-200",
@@ -66,98 +64,10 @@ export const dark: CustomTheme = {
 
 }
 
-export const buttonStyles = {
-  squareHardShadow: {
-    buttonRadius: "none",
-    fill: false,
-    border: false,
-    shadow: false,
-    hardShadow: true,
-  },
-  roundHardShadow: {
-    buttonRadius: "[0.5rem]",
-    fill: false,
-    border: false,
-    shadow: false,
-    hardShadow: true,
-  },
-  circleHardShadow: {
-    buttonRadius: "full",
-    fill: false,
-    border: false,
-    shadow: false,
-    hardShadow: true,
-  },
-  squareFill: {
-    buttonRadius: "none",
-    fill: true,
-    border: false,
-    shadow: false,
-    hardShadow: false,
-  },
-  roundFill: {
-    buttonRadius: "[0.5rem]",
-    fill: true,
-    border: false,
-    shadow: false,
-    hardShadow: false,
-  },
-  circleFill: {
-    buttonRadius: "full",
-    fill: true,
-    border: false,
-    shadow: false,
-    hardShadow: false,
-  },
-  squareBorder: {
-    buttonRadius: "none",
-    border: true,
-    fill: false,
-    shadow: false,
-    hardShadow: false,
-  },
-  roundBorder: {
-    buttonRadius: "[0.5rem]",
-    border: true,
-    fill: false,
-    shadow: false,
-    hardShadow: false,
-  },
-  circleBorder: {
-    buttonRadius: "full",
-    border: true,
-    fill: false,
-    shadow: false,
-    hardShadow: false,
-  },
-  squareShadow: {
-    buttonRadius: "none",
-    shadow: true,
-    fill: false,
-    border: false,
-    hardShadow: false,
-  },
-  roundShadow: {
-    buttonRadius: "[0.5rem]",
-    shadow: true,
-    fill: false,
-    border: false,
-    hardShadow: false,
-  },
-  circleShadow: {
-    buttonRadius: "full",
-    shadow: true,
-    fill: false,
-    border: false,
-    hardShadow: false,
-  },
-};
-
 export interface CustomTheme {
   name: string; 
-  current: boolean;
   background: {
-    style: "image" | "gradient" | "solid";
+    style: "image" | "gradient" | "solid" | "theme";
     value: string;
     opacity: number;
   };
@@ -174,7 +84,8 @@ export interface CustomTheme {
       | "circleBorder"
       | "squareShadow"
       | "roundShadow"
-      | "circleShadow";
+      | "circleShadow"
+      | "theme";
     color: string;
     opacity: number;
     fontColor: string;
@@ -198,7 +109,6 @@ export interface CustomTheme {
 
 export const defaultTheme: CustomTheme = {
   name: 'default',
-  current: false,
   background: {
     style: "solid",
     value: "sky-500",
@@ -225,6 +135,35 @@ export const defaultTheme: CustomTheme = {
     opacity: 100,
   },
 };
+
+export const emptyTheme: CustomTheme = {
+  name: '',
+  background: {
+    style: "theme",
+    value: "",
+    opacity: 100,
+  },
+  button: {
+    style: "theme",
+    color: "",
+    opacity: 100,
+    border: '',
+    borderOpacity: 100,
+    shadow: '',
+    shadowOpacity: 100,
+    fontColor: "",
+    fontOpacity: 100,
+    textEffect: {
+      effect: "none",
+      onHover: false,
+    },
+  },
+  font: {
+    family: "",
+    color: "",
+    opacity: 100,
+  }
+}
 
 export function convert(colorName: string = "lime-400"): string {
   const [color, shade] = colorName.split("-");

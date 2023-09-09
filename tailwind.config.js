@@ -13,7 +13,7 @@ export default {
         "lapture-display": ["jaf-lapture-display", "serif"],
         "lapture-subhead": ["jaf-lapture-subhead", "serif"],
         josefine: ["josefine-sans", "sans-serif"],
-        elven: ["p22-elven", "sans-serif"],
+        "elven": ["p22-elven", "sans-serif"],
         typewriter: ["p22-typewriter", "sans-serif"],
         ellograph: ["ellograph-cf", "monospace"],
         "elizeth-condensed": ["elizeth-condensed", "serif"],
