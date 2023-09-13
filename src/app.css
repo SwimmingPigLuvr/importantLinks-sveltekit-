@@ -17,11 +17,20 @@
   border-radius: 2s ease-out;
 }
 
-.hardShadow {
-  box-shadow: 10px 10px 0px black;
-  border: 2px solid black;
+.hard-shadow {
+  box-shadow: 10px 10px 0px hsl(var(--pc));
+  border: 2px solid hsl(var(--pc));
+}
+
+.soft-shadow {
+  box-shadow: 0 10px 20px -12px hsl(var(--p));
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+.border-custom {
+  border: 10px solid;
+  border-image: url('/blueborder.png') 30 round
 }

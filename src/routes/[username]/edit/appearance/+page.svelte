@@ -4,7 +4,7 @@
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { db, user, userData, storage, userTheme } from "$lib/firebase";
-  import { setTheme, type CustomTheme, defaultTheme, emptyTheme } from "$lib/theme";
+  import { setTheme, type CustomTheme, defaultTheme, emptyTheme, type GradientValue } from "$lib/theme";
   import { doc, getDoc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { flip } from "svelte/animate";
@@ -16,6 +16,40 @@
   import colors from "tailwindcss/colors";
   import { convert, concatOpacity } from "$lib/theme";
   import { onMount } from "svelte";
+
+  let from: GradientValue = {
+    value: 'lime',
+    shade: '400',
+    opacity: 100
+  };
+
+  let to: GradientValue = {
+    value: 'cyan',
+    shade: '200',
+    opacity: 100
+  };
+
+  let direction: number = 45;
+
+  // tailwind class based on user color choices
+  let fromColor: string;
+  let toColor: string;
+
+  // hex codes
+  let fromHex: string | undefined;
+  let fromHexWithOpacity: string | undefined;
+  let toHex: string | undefined;
+  let toHexWithOpacity: string | undefined;
+
+  $: if ($userData && $userData.background) {
+    // concat value + shade
+    fromTemp = from.value + '-' + from.shade.toString();
+    // convert to hex
+    fromHex = convert(fromTemp);
+    // concat opacity
+    fromHexWithOpacity = concatOpacity(fromHex, from.opacity);
+
+  }
 
   let showBackUp: boolean = false;
 
@@ -31,6 +65,31 @@
       showBackUp = false;
     }
   }
+
+  // opacity states
+  let fill = true;
+  let border = false;
+  let shadow = false;
+
+  $: if (fill) {
+    bcOpacity = 100
+  } else {
+    bcOpacity = 0
+  }
+
+  $: if (border) {
+    bbOpacity = 100
+  } else {
+    bbOpacity = 0
+  }
+
+  $: if (shadow) {
+    bsOpacity = 100
+  } else {
+    bsOpacity = 0
+  }
+
+
 
 
   let textEffect: {effect: string, onHover: boolean};
@@ -317,6 +376,11 @@
 
 
 
+
+
+
+
+
 async function updateButtonStyle(batch, buttonStyle, shadowColor, borderColor) {
   let buttonData = {
     style: buttonStyle,
@@ -402,7 +466,10 @@ async function saveButtonStyle() {
   let showButtonColorPicker = false;
   let showFontColorPicker = false;
 
-  let showColorSelection: boolean = false;
+  // solid
+  let showBackgroundColorSelect: boolean = false;
+  // gradient
+  let showBackgroundGradientSelect: boolean = false;
   
   function toggleShowColorPicker() {
     if (showGradientPicker) {
@@ -411,8 +478,22 @@ async function saveButtonStyle() {
     showColorPicker = !showColorPicker;
   }
 
-  function toggleShowColorSelection() {
-    showColorSelection = !showColorSelection;
+  function handleStyleChange(mode: string, style: string) {
+
+    if (mode === 'bg' && style === 'solid') {
+      toggleShowBackgroundColorSelect();
+    } else if (mode === 'bg' && style === 'gradient') {
+      toggleShowBackgroundGradientSelect();
+    }
+    updateStyle(mode, style);
+  }
+
+  function toggleShowBackgroundColorSelect() {
+    showBackgroundColorSelect = !showBackgroundColorSelect;
+  }
+
+  function toggleShowBackgroundGradientSelect() {
+    showBackgroundGradientSelect = !showBackgroundGradientSelect;
   }
 
 
@@ -490,6 +571,50 @@ async function saveButtonStyle() {
       uploading = false;
     }
 
+  }
+
+  async function updateStyle(mode: string, style: string) {
+    console.log('updating style of ', mode, ' to: ', style);
+
+    const batch = writeBatch(db);
+
+    if (mode === 'bg') {
+      batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+          background: {
+            style: style
+          }
+        }
+      }, { merge: true });
+    }
+    await batch.commit();
+  }
+
+
+  async function updateGradient(from: GradientValue, to: GradientValue, direction: number) {
+    // build the fromHex
+    fromColor = from.value + '-' + from.shade.toString();
+    fromHex = convert(fromColor);
+    fromHexWithOpacity = concatOpacity(fromHex, from.opacity);
+
+    // build the toHex
+    toColor = to.value + '-' + to.shade.toString();
+    toHex = convert(toColor);
+    toHexWithOpacity = concatOpacity(toHex, to.opacity);
+
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        background: {
+          style: 'gradient',
+          value: `${fromHexWithOpacity}, ${toHexWithOpacity}, ${direction}`,
+          opacity: 100
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
   }
 
   async function updateColor(mode: string, value: string, shade: string) {
@@ -769,13 +894,15 @@ async function saveButtonStyle() {
         <!-- solid color -->
         <div>
           <button 
-            on:click={() => toggleShowColorSelection()} 
+            on:click={() => handleStyleChange('bg', 'solid')} 
             class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
           <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Solid Color</h3>
         </div>
       <!-- gradient -->
       <div>
-        <button class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
+        <button 
+          on:click={() => handleStyleChange('bg', 'gradient')}
+          class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
         <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
       </div>
     
@@ -793,7 +920,7 @@ async function saveButtonStyle() {
     </div>
 
     <!-- color selection is right below background styles -->
-    {#if showColorSelection}
+    {#if showBackgroundColorSelect}
     <div 
       in:slide={{duration: 1000, easing: backOut}}
       out:slide={{duration: 400, easing: backIn}}
@@ -871,6 +998,193 @@ async function saveButtonStyle() {
     </div>
     {/if}
 
+    {#if showBackgroundGradientSelect}
+    <div 
+      in:slide={{duration: 1000, easing: backOut}}
+      out:slide={{duration: 400, easing: backIn}}
+      class="flex flex-col justify-start mt-8 ">
+
+      <!-- from color -->
+      <div class="flex space-x-10">
+        <div>
+          <label for="Gradient Color 1" class="label">
+            <span class="label-text font-input-mono">From</span>
+          </label>      
+          <div id="Gradient Color 1" class="join">
+
+              <!-- show buttoncolor / clikc for color picker -->
+              <button 
+                style={`background-color: ${bgchwo? bgchwo : 'white'}`}
+                on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
+                class="btn w-1/4 rounded-md"></button>
+
+              <!-- select vaklue -->
+              <select placeholder={from.value} bind:value={from.value} on:change={() => updateGradient(from, to, direction)} class="select select-bordered">
+                <option>slate</option>
+                <option>gray</option>
+                <option>zinc</option>
+                <option>neutral</option>
+                <option>stone</option>
+                <option>red</option>
+                <option>orange</option>
+                <option>amber</option>
+                <option>yellow</option>
+                <option>lime</option>
+                <option>green</option>
+                <option>emerald</option>
+                <option>teal</option>
+                <option>cyan</option>
+                <option>sky</option>
+                <option>blue</option>
+                <option>indigo</option>
+                <option>violet</option>
+                <option>purple</option>
+                <option>fuchsia</option>
+                <option>pink</option>
+                <option>rose</option>
+              </select>
+
+              <!-- select shade -->
+              <select bind:value={from.shade} on:change={() => updateGradient(from, to, direction)} class="select select-bordered">
+                <option>50</option>
+                <option>100</option>
+                <option>200</option>
+                <option>300</option>
+                <option>400</option>
+                <option>500</option>
+                <option>600</option>
+                <option>700</option>
+                <option>800</option>
+                <option>900</option>
+                <option>950</option>
+              </select>
+          </div>
+        </div>
+        <!-- opacity -->
+        <div class="form-control">
+          <label for="opacity" class="label">
+            <span class="label-text font-input-mono">Opacity</span>
+          </label>
+          <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
+
+          <label class="input-group">
+              <input type="text" min="0" max="100" id="opacity" bind:value={from.opacity} on:change={() => updateFromOpacity()} class="input input-bordered w-1/2" />
+            <span>%</span>
+          </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- to color -->
+      <div class="flex space-x-10">
+        <div>
+          <label for="Gradient Color 2" class="label">
+            <span class="label-text font-input-mono">To</span>
+          </label>      
+          <div id="Gradient Color 2" class="join">
+
+              <!-- show buttoncolor / clikc for color picker -->
+              <button 
+                style={`background-color: ${bgchwo? bgchwo : 'white'}`}
+                on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
+                class="btn w-1/4 rounded-md"></button>
+
+              <!-- select vaklue -->
+              <select placeholder={to.value} bind:value={to.value} on:change={() => updateGradient(from, to, direction)} class="select select-bordered">
+                <option>slate</option>
+                <option>gray</option>
+                <option>zinc</option>
+                <option>neutral</option>
+                <option>stone</option>
+                <option>red</option>
+                <option>orange</option>
+                <option>amber</option>
+                <option>yellow</option>
+                <option>lime</option>
+                <option>green</option>
+                <option>emerald</option>
+                <option>teal</option>
+                <option>cyan</option>
+                <option>sky</option>
+                <option>blue</option>
+                <option>indigo</option>
+                <option>violet</option>
+                <option>purple</option>
+                <option>fuchsia</option>
+                <option>pink</option>
+                <option>rose</option>
+              </select>
+
+              <!-- select shade -->
+              <select bind:value={to.shade} on:change={() => updateGradient(from, to, direction)} class="select select-bordered">
+                <option>50</option>
+                <option>100</option>
+                <option>200</option>
+                <option>300</option>
+                <option>400</option>
+                <option>500</option>
+                <option>600</option>
+                <option>700</option>
+                <option>800</option>
+                <option>900</option>
+                <option>950</option>
+              </select>
+          </div>
+        </div>
+        <!-- opacity -->
+        <div class="form-control">
+          <label for="opacity" class="label">
+            <span class="label-text font-input-mono">Opacity</span>
+          </label>
+          <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
+
+          <label class="input-group">
+              <input type="text" min="0" max="100" id="opacity" bind:value={to.opacity} on:change={() => updateToOpacity()} class="input input-bordered w-1/2" />
+            <span>%</span>
+          </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- gradient direction -->
+      <div class="flex flex-col mt-4">
+        <label for="Gradient Direction" class="label">
+          <span class="label-text font-input-mono">Gradient Direction <span class="text-info text-xl">{direction}°</span></span>
+        </label>
+        <div class="flex ">
+
+        <div id="Gradient Direction" class="flex flex-col text-white  join">
+          <div class="join text-white flex justify-evenly">
+            <button on:click={() => direction = 135} class="btn bg-opacity-0 text-5xl">↖</button>
+            <button on:click={() => direction = 90} class="btn bg-opacity-0 text-5xl">↑</button>
+            <button on:click={() => direction = 45} class="btn bg-opacity-0 text-5xl">↗</button>
+          </div>
+          <div class="join flex justify-evenly">
+            <button on:click={() => direction = 180} class="btn bg-opacity-0 text-5xl">←</button>
+            <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
+            <button on:click={() => direction = 0} class="btn bg-opacity-0 text-5xl">→</button>
+          </div>
+          <div class="join flex justify-evenly">
+            <button on:click={() => direction = 225} class="btn bg-opacity-0 text-5xl">↙</button>
+            <button on:click={() => direction = 270} class="btn bg-opacity-0 text-5xl">↓</button>
+            <button on:click={() => direction = 315} class="btn bg-opacity-0 text-5xl">↘</button>
+          </div>
+        </div>
+        </div>
+
+        <div>
+          <p></p>
+        </div>
+
+
+      </div>
+
+      <div class="font-input-mono mt-4 bg-accent p-2 px-4">
+        <p>from <span class="text-info">{fromHex}</span> to <span class="text-info">{toHex}</span>, <span class="text-info">{direction}</span>°</p>
+      </div>
+    </div>
+    {/if}
+
 
 
     <!-- form here -->
@@ -926,350 +1240,366 @@ async function saveButtonStyle() {
   </div>
 
 
-    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Buttons</h2>
-      <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
-        
-          <!-- fill -->
-          <h3 class="font-input-mono text-white my-2">Fill</h3>
-        <div class="flex flex-wrap justify-between">
-          <!-- square -->
-          <button on:click|preventDefault={() => handleButtonSelect('squareFill')} class="btn bg-primary w-full rounded-none border-none  mb-4"></button>
-          <!-- round -->
-          <button on:click|preventDefault={() => handleButtonSelect('roundFill')} class="btn border-none bg-primary w-full mb-4"></button>
-          <!-- circle -->
-          <button on:click|preventDefault={() => handleButtonSelect('circleFill')} class="btn bg-primary border-none rounded-full w-full mb-4"></button>
-        </div>
-            
-          <!-- border -->
-          <h3 class="font-input-mono text-white my-2">Border</h3>
-        <div class="flex flex-wrap justify-between">
-          <button on:click|preventDefault={() => handleButtonSelect('squareBorder')} class="btn bg-opacity-0 border-primary border-2 w-full rounded-none mb-4"></button>
-          <button on:click|preventDefault={() => handleButtonSelect('roundBorder')} class="btn bg-opacity-0 border-primary border-2 w-full mb-4"></button>
-          <button on:click|preventDefault={() => handleButtonSelect('circleBorder')} class="btn bg-opacity-0 border-primary border-2 w-full rounded-full mb-4"></button>
-        </div>
+    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Links</h2>
+      <!-- main container -->
+      <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl space-y-4">
 
-          <!-- shadow -->
-          <h3 class="font-input-mono text-white my-2">Shadow</h3>
-        <div class="flex flex-wrap justify-between">
-          <button on:click|preventDefault={() => handleButtonSelect('squareShadow')} class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full rounded-none mb-4"></button>
-          <button on:click|preventDefault={() => handleButtonSelect('roundShadow')}  class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full mb-4"></button>
-          <button on:click|preventDefault={() => handleButtonSelect('circleShadow')} class="btn shadow-md shadow-primary bg-opacity-0 border-none w-full mb-4 rounded-full"></button>
-        </div>
-
-          <!-- hardShadow -->
-          <h3 class="font-input-mono text-white my-2">Hard Shadow</h3>
-        <div class="flex flex-wrap justify-between">
-          <button on:click|preventDefault={() => handleButtonSelect('squareHardShadow')} class="btn hardShadow bg-opacity-0 w-full rounded-none mb-4"></button>
-          <button on:click|preventDefault={() => handleButtonSelect('roundHardShadow')}  class="btn hardShadow bg-opacity-0 w-full mb-4"></button>
-          <button on:click|preventDefault={() => handleButtonSelect('circleHardShadow')} class="btn hardShadow bg-opacity-0 w-full mb-4 rounded-full"></button>
-        </div>
-            
-  <!-- container -->
-  <div class="flex flex-col justify-start space-y-4">
-
-
-    <!-- color select -->
-    <!-- button color + opacity -->
-    <div class="flex justify-start space-x-10 mt-8 ">
-
-      <!-- button color -->
-      <div>
-        <label for="Button Color" class="label">
-          <span class="label-text font-input-mono">Button Color</span>
-        </label>      
-        <div id="Button Color" class="join">
-
-            <!-- show buttoncolor / clikc for color picker -->
-            <button 
-              style={`background-color: ${bchwo? bchwo : 'white'}`}
-              on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} 
-              class="btn w-1/4 rounded-md"></button>
-
-            <!-- select value -->
-            <select placeholder={bcValue} bind:value={bcValue} on:change={() => updateColor('bc', bcValue, bcShade)} class="select select-bordered">
-              <option>slate</option>
-              <option>gray</option>
-              <option>zinc</option>
-              <option>neutral</option>
-              <option>stone</option>
-              <option>red</option>
-              <option>orange</option>
-              <option>amber</option>
-              <option>yellow</option>
-              <option>lime</option>
-              <option>green</option>
-              <option>emerald</option>
-              <option>teal</option>
-              <option>cyan</option>
-              <option>sky</option>
-              <option>blue</option>
-              <option>indigo</option>
-              <option>violet</option>
-              <option>purple</option>
-              <option>fuchsia</option>
-              <option>pink</option>
-              <option>rose</option>
-            </select>
-
-            <!-- select shade -->
-            <select bind:value={bcShade} on:change={() => updateColor('bc', bcValue, bcShade)} class="select select-bordered">
-              <option>50</option>
-              <option>100</option>
-              <option>200</option>
-              <option>300</option>
-              <option>400</option>
-              <option>500</option>
-              <option>600</option>
-              <option>700</option>
-              <option>800</option>
-              <option>900</option>
-              <option>950</option>
-            </select>
-        </div>
-      </div>
-
-      <!-- opacity -->
-      <div class="form-control">
-        <label for="opacity" class="label">
-          <span class="label-text font-input-mono">Opacity</span>
-        </label>
-        <label class="input-group">
-          <input type="text" min="0" max="100" id="opacity" bind:value={bcOpacity} on:change={() => updateOpacity('bc')} class="input input-bordered w-1/2" />
-          <span>%</span>
-        </label>
-      </div>
-    </div>
-
-
-
-
-      <!-- button font color -->
-      <div class="flex justify-start space-x-10 mt-8 ">
-
-        <!-- button color -->
-        <div>
-          <label for="Button Font Color" class="label">
-            <span class="label-text font-input-mono">Button Font Color</span>
-          </label>      
-          <div id="Button Font Color" class="join">
-  
-              <!-- show buttoncolor / clikc for color picker -->
-              <button 
-                style={`background-color: ${bfchwo? bfchwo : 'white'}`}
-                on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonFontColor'}} 
-                class="btn w-1/4 rounded-md"></button>
-  
-              <!-- select value -->
-              <select placeholder={bfValue} bind:value={bfValue} on:change={() => updateColor('bf', bfValue, bfShade)} class="select select-bordered">
-                <option>slate</option>
-                <option>gray</option>
-                <option>zinc</option>
-                <option>neutral</option>
-                <option>stone</option>
-                <option>red</option>
-                <option>orange</option>
-                <option>amber</option>
-                <option>yellow</option>
-                <option>lime</option>
-                <option>green</option>
-                <option>emerald</option>
-                <option>teal</option>
-                <option>cyan</option>
-                <option>sky</option>
-                <option>blue</option>
-                <option>indigo</option>
-                <option>violet</option>
-                <option>purple</option>
-                <option>fuchsia</option>
-                <option>pink</option>
-                <option>rose</option>
-              </select>
-  
-              <!-- select shade -->
-              <select bind:value={bfShade} on:change={() => updateColor('bf', bfValue, bfShade)} class="select select-bordered">
-                <option>50</option>
-                <option>100</option>
-                <option>200</option>
-                <option>300</option>
-                <option>400</option>
-                <option>500</option>
-                <option>600</option>
-                <option>700</option>
-                <option>800</option>
-                <option>900</option>
-                <option>950</option>
-              </select>
+        <!-- Fill controls -->
+        <div class="flex flex-col flex-wrap justify-between ">
+          <!-- Label / checkbox -->
+          <div class="flex space-x-6 items-center ">
+            <input type="checkbox" class="toggle" bind:checked={fill} />
+            <h3 class="font-input-mono text-white text-[1.5rem]">Fill</h3>
           </div>
+
+          {#if fill}
+          <!-- fill style -->
+          <div 
+            in:slide={{duration: 300, easing: cubicInOut}}
+            out:slide>
+
+            <div 
+              in:fly={{x: -50, duration: 500, easing: cubicInOut, delay: 600}}
+              out:blur
+              class="mt-2 mb-6">
+              <label for="Fill Style" class="label">
+                <span class="label-text font-input-mono">Style</span>
+              </label>
+              <div id="Fill Style">
+                <!-- styles -->
+                <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
+                  <!-- solid -->
+                  <button class="p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">solid</button>
+                  <!-- gradient -->
+                  <button class="p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
+                  <!-- image -->
+                  <button class="hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top filter text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
+                  <!-- custom fill -->
+                  <button class="hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom filter text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- color selection -->
+            <div 
+              in:fly={{x: 50, duration: 500, easing: cubicIn, delay: 100}}
+              out:blur
+              class="flex justify-start space-x-10 0">
+
+              
+              <!-- button color -->
+              <div class="">
+                <label for="Fill Color" class="label">
+                  <span class="label-text font-input-mono text-right">Fill Color</span>
+                </label>      
+                <div id="Fill Color" class="join">
+
+                    <!-- show buttoncolor / clikc for color picker -->
+                    <button 
+                      style={`background-color: ${bchwo? bchwo : 'white'}`}
+                      on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} 
+                      class="btn w-1/4 rounded-md"></button>
+
+                    <!-- select value -->
+                    <select placeholder={bcValue} bind:value={bcValue} on:change={() => updateColor('bc', bcValue, bcShade)} class="select select-bordered">
+                      <option>slate</option>
+                      <option>gray</option>
+                      <option>zinc</option>
+                      <option>neutral</option>
+                      <option>stone</option>
+                      <option>red</option>
+                      <option>orange</option>
+                      <option>amber</option>
+                      <option>yellow</option>
+                      <option>lime</option>
+                      <option>green</option>
+                      <option>emerald</option>
+                      <option>teal</option>
+                      <option>cyan</option>
+                      <option>sky</option>
+                      <option>blue</option>
+                      <option>indigo</option>
+                      <option>violet</option>
+                      <option>purple</option>
+                      <option>fuchsia</option>
+                      <option>pink</option>
+                      <option>rose</option>
+                    </select>
+
+                    <!-- select shade -->
+                    <select bind:value={bcShade} on:change={() => updateColor('bc', bcValue, bcShade)} class="select select-bordered">
+                      <option>50</option>
+                      <option>100</option>
+                      <option>200</option>
+                      <option>300</option>
+                      <option>400</option>
+                      <option>500</option>
+                      <option>600</option>
+                      <option>700</option>
+                      <option>800</option>
+                      <option>900</option>
+                      <option>950</option>
+                    </select>
+                </div>
+              </div>
+
+              <!-- opacity -->
+              <div class="form-control">
+                <label for="opacity" class="label">
+                  <span class="label-text font-input-mono">Opacity</span>
+                </label>
+                <label class="input-group">
+                  <input type="text" min="0" max="100" id="opacity" bind:value={bcOpacity} on:change={() => updateOpacity('bc')} class="input input-bordered w-1/2" />
+                  <span>%</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          {/if}
         </div>
-  
-        <!-- opacity -->
-        <div class="form-control">
-          <label for="opacity" class="label">
-            <span class="label-text font-input-mono">Opacity</span>
-          </label>
-          <label class="input-group">
-            <input type="text" min="0" max="100" id="opacity" bind:value={bfOpacity} on:change={() => updateOpacity('bf')} class="input input-bordered w-1/2" />
-            <span>%</span>
-          </label>
+
+
+        <!-- border controls -->
+        <div class="flex flex-wrap flex-col justify-between">
+          <!-- label / checkbox -->
+          <div class="flex space-x-6 items-center ">
+            <input type="checkbox" class="toggle" bind:checked={border} />
+            <h3 class="font-input-mono text-white text-[1.5rem]">Border</h3>
+          </div>
+          
+          {#if border}
+          <!-- border style -->
+          <div 
+            in:slide={{duration: 300, easing: cubicInOut}}
+            out:slide>
+
+            <div 
+              in:fly={{x: -50, duration: 500, easing: cubicInOut, delay: 600}}
+              out:blur
+              class="mt-2 mb-6">
+              <label for="Border Style" class="label">
+                <span class="label-text font-input-mono">Style</span>
+              </label>
+              <div id="Border Style">
+                <!-- styles -->
+                <div class="flex space-x-4 font-input-mono">
+                  <!-- solid -->
+                  <button class="p-2 rounded-md btn-accent border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
+                  <!-- dashed -->
+                  <button class="p-2 rounded-md btn-accent border-success w-1/5 border-dashed border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
+                  <!-- double -->
+                  <button class="p-2 rounded-md btn-accent border-success w-1/5 border-double border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
+                  <!-- custom border -->
+                  <button class="p-2 rounded-md btn-accent w-1/5 border-t-primary border-r-primary border-b-info border-l-info border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">custom</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- color selection -->
+            <div 
+              in:fly={{x: 50, duration: 500, easing: cubicIn, delay: 100}}
+              out:blur
+              class="flex flex-wrap justify-between">
+              <div class="flex justify-start space-x-10 ">
+                <!-- button border color -->
+                <div>
+                  <label for="Border Color" class="label">
+                    <span class="label-text font-input-mono">Border Color</span>
+                  </label>      
+                  <div id="Border Color" class="join">
+          
+                      <!-- show border color / clikc for color picker -->
+                      <button 
+                        style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
+                        on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
+                        class="btn w-1/4 rounded-md"></button>
+          
+                      <!-- select value -->
+                      <select placeholder={bbValue} bind:value={bbValue} on:change={() => updateColor('bb', bbValue, bbShade)} class="select select-bordered">
+                        <option>slate</option>
+                        <option>gray</option>
+                        <option>zinc</option>
+                        <option>neutral</option>
+                        <option>stone</option>
+                        <option>red</option>
+                        <option>orange</option>
+                        <option>amber</option>
+                        <option>yellow</option>
+                        <option>lime</option>
+                        <option>green</option>
+                        <option>emerald</option>
+                        <option>teal</option>
+                        <option>cyan</option>
+                        <option>sky</option>
+                        <option>blue</option>
+                        <option>indigo</option>
+                        <option>violet</option>
+                        <option>purple</option>
+                        <option>fuchsia</option>
+                        <option>pink</option>
+                        <option>rose</option>
+                      </select>
+          
+                      <!-- select shade -->
+                      <select bind:value={bbShade} on:change={() => updateColor('bb', bbValue, bbShade)} class="select select-bordered">
+                        <option>50</option>
+                        <option>100</option>
+                        <option>200</option>
+                        <option>300</option>
+                        <option>400</option>
+                        <option>500</option>
+                        <option>600</option>
+                        <option>700</option>
+                        <option>800</option>
+                        <option>900</option>
+                        <option>950</option>
+                      </select>
+                  
+                  </div>
+                </div>
+                <!-- opacity -->
+                <div class="form-control">
+                  <label for="opacity" class="label">
+                    <span class="label-text font-input-mono">Opacity</span>
+                  </label>
+                  <label class="input-group">
+                    <input type="text" min="0" max="100" id="opacity" bind:value={bbOpacity} on:change={() => updateOpacity('bb')} class="input input-bordered w-1/2" />
+                    <span>%</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/if}
+
         </div>
-      </div>
-
-    <!-- buttonshadowcolor -->
-    {#if buttonShadow !== ''}
-    <div class="flex justify-start space-x-10 mt-8 ">
-
-      <!-- button shadow color -->
-      <div>
-        <label for="Shadow Color" class="label">
-          <span class="label-text font-input-mono">Shadow Color</span>
-        </label>      
-        <div id="Shadow Color" class="join">
-
-            <!-- show shadow color / clikc for color picker -->
-            <button 
-              style={`background-color: ${buttonShadowHexWithOpacity? buttonShadowHexWithOpacity : 'white'}`}
-              on:click={() => {toggleShowButtonColorPicker(); mode = 'shadowColor'}} 
-              class="btn w-1/4 rounded-md"></button>
-
-            <!-- select value -->
-            <select placeholder={bsValue} bind:value={bsValue} on:change={() => updateColor('bs', bsValue, bsShade)} class="select select-bordered">
-              <option>slate</option>
-              <option>gray</option>
-              <option>zinc</option>
-              <option>neutral</option>
-              <option>stone</option>
-              <option>red</option>
-              <option>orange</option>
-              <option>amber</option>
-              <option>yellow</option>
-              <option>lime</option>
-              <option>green</option>
-              <option>emerald</option>
-              <option>teal</option>
-              <option>cyan</option>
-              <option>sky</option>
-              <option>blue</option>
-              <option>indigo</option>
-              <option>violet</option>
-              <option>purple</option>
-              <option>fuchsia</option>
-              <option>pink</option>
-              <option>rose</option>
-            </select>
-
-            <!-- select shade -->
-            <select bind:value={bsShade} on:change={() => updateColor('bs', bsValue, bsShade)} class="select select-bordered">
-              <option>50</option>
-              <option>100</option>
-              <option>200</option>
-              <option>300</option>
-              <option>400</option>
-              <option>500</option>
-              <option>600</option>
-              <option>700</option>
-              <option>800</option>
-              <option>900</option>
-              <option>950</option>
-            </select>
-        </div>
-      </div>
-
-      <!-- opacity -->
-      <div class="form-control">
-        <label for="opacity" class="label">
-          <span class="label-text font-input-mono">Opacity</span>
-        </label>
-        <label class="input-group">
-          <input type="text" min="0" max="100" id="opacity" bind:value={bsOpacity} on:change={() => updateOpacity('bs')} class="input input-bordered w-1/2" />
-          <span>%</span>
-        </label>
-      </div>
-    </div>
-    {/if}
-    <!-- buttonshadowcolor -->
-
-    <!-- button border -->
-    {#if buttonBorder !== ''}
-    <div class="flex justify-start space-x-10 mt-8 ">
-
-      <!-- button border color -->
-      <div>
-        <label for="Border Color" class="label">
-          <span class="label-text font-input-mono">Border Color</span>
-        </label>      
-        <div id="Border Color" class="join">
-
-            <!-- show border color / clikc for color picker -->
-            <button 
-              style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
-              on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
-              class="btn w-1/4 rounded-md"></button>
-
-            <!-- select value -->
-            <select placeholder={bbValue} bind:value={bbValue} on:change={() => updateColor('bb', bbValue, bbShade)} class="select select-bordered">
-              <option>slate</option>
-              <option>gray</option>
-              <option>zinc</option>
-              <option>neutral</option>
-              <option>stone</option>
-              <option>red</option>
-              <option>orange</option>
-              <option>amber</option>
-              <option>yellow</option>
-              <option>lime</option>
-              <option>green</option>
-              <option>emerald</option>
-              <option>teal</option>
-              <option>cyan</option>
-              <option>sky</option>
-              <option>blue</option>
-              <option>indigo</option>
-              <option>violet</option>
-              <option>purple</option>
-              <option>fuchsia</option>
-              <option>pink</option>
-              <option>rose</option>
-            </select>
-
-            <!-- select shade -->
-            <select bind:value={bbShade} on:change={() => updateColor('bb', bbValue, bbShade)} class="select select-bordered">
-              <option>50</option>
-              <option>100</option>
-              <option>200</option>
-              <option>300</option>
-              <option>400</option>
-              <option>500</option>
-              <option>600</option>
-              <option>700</option>
-              <option>800</option>
-              <option>900</option>
-              <option>950</option>
-            </select>
-        </div>
-      </div>
-
-      <!-- opacity -->
-      <div class="form-control">
-        <label for="opacity" class="label">
-          <span class="label-text font-input-mono">Opacity</span>
-        </label>
-        <label class="input-group">
-          <input type="text" min="0" max="100" id="opacity" bind:value={bbOpacity} on:change={() => updateOpacity('bb')} class="input input-bordered w-1/2" />
-          <span>%</span>
-        </label>
-      </div>
-    </div>
-    {/if}
-    <!-- button border color -->
 
 
-    </div>
-    {#if showButtonColorPicker}
-      <ColorPicker mode={mode} customTheme={customTheme}/>
-    {/if}
+
+        <!-- shadow controls -->
+        <div class="flex flex-wrap flex-col justify-between">
+          <!-- label / checkbox -->
+          <div class="flex space-x-6 items-center ">
+            <input type="checkbox" class="toggle" bind:checked={shadow} />
+            <h3 class="font-input-mono text-white text-[1.5rem]">Shadow</h3>
+          </div>
+          
+          {#if shadow}
+          <!-- shadow style -->
+          <div 
+            in:slide={{duration: 300, easing: cubicInOut}}
+            out:slide>
+
+            <div 
+              in:fly={{x: -50, duration: 500, easing: cubicInOut, delay: 600}}
+              out:blur
+              class="mt-2 mb-6">
+              <label for="Shadow Style" class="label">
+                <span class="label-text font-input-mono">Style</span>
+              </label>
+              <div id="Shadow Style">
+                <!-- styles -->
+                <div class="flex space-x-4 font-input-mono">
+                  <!-- soft shadow -->
+                  <button class="btn soft-shadow p-2 rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">soft shadow</button>
+                  <!-- hard shadow -->
+                  <button class="hard-shadow p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">hard shadow</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- color selection -->
+            <div 
+              in:fly={{x: 50, duration: 500, easing: cubicIn, delay: 100}}
+              out:blur
+              class="flex flex-wrap justify-between">
+              <div class="flex justify-start space-x-10 ">
+                <!-- shadow color -->
+                <div>
+                  <label for="Shadow Color" class="label">
+                    <span class="label-text font-input-mono">Shadow Color</span>
+                  </label>      
+                  <div id="Shadow Color" class="join">
+          
+                      <!-- show shadow color / clikc for color picker -->
+                      <button 
+                        style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
+                        on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
+                        class="btn w-1/4 rounded-md"></button>
+          
+                      <!-- select value -->
+                      <select placeholder={bsValue} bind:value={bsValue} on:change={() => updateColor('bs', bsValue, bsShade)} class="select select-bordered">
+                        <option>slate</option>
+                        <option>gray</option>
+                        <option>zinc</option>
+                        <option>neutral</option>
+                        <option>stone</option>
+                        <option>red</option>
+                        <option>orange</option>
+                        <option>amber</option>
+                        <option>yellow</option>
+                        <option>lime</option>
+                        <option>green</option>
+                        <option>emerald</option>
+                        <option>teal</option>
+                        <option>cyan</option>
+                        <option>sky</option>
+                        <option>blue</option>
+                        <option>indigo</option>
+                        <option>violet</option>
+                        <option>purple</option>
+                        <option>fuchsia</option>
+                        <option>pink</option>
+                        <option>rose</option>
+                      </select>
+          
+                      <!-- select shade -->
+                      <select bind:value={bsShade} on:change={() => updateColor('bs', bsValue, bsShade)} class="select select-bordered">
+                        <option>50</option>
+                        <option>100</option>
+                        <option>200</option>
+                        <option>300</option>
+                        <option>400</option>
+                        <option>500</option>
+                        <option>600</option>
+                        <option>700</option>
+                        <option>800</option>
+                        <option>900</option>
+                        <option>950</option>
+                      </select>
+                  
+                  </div>
+                </div>
+                <!-- opacity -->
+                <div class="form-control">
+                  <label for="opacity" class="label">
+                    <span class="label-text font-input-mono">Opacity</span>
+                  </label>
+                  <label class="input-group">
+                    <input type="text" min="0" max="100" id="opacity" bind:value={bsOpacity} on:change={() => updateOpacity('bs')} class="input input-bordered w-1/2" />
+                    <span>%</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/if}
+
+        </div> 
 
 
-      <!-- shadow -->
+
+
+
+
+
+
+        <!-- old stuff -->
+  <!-- container -->
+ 
+    
+
+
       <h3 class="font-input-mono text-white my-2 mt-6">Text Effects</h3>
     <div class="flex flex-wrap justify-between">
       <button 

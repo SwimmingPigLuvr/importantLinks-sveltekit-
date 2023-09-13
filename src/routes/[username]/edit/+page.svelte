@@ -48,8 +48,8 @@
   let font: string;
   let fontColor: string;
   let background: string;
-  let backgroundStyle: "gradient" | "image" | "solid" | '';
-  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow" | "";
+  let backgroundStyle: "gradient" | "image" | "solid" | 'theme';
+  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow" | "theme";
   let buttonColor: string;
   let buttonFontColor: string;
 
@@ -240,9 +240,9 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
+style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
 
-class={`bg-${background ? background : 'secondary-focus'} font-${font ? font : ''} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
+class={`bg-${background ? background : ''} font-${font ? font : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
   <!-- this is an authcheck to make sure  -->
@@ -254,66 +254,44 @@ class={`bg-${background ? background : 'secondary-focus'} font-${font ? font : '
         <!-- PFP -->
     
     <div class="mx-auto  mt-16 mb-4 flex justify-center max-w-sm relative">
-        {#if showChangePfp}
-          <div 
-            in:fly={{ y: -100, duration: 500, easing: backOut }}
-            out:blur={{ duration: 3000, easing: cubicOut, amount: 100 }}
-            class="z-20 btn-info bg-opacity-25 absolute -top-8 right-1/2 translate-x-1/2 border-2">
-
-            <p class="text-secondary-content p-2 px-4">Change PFP</p>
-          </div>
-        {/if}
-        <button
-          on:mouseenter={() => showChangePfp = true}
-          on:mouseleave={() => showChangePfp = false}
-          on:click={() => showChangePfpModal = true}
-          on:keydown={() => showChangePfpModal = true}
-          on:keyup={() => showChangePfpModal = false}
-          on:blur={() => showChangePfpModal = false}
-        >
+      <button
+        on:click={() => showChangePfpModal = true}
+        on:keydown={() => showChangePfpModal = true}
+        on:keyup={() => showChangePfpModal = false}
+        on:blur={() => showChangePfpModal = false}>
       <img 
-        
         src={photoURL ?? "/sonic.jpeg"}
         alt="photoURL"
-        class={`mx-auto h-20 w-20 duration-500 transform transition-all ease-[backOut] ${showChangePfp ? 'scale-x-[2] scale-y-50 filter invert' : ''}`}
-      />
-
-        </button>
+        class={`mx-auto h-20 w-20 duration-500 transform transition-all ease-[backOut]`} />
+      </button>
 
         {#if showChangePfpModal}
         <div 
-        in:fade
-        out:fade
-        class="w-screen h-screen fixed top-0 left-0 bg-primary bg-opacity-50 ">
-
-
+          in:fade
+          out:fade
+          class="w-screen h-screen fixed top-0 left-0 bg-secondary bg-opacity-50 backdrop-blur">
           <div 
-            in:blur
-            out:fly={{ y: -1000, duration: 500, easing: backIn}}
+            in:blur={{duration: 500, delay: 200}}
+            out:blur
             class="m-auto z-50 fixed top-1/3 left-1/2 -translate-x-1/2 bg-{background} w-1/2 p-8">
-
           <input
-
-                on:change|stopPropagation={upload}
-                name="photoURL"
-                type="file"
-                class="file-input file-input-bordered w-full max-w-xs"
-                accept="image/png, image/jpeg, image/gif, image/webp"
-            />
+            on:change|stopPropagation={upload}
+            name="photoURL"
+            type="file"
+            class="file-input file-input-bordered w-full max-w-xs"
+            accept="image/png, image/jpeg, image/gif, image/webp"
+          />
             {#if uploading}
-                <p class="text-info-content mt-6">uploading...</p>
-                <progress class="progress progress-secondary w-56 mt-2 m-auto" />
+              <p class="text-info-content mt-6">uploading...</p>
+              <progress class="progress progress-secondary w-56 mt-2 m-auto" />
             {/if}
             {#if uploadSuccess}
-                <div class="bg-success rounded-md p-2 mt-6 w-3/4 m-auto">
-                    <p class="text-success-content">uploaded successfully</p>
-                </div>
+              <div class="bg-success rounded-md p-2 mt-6 w-3/4 m-auto">
+                  <p class="text-success-content">uploaded successfully</p>
+              </div>
             {/if}
           </div>
-
-      
         </div>
-        
         {/if}
     </div>
 

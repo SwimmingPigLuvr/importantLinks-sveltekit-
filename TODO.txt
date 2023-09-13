@@ -8,6 +8,22 @@ make sure that theme is saved to firestore
 
 
 
+loading state
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2153,3 +2169,192 @@ toggle button that toggles the transparency from 0 / 100
 that way i can keep the button colors uniform
 
 every button can have a fill, border, shadow/hardShadow
+
+
+
+sep 9
+
+hardshadow is applying but the radius isn't
+
+choose radius then style
+
+take it slow with these changes so that i don't make it worse than it is
+
+relevant files for this:
+    edit/appearance
+    UserLink.svelte
+
+if i run into any conditionals that only allow for certain styles i should delete those
+    these can stack
+    they will be controlled by the opacity toggles
+
+    the user is dealing with links. not buttons
+    button font color => link font color / link title color
+
+    wireframe a good way to toggle the styles and chosoe the colors
+
+
+    fill ✅/❌
+    link style / color / opacity
+
+    border ✅/❌
+    border style / color / opacity
+
+    shadow ✅/❌
+    shadow style / color / opacity
+
+    radius
+    none, 0.5rem, full
+
+
+    steps surgically remove the button color selector and implant it into the fill div taking out the buttons
+
+    create on and off button states
+
+    on = 100% opacity
+    off = 0% opacity
+
+    todo reformat all of the html. add styles for borders / shadows etc
+
+
+loading state
+
+
+
+september 11, 23
+
+notes:
+
+add a toggle for the background color so that the user can use the theme colors if they want to.
+
+implement:
+    handler function:
+        solid
+            choosing solid should set value field to '':
+                that way the default daisy ui can come through
+                    actually i think it does this even though for the value field it still shows the img url we uploaded earlier
+        gradient
+            create ui for:
+                add to the handler and update function:
+                    if (mode === 'bg') {
+                        style: defaultGradient
+                    }
+                    showBackgroundGradientSelect
+                2 button selections
+                gradient direction choice1
+
+
+                
+                the color choices dont fit horizontally so have to wrap in another div and hit it with the flex flex-col
+                create a directional selection
+
+                [top left]     [top]    [top right]
+                [left]                      [right]
+                [bottom left] [down] [bottom right]
+
+                best way to do this?
+                use arrow icons with handler functions
+
+                daisy ui join?
+                flex col
+                    3 rows of 3 buttons? evenly spaced
+
+                create button handlers for each direction
+                create a selected button state
+                update the style based on the gradient. 
+                use a default gradient if no color is selected
+                default is based on the button color because that looks pretty cool rn
+
+
+        image
+
+
+september 12
+
+✅homepage uses wrong data-theme, but edit page uses correct theme from db
+    go into edit file and search for 'data-theme'
+✅edit page needs correct styles:
+    font + font color
+✅get rid of change pfp box & hover pfp
+
+✅reminder! buttons => links
+    this sounds way better and more specific thatn just calling the links buttons lolol
+
+notes for later:
+
+
+current focus:
+    implement the gradient:
+        gradient value in the db: 'from, to, direction'
+            parse these values into hex codes, one by one
+                fromHex = convert('from')
+                fromWithOpacityHex = concatOpacity('from', opacity)
+                toHex = convert('to')
+                toWithOpacityHex = concatOpacity('to', opacity)
+            now we have (at least) 2 hex values we can use as the opacity
+                use these values to style bg
+
+                
+examply gradient value in db
+background
+    opacity: 100
+    style: 'gradient'
+    value: '#00000, #FFFFF, 45' ('from, to, direction')
+
+    so we need to get the hex from the db.
+        step 1 get value from selections.
+        step 2 convert
+        step 3 concatonate
+
+                solution:
+
+                    declare vars:
+                        let from;
+                        let to;
+                        let direction;
+                        let angle;
+                        
+                    split the gradient value: [from, to, direction]
+                        from = gradientValue[0]
+                        to = gradientValue[1]
+                        angle = gradientValue[2]
+                    
+                    
+                    create css class
+                        .gradient-bg {
+                            background: linear-gradient(var(--angle, to right), var(--from), var(--to));
+                        }
+
+                    apply gradient-bg conditionally if background.style === 'gradient'
+
+
+                handler function:
+
+                    ux flow experince:
+                        hit gradient button. pick 2 colors
+                            each color choice triggers updateGradient(fromValue, fromShade, fromOpacity, toValue, toShade, direction)
+
+
+                    handle gradient direction selection angle degrees
+
+
+                    take breaks but don't lose focus:
+                        next task when i come back
+                        get a value saved in the db
+                            complete updateGradient function
+
+
+get rid of the construction disclaimer on the gradient choice
+
+
+
+ui looks good
+
+now let's handle the handling functions so they are functioning
+
+
+    handle colors and convert them to colors with hex
+
+
+
+    now i will put the gradient to the left of the gradient direction selection so that the user can see a preview

@@ -28,9 +28,22 @@
   // declare customTheme vars
   let font: string;
   let fontColor: string;
-  let backgroundStyle: "image" | "solid" | "gradient" | "";
+  let backgroundStyle: "image" | "solid" | "gradient" | "theme";
   let background: string;
-  let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow" | "";
+  let buttonStyle: 
+    "squareHardShadow" 
+    | "roundHardShadow" 
+    | "circleHardShadow" 
+    | "squareFill" 
+    | "roundFill" 
+    | "circleFill" 
+    | "squareBorder" 
+    | "roundBorder" 
+    | "circleBorder" 
+    | "squareShadow" 
+    | "roundShadow" 
+    | "circleShadow" 
+    | "theme";
   let buttonColor: string;
   let buttonFontColor: string;
 
@@ -128,8 +141,9 @@
 </svelte:head>
 
 <main 
-style={`color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
-class={`font-${font? font : 'herb'} bg-primary -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
+data-theme={theme}
+style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
+class={`font-${font? font : 'input-mono'} bg- -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 
   <!-- PFP -->

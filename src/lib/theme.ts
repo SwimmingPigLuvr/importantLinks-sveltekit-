@@ -4,6 +4,14 @@ import { collection, doc, onSnapshot, writeBatch, getDoc, setDoc, updateDoc } fr
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import colors from "tailwindcss/colors";
 
+
+
+export interface GradientValue {
+  value: string,
+  shade: string,
+  opacity: number
+}
+
 export const light: CustomTheme = {
   name: 'light',
   background: {
