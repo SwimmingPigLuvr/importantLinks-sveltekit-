@@ -10,7 +10,7 @@
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import { fade, fly, slide, blur } from "svelte/transition";
   import { backIn, backInOut, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
-  import { concatOpacity, themeStore } from "$lib/theme";
+  import { convert, themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
   import colors from "tailwindcss/colors";
   import { updateTheme } from "$lib/themeStore";
@@ -43,24 +43,51 @@
   let links: LinkData[];
   let customTheme: CustomTheme;
   let theme: string | undefined;
-  
-  // declare customTheme vars
-  let font: string;
-  let fontColor: string;
-  let background: string;
-  let backgroundStyle: "gradient" | "image" | "solid" | 'theme';
-  let buttonStyle: "roundHardShadow" | "squareHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow" | "theme";
-  let buttonColor: string;
-  let buttonFontColor: string;
 
-  // hexes 
-  let bgOpacity: number = 100;
-  let backgroundHex: string | undefined;
-  let fontColorHex: string | undefined;
-  let buttonColorHex: string | undefined;
-  let buttonFontColorHex: string | undefined;
+  let background: {
+    style: "image" | "gradient" | "solid";
+    value: string;
+    opacity: number;
+    hex: string | undefined;
+  }
 
-  let bgchwo: string;
+  let link: {
+    radius: string;
+    fill: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    border: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    shadow: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    title: {
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+      size: number;
+      tracking: string;
+      effect: string;
+      onHover: boolean;
+    }
+  }
+
+  let font: {
+    family: string;
+    value: string;
+    opacity: number;
+    hex: string | undefined;
+  }
 
   $: if ($userData) {
     username = $userData.username;
@@ -70,50 +97,38 @@
     theme = $userData.theme;    
 
     // set customTheme vars
-    font = customTheme.font.family;
-    fontColor = customTheme.font.color;
-    background = customTheme.background.value;
-    bgOpacity = customTheme.background.opacity;
-    backgroundStyle = customTheme.background.style;
-    buttonStyle = customTheme.button.style;
-    buttonColor = customTheme.button.color;
-    buttonFontColor = customTheme.button.fontColor;
+    font.family = customTheme.font.family;
+    font.value = customTheme.font.value;
+    background.value = customTheme.background.value;
+    background.opacity = customTheme.background.opacity;
+    background.style = customTheme.background.style;
+    link.fill.value = customTheme.link.fill.value;
+    link.title.value = customTheme.link.title.value;
 
     // convert these to hex codes
-    backgroundHex = background ? convert(background) : undefined;
-    fontColorHex = fontColor ? convert(fontColor) : undefined;
-    buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
-    buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
-
-    bgchwo = concatOpacity(backgroundHex, bgOpacity);
-
+    background.hex = background.value ? convert(background.value, background.opacity) : undefined;
+    font.hex = font.value ? convert(font.value, font.opacity) : undefined;
+    link.fill.hex = link.fill.value ? convert(link.fill.value, link.fill.opacity) : undefined;
+    link.title.hex = link.title.value ? convert(link.title.value, link.fill.opacity) : undefined;
   }
 
   let gradient: string[];
   // gradient values
-  let fromHexWithOpacity: string;
-  let toHexWithOpacity: string;
+  let fromHex: string;
+  let toHex: string;
   let direction: string;
 
-  $: if (backgroundStyle === 'gradient') {
-    gradient = background.split(', ');
-    fromHexWithOpacity = gradient[0];
-    toHexWithOpacity = gradient[1];
+  $: if (background.style === 'gradient') {
+    gradient = background.value.split(', ');
+
+    fromHex = gradient[0];
+    toHex = gradient[1];
     direction = gradient[2];
   }
 
   // makes sure bio isn't actively being edited
   $: if ($userData && !editingBio) {
     bio = $userData.bio;
-  }
-
-  // convert tailwind to hex
-  function convert(colorName: string): string | undefined {
-    const [color, shade] = colorName.split('-');
-
-    // convert('lime-400') returns colors[lime].[400]
-    // colors[lime].[400] === the correct hex code
-    return (colors as any)[color]?.[shade];
   }
 
   onMount (() => {
@@ -125,8 +140,6 @@
       console.log('themeupdated 🍨', $themeStore);
     }
   });
-
-
 
   // upload new pfp
   async function upload(e: any) {
@@ -165,7 +178,6 @@
     console.log('editingBio: ', editingBio);
   }
 
-
   const formDefaults = {
     iconURL: "",
     title: "",
@@ -178,8 +190,6 @@
   let uploadSuccess = false;
   let uploading = false;
   let previewURL: string;
-
-
 
   // verify url && title
   $: urlIsValid = $formData.url.match(/^(ftp|http|https):\/\/[^ "]+$/);
@@ -222,7 +232,6 @@
 
     showForm = false;
   }
-
   
   // cancel new link upload
   function cancelLink() {
@@ -253,7 +262,7 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : (backgroundStyle === 'gradient' ? `background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});` : ''))}`}
+style={`color: ${font.hex? font.hex : 'hsl(var(--p))'}; ${background.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (background.style === 'solid' ? `background-color: ${background.hex};` : (background.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex});` : ''))}`}
 
 class={`bg-${background ? background : ''} font-${font ? font : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
@@ -375,7 +384,7 @@ class={`bg-${background ? background : ''} font-${font ? font : 'input-mono'} -z
         in:slide={{ duration: 700, easing: cubicInOut}}
         out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-{fontColor} text-{background} font-{font} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
+        class="bg-{font.value} text-{background} font-{font} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->

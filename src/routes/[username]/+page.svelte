@@ -6,9 +6,8 @@
   import Footer from "$lib/components/Footer.svelte";
   import { blur, fly, slide } from "svelte/transition";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
-  import { themeStore, updateTheme } from "$lib/themeStore";
-  import { concatOpacity, convert, type CustomTheme } from "$lib/theme";
-  import colors from 'tailwindcss/colors';
+  import { updateTheme } from "$lib/themeStore";
+  import { convert, type CustomTheme } from "$lib/theme";
   import type { LinkData } from "$lib/firebase";
   import { page } from "$app/stores";
 
@@ -30,7 +29,7 @@
     style: "image" | "gradient" | "solid";
     value: string;
     opacity: number;
-    hex: string;
+    hex: string | undefined;
   }
 
   let link: {
@@ -39,24 +38,24 @@
       style: string;
       value: string;
       opacity: number;
-      hex: string;
+      hex: string | undefined;
     }
     border: {
       style: string;
       value: string;
       opacity: number;
-      hex: string;
+      hex: string | undefined;
     }
     shadow: {
       style: string;
       value: string;
       opacity: number;
-      hex: string;
+      hex: string | undefined;
     }
     title: {
       value: string;
       opacity: number;
-      hex: string;
+      hex: string | undefined;
       size: number;
       tracking: string;
       effect: string;
@@ -68,20 +67,8 @@
     family: string;
     value: string;
     opacity: number;
-    hex: string;
+    hex: string | undefined;
   }
-
-  // hex vars
-  let fontColorHex: string | undefined;
-  let backgroundHex: string | undefined;
-  let buttonColorHex: string | undefined;
-  let buttonFontColorHex: string | undefined;
-
-  let buttonTextEffect: 'none' | 'glow' | 'gradient' | 'highlight';
-  let buttonTextEffectHover: boolean;
-
-  let bgOpacity: number = 100;
-  let bgchwo: string;
 
   $: if (data) {
     bio = data.bio;
@@ -92,60 +79,53 @@
     theme = data.theme;    
 
     // set customTheme vars
-    font = customTheme?.font?.family;
-    fontColor = customTheme?.font?.value;
+    font.family = customTheme?.font?.family;
+    font.value = customTheme?.font?.value;
 
 
     // the style of backgorund will effect how we apply it
     // we only need the string value rn
-    backgroundStyle = customTheme?.background?.style;
-    background = customTheme?.background?.value;
-    bgOpacity = customTheme?.background?.opacity;
+    background.style = customTheme?.background?.style;
+    background.value = customTheme?.background?.value;
+    background.opacity = customTheme?.background?.opacity;
 
     // buttons
-    buttonColor = customTheme?.link?.color;
-    buttonFontColor = customTheme?.button?.fontColor;
+    link.fill.value = customTheme?.link?.fill?.value;
+    link.title.value = customTheme?.link?.title?.value;
 
     // text effect
-    buttonTextEffect = customTheme?.button?.textEffect?.effect;
-    buttonTextEffectHover = customTheme?.button?.textEffect?.onHover;
+    link.title.effect = customTheme?.link?.title?.effect;
+    link.title.onHover = customTheme?.link?.title?.onHover;
 
     // convert these to hex codes
-    backgroundHex = background ? convert(background) : undefined;
-    fontColorHex = fontColor ? convert(fontColor) : undefined;
-    buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
-    buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
-
-    bgchwo = concatOpacity(backgroundHex, bgOpacity);
-
+    background.hex = background.value ? convert(background.value, background.opacity) : undefined;
+    font.hex = font.value ? convert(font.value, font.opacity) : undefined;
+    link.fill.hex = link.fill.value ? convert(link.fill.value, link.fill.opacity) : undefined;
+    link.title.hex = link.title.value ? convert(link.title.value, link.title.opacity) : undefined;
   }
 
   let gradient: string[];
 
-  let fromHexWithOpacity: string;
-  let toHexWithOpacity: string;
+  let fromHex: string;
+  let toHex: string;
   let direction: string;
 
-  $: if (backgroundStyle === 'gradient') {
-    gradient = background.split(', ');
+  $: if (background.style === 'gradient') {
+    gradient = background.value.split(', ');
 
-    fromHexWithOpacity = gradient[0];
-    toHexWithOpacity = gradient[1];
+    fromHex = gradient[0];
+    toHex = gradient[1];
     direction = gradient[2];
   }
    
  
 
-    // convert the pesky classes that tailwind is too lazy to let me use
 
     onMount(() => {
 
-    console.log('theme store ', $themeStore)
     
     if (data && data.customTheme) {
       updateTheme(customTheme);
-      console.log('customTHeme: ', customTheme);
-      console.log('themeupdated 🍨', $themeStore);
     }
     mounted = true;
   });
@@ -179,7 +159,7 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : (backgroundStyle === 'gradient' ? `background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity})` : ''))}`}
+style={`color: ${font.hex? font.hex : 'hsl(var(--p))'}; ${background.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (background.style === 'solid' ? `background-color: ${background.hex};` : (background.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex})` : ''))}`}
 class={`font-${font? font : 'input-mono'} bg- -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 

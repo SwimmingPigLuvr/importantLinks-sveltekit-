@@ -18,6 +18,7 @@ export interface CustomTheme {
     style: "image" | "gradient" | "solid";
     value: string;
     opacity: number;
+    hex: string | undefined;
   };
   link: {
     radius: string;
@@ -25,22 +26,26 @@ export interface CustomTheme {
       style: string;
       value: string;
       opacity: number;
+      hex: string | undefined;
     }
     border: {
       style: string;
       value: string;
       opacity: number;
+      hex: string | undefined;
     }
     shadow: {
       style: string;
       value: string;
       opacity: number;
+      hex: string | undefined;
     }
     title: {
       value: string;
       size: number;
       tracking: string;
       opacity: number;
+      hex: string | undefined;
       effect: string;
       onHover: boolean;
     }
@@ -49,6 +54,7 @@ export interface CustomTheme {
     family: string;
     value: string;
     opacity: number;
+    hex: string | undefined;
   };
 }
 
@@ -213,15 +219,10 @@ export const dark: CustomTheme = {
   },
 };
 
-export function convert(colorName: string = "lime-400"): string {
-  const [color, shade] = colorName.split("-");
-  return (colors as any)[color]?.[shade];
-}
+export function convert(value: string, opacity: number): string {
+  const [color, shade] = value.split('-');
+  const hex = (colors as any)[color]?.[shade];
 
-export function concatOpacity(
-  hex: string | undefined,
-  opacity: number,
-): string {
   if (opacity >= 0 && opacity <= 99) {
     // If opacity is a single digit, prepend a '0' for formatting.
     const paddedOpacity =

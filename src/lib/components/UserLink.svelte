@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { convert, concatOpacity } from "$lib/theme";
+  import { convert } from "$lib/theme";
   import { onMount } from "svelte";
   import type { CustomTheme } from "$lib/theme";
   import Page from "../../routes/+page.svelte";
@@ -14,71 +14,60 @@
     export let title = 'some cool title';
     export let previewMode = false;
 
-    let buttonStyle: "squareHardShadow" | "roundHardShadow" | "circleHardShadow" | "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow" | "theme";
-    let buttonColor: string;
-    let buttonOpacity: number;
-    let buttonFont: string;
-    let buttonFontOpacity: number;
-    let buttonFontColor: string;
-    let buttonTextEffect: string;
-    let buttonTextEffectHover = false;
-    let buttonColorHex: string | undefined;
-    let buttonFontColorHex: string | undefined;
+  let background: {
+    style: "image" | "gradient" | "solid";
+    value: string;
+    opacity: number;
+    hex: string | undefined;
+  }
 
-    let buttonBorder: string;
-    let buttonShadow: string;
-    let buttonBorderOpacity: number;
-    let buttonShadowOpacity: number;
-    let buttonBorderHex: string | undefined;
-    let buttonShadowHex: string | undefined;
+  let link: {
+    radius: string;
+    fill: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    border: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    shadow: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    title: {
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+      size: number;
+      tracking: string;
+      effect: string;
+      onHover: boolean;
+    }
+  }
 
-    // button color hex w opacity
-    let bchwo: string | undefined;
-    // button font color hex w opacity
-    let bfchwo: string | undefined;
-    // border
-    let buttonBorderHexWithOpacity: string;
-    // shadow
-    let buttonShadowHexWithOpacity: string;
+  let font: {
+    family: string;
+    value: string;
+    opacity: number;
+    hex: string | undefined;
+  }
 
     // buttons
-    $: if (customTheme && customTheme.button) {
-      buttonStyle = customTheme.button.style;
-      buttonColor = customTheme.button.color;
-      buttonFont = customTheme.font.family;
-      buttonFontColor = customTheme.button.fontColor;
-
-      buttonOpacity = customTheme.button.opacity;
-      buttonFontOpacity = customTheme.button.fontOpacity;
-
-      buttonBorderOpacity = customTheme.button.borderOpacity;
-      buttonShadowOpacity = customTheme.button.shadowOpacity;
-
-      buttonShadow = customTheme.button.shadow;
-      buttonBorder = customTheme.button.border;
-
-
-
-      // convert tailwind to hex
-      buttonColorHex = convert(buttonColor);
-      buttonFontColorHex = convert(buttonFontColor);
-
-      buttonBorderHex = convert(buttonBorder);
-      buttonShadowHex = convert(buttonShadow);
-
-      // button color hex w opacity
-      bchwo = concatOpacity(buttonColorHex, buttonOpacity);
-      // font color
-      bfchwo = concatOpacity(buttonFontColorHex, buttonFontOpacity);
-
-      buttonBorderHexWithOpacity = concatOpacity(buttonBorderHex, buttonBorderOpacity);
-      buttonShadowHexWithOpacity = concatOpacity(buttonShadowHex, buttonShadowOpacity);
-
+    $: if (customTheme && customTheme.link) {
+      link = customTheme.link;
+      font = customTheme.font;
     }
 
-    $: if (customTheme?.button?.textEffect) {
-      buttonTextEffect = customTheme.button.textEffect.effect;
-      buttonTextEffectHover = customTheme.button.textEffect.onHover;
+    $: if (customTheme?.link?.title?.effect) {
+      link.title.effect = customTheme.link.title.effect;
+      link.title.onHover = customTheme.link.title.onHover;
     }
 
 
