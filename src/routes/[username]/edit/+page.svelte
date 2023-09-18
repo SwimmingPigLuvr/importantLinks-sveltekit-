@@ -89,6 +89,19 @@
 
   }
 
+  let gradient: string[];
+  // gradient values
+  let fromHexWithOpacity: string;
+  let toHexWithOpacity: string;
+  let direction: string;
+
+  $: if (backgroundStyle === 'gradient') {
+    gradient = background.split(', ');
+    fromHexWithOpacity = gradient[0];
+    toHexWithOpacity = gradient[1];
+    direction = gradient[2];
+  }
+
   // makes sure bio isn't actively being edited
   $: if ($userData && !editingBio) {
     bio = $userData.bio;
@@ -240,7 +253,7 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
+style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : (backgroundStyle === 'gradient' ? `background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});` : ''))}`}
 
 class={`bg-${background ? background : ''} font-${font ? font : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 

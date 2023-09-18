@@ -48,6 +48,22 @@
 
   }
 
+  let gradient: string[];
+  // gradient values
+  let fromHexWithOpacity: string;
+  let toHexWithOpacity: string;
+  let direction: string;
+
+  $: if (backgroundStyle === 'gradient') {
+    // split the background var into from, to, direction
+    gradient = background.split(', ');
+    fromHexWithOpacity = gradient[0];
+    toHexWithOpacity = gradient[1];
+    direction = gradient[2];
+
+    console.log('🐉' + fromHexWithOpacity, toHexWithOpacity, direction);
+  }
+
 
   
 
@@ -138,7 +154,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
     <div 
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
         data-theme={theme}
-        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
+        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : backgroundStyle === 'gradient' ? `background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});` : '')}`}
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg- flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">

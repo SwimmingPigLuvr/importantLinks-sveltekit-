@@ -8,6 +8,13 @@ make sure that theme is saved to firestore
 
 
 
+
+
+
+
+
+
+
 loading state
 
 
@@ -2358,3 +2365,94 @@ now let's handle the handling functions so they are functioning
 
 
     now i will put the gradient to the left of the gradient direction selection so that the user can see a preview
+
+
+
+    september 14
+
+    add distance between gradient preview and graident direction selector
+    ✅opacities aren't being added into the gradients
+    ✅gradient preview is sitting weird. let's tidy that up a bit.
+    ✅add value to the preview on color selections
+    ✅update degrees in db
+    ✅opacity doesn't update in the db
+        opacity and direction only update on the colorchange
+        add on:change to direction and opacities to use the same function
+    ✅implement into livePreview. editpage. && homepage
+        steps:
+            1: get to this style:
+                    style={`background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});`}
+                    so each page will have to parse this data from the db
+    theme buttonstyle should stay the same.
+    addlink form needs a bg
+    link animations should come from inside div
+    link toggles should trigger updateButtonColor
+    becasue my styles stack i should get rid of the buttonStyle field completely
+    i should jsut use
+        fillStyle
+        borderStyle
+        shadowStyle
+
+
+    updated data: 
+        button.radius
+        button.color -> button.fill
+        button.opacity -> button.fillOpacity
+        deleted button.style
+
+    make sure the save functions are updated!
+        how to update:
+            don't check for the buttonStyle! just check for:
+                fill / border / shadow
+                    fillStyle / borderStyle / shadowStyle
+
+                should just be 
+                
+                fill: {
+                    style: string
+                    value: string
+                    opacity: number
+                }
+
+                border: {
+                    style: string
+                    value: string
+                    opacity: number
+                }
+
+                shadow: {
+                    style: string
+                    value: string
+                    opacity: number
+                }
+
+                textEffect: {
+                    effect: string
+                    value: string
+                    opacity: number
+                }
+
+
+
+
+    let user add their own hex codes!
+    let user add social media icons
+    set limits on file sizes
+    add decorations
+    add banners
+    add custom cursors
+    add music
+        music players with custom skins
+            winramp uploads
+
+
+september 17
+    
+
+fill / border / shadow
+
+colors are always on
+opacities are switched on and off
+styles create conditional styles
+
+toggling styles should just set style to none instead of toggling opacity that way i can toggle the one wih oacpityies

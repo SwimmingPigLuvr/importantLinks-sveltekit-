@@ -20,7 +20,7 @@
   let from: GradientValue = {
     value: 'lime',
     shade: '400',
-    opacity: 100
+    opacity: 100 
   };
 
   let to: GradientValue = {
@@ -29,7 +29,7 @@
     opacity: 100
   };
 
-  let direction: number = 45;
+  let direction: string = '45deg';
 
   // tailwind class based on user color choices
   let fromColor: string;
@@ -53,46 +53,30 @@
 
   let showBackUp: boolean = false;
 
-  function handleScroll() {
-    const windowHeight = document.documentElement.offsetHeight;
-    const windowBottom = windowHeight + window.pageYOffset;
-    const documentHeight = document.documentElement.scrollHeight;
-
-    // check if scrolled past 60% of the page
-    if (windowBottom / documentHeight >= 0.8) {
-      showBackUp = true;
-    } else {
-      showBackUp = false;
-    }
-  }
-
   // opacity states
   let fill = true;
   let border = false;
   let shadow = false;
 
-  $: if (fill) {
-    bcOpacity = 100
-  } else {
-    bcOpacity = 0
-  }
+  let textEffect: string = 'none';
+  let onHover: boolean = false;
 
-  $: if (border) {
-    bbOpacity = 100
-  } else {
-    bbOpacity = 0
-  }
+  // textEffect.effect = 'none';
+  // textEffect.onHover = false;
+  
+  // let applyGlow = false;
 
-  $: if (shadow) {
-    bsOpacity = 100
-  } else {
-    bsOpacity = 0
-  }
+  // function handleMouseOver() {
+  //   if (textEffect?.onHover) {
+  //     applyGlow = true;
+  //   }
+  // }
 
-
-
-
-  let textEffect: {effect: string, onHover: boolean};
+  // function handleMouseOut() {
+  //   if (textEffect?.onHover) {
+  //     applyGlow = false;
+  //   }
+  // }
 
   export let data: PageData;
 
@@ -153,7 +137,6 @@
   let fcValue: string = 'zinc';
   let fcShade: string = '50';
   let fcOpacity: number = 100;
-
 
   let temp: string;
 
@@ -371,61 +354,8 @@
   }
 
 
-  // save button style
-  let chosenButtonStyle = '';
-
-
-
-
-
-
-
-
-async function updateButtonStyle(batch, buttonStyle, shadowColor, borderColor) {
-  let buttonData = {
-    style: buttonStyle,
-    shadow: '',
-    border: '',
-    shadowOpacity: 0,
-    borderOpacity: 0,
-  };
-
-  if (buttonStyle.endsWith('Shadow')) {
-    buttonData.shadow = shadowColor;
-    buttonData.shadowOpacity = 100;
-  } else if (buttonStyle.endsWith('Border')) {
-    buttonData.border = borderColor;
-    buttonData.borderOpacity = 100;
-  }
-
-  return {
-    customTheme: {
-      button: buttonData
-    }
-  };
-}
-
-async function saveButtonStyle() {
-  console.log('saving button style: ', chosenButtonStyle);
-
-  const batch = writeBatch(db);
-  const dataToSave = await updateButtonStyle(batch, chosenButtonStyle, tempButtonShadowColor, tempButtonBorderColor);
-
-  batch.set(doc(db, "users", $user!.uid), dataToSave, { merge: true });
-
-  await batch.commit();
-  chosenButtonStyle = '';
-}
-
-
-
-
-  const handleButtonSelect = (selectedButton: string) => {
-    chosenButtonStyle = selectedButton;
-    saveButtonStyle();
-  }
-
-  async function saveTextEffect(textEffect: {effect: string, onHover: boolean}) {
+  async function saveTextEffect(effect: string, onHover: boolean) {
+    textEffect = {effect, onHover};
     console.log('saving text effect: ', textEffect);
 
     const batch = writeBatch(db);
@@ -442,11 +372,11 @@ async function saveButtonStyle() {
     await batch.commit();
   }
 
-  const handleTextEffectSelect = (effect, onHover) => {
-    textEffect = {effect: effect, onHover: onHover}
+  const handleTextEffectSelect = (effect) => {
     console.log('handling text effect selection: ', textEffect);
-    saveTextEffect(textEffect);
+    saveTextEffect(effect, onHover);
   }
+
 
 
   let fontDropdown = false;
@@ -591,7 +521,7 @@ async function saveButtonStyle() {
   }
 
 
-  async function updateGradient(from: GradientValue, to: GradientValue, direction: number) {
+  async function updateGradient(from: GradientValue, to: GradientValue, direction: string) {
     // build the fromHex
     fromColor = from.value + '-' + from.shade.toString();
     fromHex = convert(fromColor);
@@ -790,7 +720,7 @@ async function saveButtonStyle() {
 
 </script>
 
-<svelte:window on:scroll={handleScroll} />
+<!-- <svelte:window on:scroll={handleScroll} /> -->
 
 
 <!-- put these props back incase hehe -->
@@ -1014,7 +944,7 @@ async function saveButtonStyle() {
 
               <!-- show buttoncolor / clikc for color picker -->
               <button 
-                style={`background-color: ${bgchwo? bgchwo : 'white'}`}
+                style={`background-color: ${fromHexWithOpacity? fromHexWithOpacity : 'white'}`}
                 on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
                 class="btn w-1/4 rounded-md"></button>
 
@@ -1068,7 +998,7 @@ async function saveButtonStyle() {
           <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
 
           <label class="input-group">
-              <input type="text" min="0" max="100" id="opacity" bind:value={from.opacity} on:change={() => updateFromOpacity()} class="input input-bordered w-1/2" />
+              <input type="text" min="0" max="100" id="opacity" bind:value={from.opacity} on:change={() => updateGradient(from, to, direction)} class="input input-bordered w-1/2" />
             <span>%</span>
           </label>
           </div>
@@ -1085,7 +1015,7 @@ async function saveButtonStyle() {
 
               <!-- show buttoncolor / clikc for color picker -->
               <button 
-                style={`background-color: ${bgchwo? bgchwo : 'white'}`}
+                style={`background-color: ${toHexWithOpacity? toHexWithOpacity : 'white'}`}
                 on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
                 class="btn w-1/4 rounded-md"></button>
 
@@ -1139,7 +1069,7 @@ async function saveButtonStyle() {
           <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
 
           <label class="input-group">
-              <input type="text" min="0" max="100" id="opacity" bind:value={to.opacity} on:change={() => updateToOpacity()} class="input input-bordered w-1/2" />
+              <input type="text" min="0" max="100" id="opacity" bind:value={to.opacity} on:change={() => updateGradient(from, to, direction)} class="input input-bordered w-1/2" />
             <span>%</span>
           </label>
           </div>
@@ -1147,40 +1077,47 @@ async function saveButtonStyle() {
       </div>
 
       <!-- gradient direction -->
-      <div class="flex flex-col mt-4">
+      <!-- container -->
+      <div class="flex justify-start space-x-2 ">
+        <!-- preview -->
+        <div 
+        style={`background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});`}
+        class="w-60 border-2 mt-10 border-primary rounded-xl max-w-md h-40 custom-gradient">
+
+        </div>
+      <div class="flex flex-col mt-4 ">
         <label for="Gradient Direction" class="label">
-          <span class="label-text font-input-mono">Gradient Direction <span class="text-info text-xl">{direction}°</span></span>
+          <span class="label-text font-input-mono">Direction <span class="text-info">{direction}°</span></span>
         </label>
         <div class="flex ">
 
         <div id="Gradient Direction" class="flex flex-col text-white  join">
           <div class="join text-white flex justify-evenly">
-            <button on:click={() => direction = 135} class="btn bg-opacity-0 text-5xl">↖</button>
-            <button on:click={() => direction = 90} class="btn bg-opacity-0 text-5xl">↑</button>
-            <button on:click={() => direction = 45} class="btn bg-opacity-0 text-5xl">↗</button>
+            <button on:click={() => updateGradient(from, to, direction = '315deg')} class="btn bg-opacity-0 text-5xl">↖</button>
+            <button on:click={() => updateGradient(from, to, direction = '0deg')} class="btn bg-opacity-0 text-5xl">↑</button>
+            <button on:click={() => updateGradient(from, to, direction = '45deg')} class="btn bg-opacity-0 text-5xl">↗</button>
           </div>
           <div class="join flex justify-evenly">
-            <button on:click={() => direction = 180} class="btn bg-opacity-0 text-5xl">←</button>
+            <button on:click={() => updateGradient(from, to, direction = '270deg')} class="btn bg-opacity-0 text-5xl">←</button>
             <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
-            <button on:click={() => direction = 0} class="btn bg-opacity-0 text-5xl">→</button>
+            <button on:click={() => updateGradient(from, to, direction = '90deg')} class="btn bg-opacity-0 text-5xl">→</button>
           </div>
           <div class="join flex justify-evenly">
-            <button on:click={() => direction = 225} class="btn bg-opacity-0 text-5xl">↙</button>
-            <button on:click={() => direction = 270} class="btn bg-opacity-0 text-5xl">↓</button>
-            <button on:click={() => direction = 315} class="btn bg-opacity-0 text-5xl">↘</button>
+            <button on:click={() => updateGradient(from, to, direction = '225deg')} class="btn bg-opacity-0 text-5xl">↙</button>
+            <button on:click={() => updateGradient(from, to, direction = '180deg')} class="btn bg-opacity-0 text-5xl">↓</button>
+            <button on:click={() => updateGradient(from, to, direction = '135deg')} class="btn bg-opacity-0 text-5xl">↘</button>
           </div>
         </div>
         </div>
 
-        <div>
-          <p></p>
-        </div>
+        
+      </div>
 
 
       </div>
 
       <div class="font-input-mono mt-4 bg-accent p-2 px-4">
-        <p>from <span class="text-info">{fromHex}</span> to <span class="text-info">{toHex}</span>, <span class="text-info">{direction}</span>°</p>
+        <p>from <span class="text-info">{fromHexWithOpacity}</span> to <span class="text-info">{toHexWithOpacity}</span>, <span class="text-info">{direction}</span>°</p>
       </div>
     </div>
     {/if}
@@ -1248,7 +1185,7 @@ async function saveButtonStyle() {
         <div class="flex flex-col flex-wrap justify-between ">
           <!-- Label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={fill} />
+            <input type="checkbox" class="toggle" bind:checked={fill} on:change={() => {if (fill) {bcOpacity = 100} else {bcOpacity = 0}; updateOpacity('bc')}} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Fill</h3>
           </div>
 
@@ -1259,7 +1196,7 @@ async function saveButtonStyle() {
             out:slide>
 
             <div 
-              in:fly={{x: -50, duration: 500, easing: cubicInOut, delay: 600}}
+              in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
               out:blur
               class="mt-2 mb-6">
               <label for="Fill Style" class="label">
@@ -1282,7 +1219,7 @@ async function saveButtonStyle() {
 
             <!-- color selection -->
             <div 
-              in:fly={{x: 50, duration: 500, easing: cubicIn, delay: 100}}
+              in:fly={{x: 20, duration: 400, easing: backOut, delay: 500}}
               out:blur
               class="flex justify-start space-x-10 0">
 
@@ -1363,7 +1300,7 @@ async function saveButtonStyle() {
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={border} />
+            <input type="checkbox" class="toggle" bind:checked={border} on:change={() => {if (border) {bbOpacity = 100} else {bbOpacity = 0}; updateOpacity('bb')}} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Border</h3>
           </div>
           
@@ -1374,7 +1311,7 @@ async function saveButtonStyle() {
             out:slide>
 
             <div 
-              in:fly={{x: -50, duration: 500, easing: cubicInOut, delay: 600}}
+              in:fly={{x: -20, duration: 400, easing: cubicInOut, delay: 200}}
               out:blur
               class="mt-2 mb-6">
               <label for="Border Style" class="label">
@@ -1397,7 +1334,7 @@ async function saveButtonStyle() {
 
             <!-- color selection -->
             <div 
-              in:fly={{x: 50, duration: 500, easing: cubicIn, delay: 100}}
+              in:fly={{x: 20, duration: 400, easing: backOut, delay: 500}}
               out:blur
               class="flex flex-wrap justify-between">
               <div class="flex justify-start space-x-10 ">
@@ -1480,7 +1417,7 @@ async function saveButtonStyle() {
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={shadow} />
+            <input type="checkbox" class="toggle" bind:checked={shadow} on:change={() => {if (shadow) {bsOpacity = 100} else {bsOpacity = 0}; updateOpacity('bs')}} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Shadow</h3>
           </div>
           
@@ -1491,7 +1428,7 @@ async function saveButtonStyle() {
             out:slide>
 
             <div 
-              in:fly={{x: -50, duration: 500, easing: cubicInOut, delay: 600}}
+              in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
               out:blur
               class="mt-2 mb-6">
               <label for="Shadow Style" class="label">
@@ -1510,7 +1447,7 @@ async function saveButtonStyle() {
 
             <!-- color selection -->
             <div 
-              in:fly={{x: 50, duration: 500, easing: cubicIn, delay: 100}}
+              in:fly={{y: 20, duration: 400, easing: backOut, delay: 500}}
               out:blur
               class="flex flex-wrap justify-between">
               <div class="flex justify-start space-x-10 ">
@@ -1587,8 +1524,33 @@ async function saveButtonStyle() {
 
         </div> 
 
+      <h3 class="font-input-mono text-white my-2 mt-6">Text Effect</h3>
+      <div class="flex space-x-6 items-center ">
+        <input type="checkbox" class="toggle" bind:checked={onHover}>
+        <h4 class="font-input-mono text-white text-[1rem]">On Hover = {onHover}</h4>
+      </div>
+      <div class="flex flex-wrap justify-between">
+        <button 
+          on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
+          class="btn w-1/3 rounded-md mb-4 glow">
+          Glow
+        </button>
+        <button on:click|preventDefault={() => handleTextEffectSelect('highlight', false)} class="btn w-1/3 rounded-md mb-4">Highlight</button>
+        <button on:click|preventDefault={() => handleTextEffectSelect('gradient', false)} class="btn w-1/4 rounded-md mb-4">Gradient</button>
+      </div>
 
-
+      <h3 class="font-input-mono text-white my-2 mt-6">Radius</h3>
+      <div class="flex flex-wrap justify-between">
+        <button 
+          on:mouseenter={() => showOptions = true}
+          on:mouseleaeve={() => showOptions = false}
+          on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
+          class="btn w-1/3 rounded-none mb-4">
+          None
+        </button>
+        <button on:click|preventDefault={() => handleTextEffectSelect('highlight', false)} class="btn w-1/3 rounded-[0.5rem] mb-4">Half</button>
+        <button on:click|preventDefault={() => handleTextEffectSelect('gradient', false)} class="btn w-1/4 rounded-full mb-4">Full</button>
+      </div>
 
 
 
@@ -1600,18 +1562,7 @@ async function saveButtonStyle() {
     
 
 
-      <h3 class="font-input-mono text-white my-2 mt-6">Text Effects</h3>
-    <div class="flex flex-wrap justify-between">
-      <button 
-        on:mouseenter={() => showOptions = true}
-        on:mouseleaeve={() => showOptions = false}
-        on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
-        class="btn w-1/3 rounded-md mb-4">
-        Glow
-      </button>
-      <button on:click|preventDefault={() => handleTextEffectSelect('highlight', false)} class="btn w-1/3 rounded-md mb-4">Highlight</button>
-      <button on:click|preventDefault={() => handleTextEffectSelect('gradient', false)} class="btn w-1/4 rounded-md mb-4">Gradient</button>
-    </div>
+      
   
       
       </div>
@@ -1814,6 +1765,10 @@ class="btn">Save Theme</button>
 
 .my-theme:hover::before {
   opacity: 1;  /* Opacity set to 100% on hover */
+}
+
+.custom-gradient {
+  background: linear-gradient(var(--direction, to right), var(--fromHexWithOpacity), var(--toHexWithOpacity));
 }
 
   

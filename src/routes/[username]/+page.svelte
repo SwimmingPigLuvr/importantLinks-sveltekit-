@@ -25,27 +25,51 @@
   let customTheme: CustomTheme;
   let theme: string | undefined;
 
-  // declare customTheme vars
-  let font: string;
-  let fontColor: string;
-  let backgroundStyle: "image" | "solid" | "gradient" | "theme";
-  let background: string;
-  let buttonStyle: 
-    "squareHardShadow" 
-    | "roundHardShadow" 
-    | "circleHardShadow" 
-    | "squareFill" 
-    | "roundFill" 
-    | "circleFill" 
-    | "squareBorder" 
-    | "roundBorder" 
-    | "circleBorder" 
-    | "squareShadow" 
-    | "roundShadow" 
-    | "circleShadow" 
-    | "theme";
-  let buttonColor: string;
-  let buttonFontColor: string;
+
+  let background: {
+    style: "image" | "gradient" | "solid";
+    value: string;
+    opacity: number;
+    hex: string;
+  }
+
+  let link: {
+    radius: string;
+    fill: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string;
+    }
+    border: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string;
+    }
+    shadow: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string;
+    }
+    title: {
+      value: string;
+      opacity: number;
+      hex: string;
+      size: number;
+      tracking: string;
+      effect: string;
+      onHover: boolean;
+    }
+  }
+
+  let font: {
+    family: string;
+    value: string;
+    opacity: number;
+    hex: string;
+  }
 
   // hex vars
   let fontColorHex: string | undefined;
@@ -69,7 +93,7 @@
 
     // set customTheme vars
     font = customTheme?.font?.family;
-    fontColor = customTheme?.font?.color;
+    fontColor = customTheme?.font?.value;
 
 
     // the style of backgorund will effect how we apply it
@@ -79,8 +103,7 @@
     bgOpacity = customTheme?.background?.opacity;
 
     // buttons
-    buttonStyle = customTheme?.button?.style;
-    buttonColor = customTheme?.button?.color;
+    buttonColor = customTheme?.link?.color;
     buttonFontColor = customTheme?.button?.fontColor;
 
     // text effect
@@ -95,6 +118,20 @@
 
     bgchwo = concatOpacity(backgroundHex, bgOpacity);
 
+  }
+
+  let gradient: string[];
+
+  let fromHexWithOpacity: string;
+  let toHexWithOpacity: string;
+  let direction: string;
+
+  $: if (backgroundStyle === 'gradient') {
+    gradient = background.split(', ');
+
+    fromHexWithOpacity = gradient[0];
+    toHexWithOpacity = gradient[1];
+    direction = gradient[2];
   }
    
  
@@ -142,7 +179,7 @@
 
 <main 
 data-theme={theme}
-style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : '')}`}
+style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : (backgroundStyle === 'gradient' ? `background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity})` : ''))}`}
 class={`font-${font? font : 'input-mono'} bg- -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 
