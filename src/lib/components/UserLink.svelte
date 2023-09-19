@@ -59,60 +59,16 @@
     hex: string | undefined;
   }
 
-    // buttons
-    $: if (customTheme && customTheme.link) {
-      link = customTheme.link;
-      font = customTheme.font;
-    }
-
-    $: if (customTheme?.link?.title?.effect) {
-      link.title.effect = customTheme.link.title.effect;
-      link.title.onHover = customTheme.link.title.onHover;
-    }
+  $: if (customTheme && customTheme.link) {
+    background = customTheme.background;
+    link = customTheme.link;
+    font = customTheme.font;
+  }
 
 
   onMount(() => {
     
   })
-
-  let theme = false;
-
-  $: if (buttonStyle === 'theme') {
-    theme = true;
-    console.log('theme? ', theme);
-  }
-    
-  let buttonRadius = '';
-  let fill = false;
-  let border = false;
-  let shadow = false;
-  let hardShadow = false;
-
-  // Object map for button styles
-  const styleMap: { [key: string]: string } = {
-    'square': 'rounded-none',
-    'round': 'rounded-[0.5rem]',
-    'circle': 'rounded-full',
-  };
-
-  const endsWithMap: { [key: string]: () => void } = {
-    'Fill': () => fill = true,
-    'HardShadow': () => hardShadow = true,
-    'Shadow': () => shadow = true,
-    'Border': () => border = true,
-  };
-
-  $: if (buttonStyle && buttonStyle !== 'theme') {
-    const prefix = buttonStyle.split(/Fill|HardShadow|Shadow|Border/)[0];
-    const suffix = buttonStyle.slice(prefix.length);
-
-    buttonRadius = styleMap.hasOwnProperty(prefix) ? styleMap[prefix] : '';
-    if (endsWithMap.hasOwnProperty(suffix)) endsWithMap[suffix]();
-  }
-    
-
-
-    
 
    
   
@@ -122,41 +78,35 @@
 
 <a 
   href="{url}" 
-    class:hardShadow={hardShadow}
-    style={`background-color: ${bchwo}; border: 3px solid transparent;
-      ${shadow ? `box-shadow: 0 10px 20px  -12px ${buttonShadowHexWithOpacity};` : ''}
-      ${border || theme ? `border: 3px solid ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'hsl(var(--a))'};` : ''}
-      ${hardShadow || theme ? `box-shadow: 10px 10px 0px ${buttonShadowHexWithOpacity? buttonShadowHexWithOpacity : 'hsl(var(--a))'}; border: 2px solid ${buttonShadowHexWithOpacity? buttonShadowHexWithOpacity : 'hsl(var(--a))'};` : ''}
+    style={`
+      ${link.fill.style === 'image' ? `background-image: url(${link.fill.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : ''}
+      ${link.fill.style === 'gradient' ? `linear-gradient: 0deg, hsl(var(--s)), hsl(var(--a))` : ''}
+      ${link.fill.style === 'solid' ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : ''}
+      ${link.shadow.style === 'soft' ? `box-shadow: 0 10px 20px -12px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
+      ${link.shadow.style === 'hard' ? `box-shadow: 10px 10px 0px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
+      ${link.border.style === 'solid' ? `border: 3px solid ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
+      ${link.border.style === 'double' ? `border: 3px double ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
+      ${link.border.style === 'dashed' ? `border: 3px dashed ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
+      ${link.border.style === 'custom' ? `border: 3px dashed ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
     `}    
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
-     {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'} border-0  
-     {fill || theme ? `bg-${buttonColor ? 'lime-400' : 'secondary'}` : 'bg-opacity-0'}
-     {border ? 'border-2' : 'border-transparent'}
-     {shadow ? 'shadow-xl' : 'shadow-none'}
+     {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
      hover:translate-x-1 hover:translate-y-1 
      flex justify-between m-auto items-center no-underline">
-
      <!-- link icon -->
     <img 
       src={iconURL} 
       alt={iconURLalt} 
-      class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {buttonRadius === 'full' ? 'rounded-full' : buttonRadius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
+      class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {link.radius === 'full' ? 'rounded-full' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
     
     <!-- Link title -->
     <p 
-    style={`${theme ? `color: hsl(var(--sc));` : `color: ${bfchwo ? bfchwo : 'orange-600'};`} ${previewMode ? 'transform: translateX(-1rem); font-size: 1rem;' : 'transform: translateX(-1.6rem);'}`}
-    class='font-{buttonFont} {previewMode ? 'text-[0.5rem]' : 'text-[1rem]'} herby '>{title}
+    style={`
+      color: ${link.title.hex ? link.title.hex : `hsl(var(--sc))`} 
+      ${previewMode ? 'transform: translateX(-1rem); font-size: 1rem;' : 'transform: translateX(-1.6rem);'}
+    `}
+    class='font-{font.family} {previewMode ? 'text-[0.5rem]' : 'text-[1rem]'}'>{title}
     </p>
-    <!-- empty element -->
-    <div class="right"></div>
 </a>
 
-<style>
-
-.hardShadow {
-  box-shadow: 10px 10px 0px black;
-  border: 2px solid black;
-}
-
-</style>
 

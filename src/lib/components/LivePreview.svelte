@@ -3,9 +3,7 @@
     import UserLink from "./UserLink.svelte";
     import { fly, blur, fade, slide } from "svelte/transition";
     import { backOut } from "svelte/easing";
-  import { concatOpacity, convert, type CustomTheme } from "$lib/theme";
-  import Page from "../../routes/+page.svelte";
-  import { userData } from "$lib/firebase";
+  import type { CustomTheme } from "$lib/theme";
 
   // customTHeme prop
   export let customTheme: CustomTheme;
@@ -17,55 +15,73 @@
   export let links: any[] = [];
   export let theme: string = '';
 
-  let background: string;
-  let bgOpacity: number;
-  let backgroundStyle: "gradient" | "solid" | "image" | 'theme';
-  let backgroundHex: string | undefined;
-  let font: string;
-  let fontColor: string;
-  let fontColorHex: string | undefined;
-  let buttonColor: string;
+  let background: {
+    style: string,
+    value: string,
+    opacity: number,
+    hex: string | undefined,
+  }
 
-  let bgchwo: string;
+  let font: {
+    family: string,
+    value: string,
+    opacity: number,
+    hex: string | undefined,
+  }
 
-  $: if (customTheme && customTheme?.background && customTheme?.font) {
-    background = customTheme.background.value;
-    bgOpacity = customTheme.background.opacity;
+  let link: {
+    radius: string;
+    fill: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    border: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    shadow: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    title: {
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+      size: number;
+      tracking: string;
+      effect: string;
+      onHover: boolean;
+    }
+  }
 
-    backgroundStyle = customTheme.background.style;
-    font = customTheme.font.family;
-    fontColor = customTheme?.font?.color;
-
-    buttonColor = customTheme?.button?.color;
-
-    fontColorHex = convert(fontColor);
-    backgroundHex = convert(background);
-
-    bgchwo = concatOpacity(backgroundHex, bgOpacity);
-
-    // add all the styles here
-
-
+  $: if (customTheme) {
+    background = customTheme.background;
+    font = customTheme.font;
+    link = customTheme.link;
   }
 
   let gradient: string[];
   // gradient values
-  let fromHexWithOpacity: string;
-  let toHexWithOpacity: string;
+  let fromHex: string;
+  let toHex: string;
   let direction: string;
 
-  $: if (backgroundStyle === 'gradient') {
+  $: if (background?.style === 'gradient') {
     // split the background var into from, to, direction
-    gradient = background.split(', ');
-    fromHexWithOpacity = gradient[0];
-    toHexWithOpacity = gradient[1];
+    gradient = background.value.split(', ');
+    fromHex = gradient[0];
+    toHex = gradient[1];
     direction = gradient[2];
 
-    console.log('🐉' + fromHexWithOpacity, toHexWithOpacity, direction);
+    console.log('🐉' + fromHex, toHex, direction);
   }
 
-
-  
 
   let showData = false;
   let showPreview = false;
@@ -99,8 +115,6 @@
     console.log('showPreview: ', showPreview)
 
     
-
-        
       }
   );
     
@@ -154,7 +168,13 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
     <div 
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
         data-theme={theme}
-        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} color: ${fontColorHex}; ${backgroundStyle === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : (backgroundStyle === 'solid' ? `background-color: ${bgchwo};` : backgroundStyle === 'gradient' ? `background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});` : '')}`}
+        style={`
+          ${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} 
+          color: ${font?.hex? font?.hex : `hsl(var(--a))`}; 
+          ${background?.style === 'image' ? `background-image: url(${background}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''} 
+          ${background?.style === 'solid' ? `background-color: ${background?.hex? background?.hex : `hsl(var(--a))`};` : ''}
+          ${background?.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex});` : ''}
+        `}
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} bg- flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
@@ -166,8 +186,8 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
     >
 
       <div 
-      style={`color: ${fontColorHex? fontColorHex : 'hsl(var(--p))'}`}
-      class="flex flex-col items-center mt-8 mb-4 font-{font}">
+      style={`color: ${font?.hex? font?.hex : 'hsl(var(--p))'}`}
+      class="flex flex-col items-center mt-8 mb-4 font-{font?.family}">
         <!-- pfp -->
         <img class="min-w-[38px] min-h-[38px] max-h-[88px] max-w-[88px]"  src="{photoURL}" alt="pfp">
         <!-- Username -->
@@ -194,7 +214,15 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
       <div
         in:fade={{duration: 1000, easing: backOut}}
         out:fade={{duration: 1000, easing: backOut}}
-        class="bg-{buttonColor} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen flex">
+        style={`
+          
+        `}
+        class={`
+          ${link?.radius === 'full' ? `rounded-full` : ''}
+          ${link?.radius === 'half' ? `rounded-[0.5rem]` : ''}
+          ${link?.radius === 'none' ? `rounded-none` : ''}
+          bg-${link?.fill?.value} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen flex
+        `}>
           <!-- data -->
           <div class="m-auto">
             <h1 class="font-{font} text-[2rem]">Data</h1>

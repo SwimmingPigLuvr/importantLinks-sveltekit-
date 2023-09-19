@@ -97,19 +97,16 @@
     theme = $userData.theme;    
 
     // set customTheme vars
-    font.family = customTheme.font.family;
-    font.value = customTheme.font.value;
-    background.value = customTheme.background.value;
-    background.opacity = customTheme.background.opacity;
-    background.style = customTheme.background.style;
-    link.fill.value = customTheme.link.fill.value;
-    link.title.value = customTheme.link.title.value;
+    font = customTheme.font;
+    background = customTheme.background;
+    link = customTheme.link;
 
     // convert these to hex codes
-    background.hex = background.value ? convert(background.value, background.opacity) : undefined;
-    font.hex = font.value ? convert(font.value, font.opacity) : undefined;
-    link.fill.hex = link.fill.value ? convert(link.fill.value, link.fill.opacity) : undefined;
-    link.title.hex = link.title.value ? convert(link.title.value, link.fill.opacity) : undefined;
+    // move these ones into save functions. so they're in the db
+    // background.hex = background.value ? convert(background.value, background.opacity) : undefined;
+    // font.hex = font.value ? convert(font.value, font.opacity) : undefined;
+    // link.fill.hex = link.fill.value ? convert(link.fill.value, link.fill.opacity) : undefined;
+    // link.title.hex = link.title.value ? convert(link.title.value, link.fill.opacity) : undefined;
   }
 
   let gradient: string[];

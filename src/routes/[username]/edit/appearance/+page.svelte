@@ -4,7 +4,7 @@
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { db, user, userData, storage, userTheme } from "$lib/firebase";
-  import { setTheme, type CustomTheme, defaultTheme, emptyTheme, type GradientValue } from "$lib/theme";
+  import { setTheme, type CustomTheme, defaultTheme, emptyTheme, type GradientValue, convert } from "$lib/theme";
   import { doc, getDoc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { flip } from "svelte/animate";
@@ -14,8 +14,113 @@
   import type { PageData } from "./$types";
   import Nav from "$lib/components/Nav.svelte";
   import colors from "tailwindcss/colors";
-  import { convert, concatOpacity } from "$lib/theme";
   import { onMount } from "svelte";
+
+  let background: {
+    style: string,
+    value: string,
+    opacity: number,
+    hex: string | undefined,
+  }
+
+  let font: {
+    family: string,
+    value: string,
+    opacity: number,
+    hex: string | undefined,
+  }
+
+  let link: {
+    radius: string;
+    fill: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    border: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    shadow: {
+      style: string;
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+    }
+    title: {
+      value: string;
+      opacity: number;
+      hex: string | undefined;
+      size: number;
+      tracking: string;
+      effect: string;
+      onHover: boolean;
+    }
+  }
+
+
+  let fill: boolean;
+  let border: boolean;
+  let shadow: boolean;
+
+  async function updateVisibility(mode: boolean) {
+    const batch = writeBatch(db);
+
+    if (mode === 'fill') {
+      batch.set(doc(db, `users/${user!.uid}`), {
+        customTheme: {
+          link: {
+            fill: {
+              visible: mode
+            }
+          }
+        }
+      }, { merge: true });
+
+    } else if (mode === 'border') {
+      batch.set(doc(db, `users/${user!.uid}`), {
+        customTheme: {
+          link: {
+            border: {
+              visible: mode
+            }
+          }
+        }
+      }, { merge: true });
+      
+    } else if (mode === 'shadow') {
+      batch.set(doc(db, `users/${user!.uid}`), {
+        customTheme: {
+          link: {
+            shadow: {
+              visible: mode
+            }
+          }
+        }
+      }, { merge: true });
+    }
+    await batch.commit();
+
+  }
+
+  async function updateOnHover() {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${user!.uid}`), {
+      customTheme: {
+        link: {
+          title: {
+            onHover: onHover
+          }
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+  }
 
   let from: GradientValue = {
     value: 'lime',
@@ -37,46 +142,9 @@
 
   // hex codes
   let fromHex: string | undefined;
-  let fromHexWithOpacity: string | undefined;
   let toHex: string | undefined;
-  let toHexWithOpacity: string | undefined;
-
-  $: if ($userData && $userData.background) {
-    // concat value + shade
-    fromTemp = from.value + '-' + from.shade.toString();
-    // convert to hex
-    fromHex = convert(fromTemp);
-    // concat opacity
-    fromHexWithOpacity = concatOpacity(fromHex, from.opacity);
-
-  }
 
   let showBackUp: boolean = false;
-
-  // opacity states
-  let fill = true;
-  let border = false;
-  let shadow = false;
-
-  let textEffect: string = 'none';
-  let onHover: boolean = false;
-
-  // textEffect.effect = 'none';
-  // textEffect.onHover = false;
-  
-  // let applyGlow = false;
-
-  // function handleMouseOver() {
-  //   if (textEffect?.onHover) {
-  //     applyGlow = true;
-  //   }
-  // }
-
-  // function handleMouseOut() {
-  //   if (textEffect?.onHover) {
-  //     applyGlow = false;
-  //   }
-  // }
 
   export let data: PageData;
 
@@ -88,16 +156,6 @@
   let customTheme: CustomTheme;
   let theme: string | undefined;
   
-  // declare customTheme vars
-  let font: string;
-  let fontSize: number = 1;
-  let fontColor: string;
-  let background: string;
-  let backgroundStyle: 'gradient' | 'image' | 'solid';
-  let buttonStyle: "squareFill" | "roundFill" | "circleFill" | "squareBorder" | "roundBorder" | "circleBorder" | "squareShadow" | "roundShadow" | "circleShadow";
-  let buttonColor: string;
-  let buttonFontColor: string;
-  let buttonFontSize: number = 1;
 
 
   // new color flow
@@ -178,6 +236,8 @@
   // font color hex w opacity
   let fchwo: string;
 
+  let onHover: boolean;
+
   $: if ($userData) {
     username = $userData.username;
     bio = $userData.bio;
@@ -187,48 +247,10 @@
     theme = $userData.theme;    
     userThemes = $userData.userThemes;
 
-    
-
-    // set customTheme vars
-    font = customTheme?.font?.family;
-    fontColor = customTheme?.font?.color;
-
-
-    // the style of backgorund will effect how we apply it
-    // we only need the string value rn
-    backgroundStyle = customTheme?.background?.style;
-    background = customTheme?.background?.value;
-
-    // buttons
-    buttonStyle = customTheme?.button?.style;
-    buttonColor = customTheme?.button?.color;
-    buttonFontColor = customTheme?.button?.fontColor;
-    buttonBorder = customTheme?.button?.border;
-    buttonShadow = customTheme?.button?.shadow;
-
-    // convert these to hex codes
-    backgroundHex = background ? convert(background) : undefined;
-    fontColorHex = fontColor ? convert(fontColor) : undefined;
-    buttonColorHex = buttonColor ? convert(buttonColor) : undefined;
-    buttonFontColorHex = buttonFontColor ? convert(buttonFontColor) : undefined;
-    buttonShadowHex = buttonShadow ? convert(buttonShadow) : undefined;
-    buttonBorderHex = buttonBorder ? convert(buttonBorder) : undefined;
-
-    // [buttonShade, buttonValue] = buttonColor.split('-');
-
-    // append opacities
-    bgchwo = concatOpacity(backgroundHex, bgOpacity);
-
-    fchwo = concatOpacity(fontColorHex, fcOpacity);
-
-    bchwo = concatOpacity(buttonColorHex, bcOpacity);
-
-    bfchwo = concatOpacity(buttonFontColorHex, bfOpacity);
-
-    buttonBorderHexWithOpacity = concatOpacity(buttonBorderHex, bbOpacity);
-    buttonShadowHexWithOpacity = concatOpacity(buttonShadowHex, bsOpacity);
-
-
+    font = customTheme.font;
+    background = customTheme.background;
+    link = customTheme.link;
+    onHover = link.title.onHover;
   }
 
   $: if ($userData && $userData.userThemes && $userData.userThemes.length > 1) {
@@ -240,13 +262,6 @@
     updateTheme(customTheme);
   }
 
-  // delete this: will be imported from theme.ts
-  // convert tailwind to hex
-
-  // function convert(colorName: string): string | undefined {
-  //   const [color, shade] = colorName.split('-');
-  //   return (colors as any)[color]?.[shade];
-  // }
 
   let mode = '';
 
@@ -308,23 +323,6 @@
     await batch.commit();
   }
 
-  async function changeButtonFontSize() {
-    console.log('changing buttonFontsize to: ', buttonFontSize);
-
-    const batch = writeBatch(db);
-    batch.set(doc(db, "users", $user!.uid), {
-      customTheme: {
-        ...customTheme,
-        button: {
-          ...button,
-          fontSize: buttonFontSize
-        }
-      }
-    }, { merge: true })
-
-    await batch.commit();
-  }
-
   const handleThemeSelect = (selectedTheme: string) => {
     chosenTheme = selectedTheme;
     saveTheme();
@@ -354,17 +352,16 @@
   }
 
 
-  async function saveTextEffect(effect: string, onHover: boolean) {
-    textEffect = {effect, onHover};
-    console.log('saving text effect: ', textEffect);
-
+  async function saveTextEffect(effect: string) {
     const batch = writeBatch(db);
 
     // update textEffect
     batch.set(doc(db, "users", $user!.uid), {
       customTheme: {
-        button: { 
-          textEffect: textEffect 
+        link: { 
+          title: {
+            effect: effect
+          }
         }
       }
     } , { merge: true });
@@ -373,8 +370,8 @@
   }
 
   const handleTextEffectSelect = (effect) => {
-    console.log('handling text effect selection: ', textEffect);
-    saveTextEffect(effect, onHover);
+    console.log('handling text effect selection');
+    saveTextEffect(effect);
   }
 
 
@@ -408,8 +405,8 @@
     showColorPicker = !showColorPicker;
   }
 
+  // handles 'solid' and 'gradient' background styles
   function handleStyleChange(mode: string, style: string) {
-
     if (mode === 'bg' && style === 'solid') {
       toggleShowBackgroundColorSelect();
     } else if (mode === 'bg' && style === 'gradient') {
@@ -418,13 +415,11 @@
     updateStyle(mode, style);
   }
 
-  function toggleShowBackgroundColorSelect() {
-    showBackgroundColorSelect = !showBackgroundColorSelect;
-  }
+  // color selection
+  function toggleShowBackgroundColorSelect() {showBackgroundColorSelect = !showBackgroundColorSelect;}
 
-  function toggleShowBackgroundGradientSelect() {
-    showBackgroundGradientSelect = !showBackgroundGradientSelect;
-  }
+  // gradient selection
+  function toggleShowBackgroundGradientSelect() {showBackgroundGradientSelect = !showBackgroundGradientSelect;}
 
 
   function toggleShowGradientPicker() {
@@ -481,6 +476,7 @@
     const batch = writeBatch(db);
 
     try {
+      // get user uploaded file into a URL
       const file = e.target.files[0];
       previewURL = URL.createObjectURL(file);
       const storageRef = ref(storage, `users/${$user!.uid}/background.png`);
@@ -522,15 +518,11 @@
 
 
   async function updateGradient(from: GradientValue, to: GradientValue, direction: string) {
-    // build the fromHex
     fromColor = from.value + '-' + from.shade.toString();
-    fromHex = convert(fromColor);
-    fromHexWithOpacity = concatOpacity(fromHex, from.opacity);
+    fromHex = convert(fromColor, from.opacity);
 
-    // build the toHex
     toColor = to.value + '-' + to.shade.toString();
-    toHex = convert(toColor);
-    toHexWithOpacity = concatOpacity(toHex, to.opacity);
+    toHex = convert(toColor, to.opacity);
 
     const batch = writeBatch(db);
 
@@ -538,8 +530,9 @@
       customTheme: {
         background: {
           style: 'gradient',
-          value: `${fromHexWithOpacity}, ${toHexWithOpacity}, ${direction}`,
-          opacity: 100
+          value: `${fromColor}, ${toColor}, ${direction}`,
+          opacity: 100,
+          hex: `${fromHex}, ${toHex}, ${direction}`,
         }
       }
     }, { merge: true });
@@ -547,8 +540,11 @@
     await batch.commit();
   }
 
+  // save color selections
+  // construct hex codes in the db
   async function updateColor(mode: string, value: string, shade: string) {
-
+    // mode let's us know hwere to save it in the db
+    // value + shade create the color
     console.log('updateing colors: ', mode + ': ' + value + '-' + shade);
     temp = value + '-' + shade.toString();
 
@@ -563,7 +559,8 @@
             background: {
               style: 'solid',
               value: temp,
-              opacity: bgOpacity
+              opacity: background.opacity,
+              hex: convert(temp, background.opacity)
             }
           }
         }, { merge: true });
@@ -574,9 +571,13 @@
       case 'bc':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              color: temp,
-              opacity: bcOpacity
+            link: {
+              fill: {
+                style: 'solid',
+                value: temp,
+                opacity: link.fill.opacity,
+                hex: convert(temp, link.fill.opacity)
+              }
             }
           }
         }, { merge: true });
@@ -587,9 +588,13 @@
       case 'bb':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              border: temp,
-              borderOpacity: bbOpacity
+            link: {
+              border: {
+                // no style because the same color can be used with idfferent styles
+                value: temp,
+                opacity: link.border.opacity,
+                hex: convert(temp, link.border.opacity)
+              }
             }
           }
         }, { merge: true });
@@ -600,9 +605,12 @@
       case 'bs':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              shadow: temp,
-              shadowOpacity: bsOpacity
+            link: {
+              shadow: {
+                value: temp,
+                opacity: link.shadow.opacity,
+                hex: convert(temp, link.shadow.opacity)
+              }
             }
           }
         }, { merge: true });
@@ -613,9 +621,12 @@
       case 'bf':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              fontColor: temp,
-              fontOpacity: bfOpacity
+            link: {
+              title: {
+                value: temp,
+                opacity: link.title.opacity,
+                hex: convert(temp, link.title.opacity)
+              }
             }
           }
         }, { merge: true });
@@ -627,8 +638,9 @@
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
-              color: temp,
-              opacity: fcOpacity
+              value: temp,
+              opacity: font.opacity,
+              hex: convert(temp, font.opacity)
             }
           }
         }, { merge: true });
@@ -642,6 +654,7 @@
     await batch.commit();
   }
 
+  // save opacities in the db
   async function updateOpacity(mode: string) {
     const batch = writeBatch(db);
 
@@ -650,7 +663,7 @@
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
-              opacity: bgOpacity
+              opacity: background.opacity
             }
           }
         }, { merge: true });
@@ -659,7 +672,7 @@
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
-              opacity: fcOpacity
+              opacity: font.opacity
             }
           }
         }, { merge: true });
@@ -667,8 +680,10 @@
       case 'bf':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              fontOpacity: bfOpacity
+            link: {
+              title: {
+                opacity: link.title.opacity
+              }
             }
           }
         }, { merge: true });
@@ -676,8 +691,10 @@
       case 'bc':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              opacity: bcOpacity
+            link: {
+              fill: {
+                opacity: link.fill.opacity
+              }
             }
           }
         }, { merge: true });
@@ -685,8 +702,10 @@
       case 'bb':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              borderOpacity: bbOpacity
+            link: {
+              border: {
+                opacity: link.border.opacity
+              }
             }
           }
         }, { merge: true });
@@ -694,8 +713,10 @@
       case 'bs':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
-            button: {
-              shadowOpacity: bsOpacity
+            link: {
+              shadow: {
+                opacity: link.shadow.opacity
+              }
             }
           }
         }, { merge: true });
@@ -944,7 +965,7 @@
 
               <!-- show buttoncolor / clikc for color picker -->
               <button 
-                style={`background-color: ${fromHexWithOpacity? fromHexWithOpacity : 'white'}`}
+                style={`background-color: ${fromHex? fromHex : 'white'}`}
                 on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
                 class="btn w-1/4 rounded-md"></button>
 
@@ -1015,7 +1036,7 @@
 
               <!-- show buttoncolor / clikc for color picker -->
               <button 
-                style={`background-color: ${toHexWithOpacity? toHexWithOpacity : 'white'}`}
+                style={`background-color: ${toHex? toHex : 'white'}`}
                 on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
                 class="btn w-1/4 rounded-md"></button>
 
@@ -1081,7 +1102,7 @@
       <div class="flex justify-start space-x-2 ">
         <!-- preview -->
         <div 
-        style={`background: linear-gradient(${direction}, ${fromHexWithOpacity}, ${toHexWithOpacity});`}
+        style={`background: linear-gradient(${direction}, ${fromHex}, ${toHex});`}
         class="w-60 border-2 mt-10 border-primary rounded-xl max-w-md h-40 custom-gradient">
 
         </div>
@@ -1117,7 +1138,7 @@
       </div>
 
       <div class="font-input-mono mt-4 bg-accent p-2 px-4">
-        <p>from <span class="text-info">{fromHexWithOpacity}</span> to <span class="text-info">{toHexWithOpacity}</span>, <span class="text-info">{direction}</span>°</p>
+        <p>from <span class="text-info">{fromHex}</span> to <span class="text-info">{toHex}</span>, <span class="text-info">{direction}</span>°</p>
       </div>
     </div>
     {/if}
@@ -1185,7 +1206,7 @@
         <div class="flex flex-col flex-wrap justify-between ">
           <!-- Label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={fill} on:change={() => {if (fill) {bcOpacity = 100} else {bcOpacity = 0}; updateOpacity('bc')}} />
+            <input type="checkbox" class="toggle" bind:checked={fill} on:change={() => updateVisibility(fill)} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Fill</h3>
           </div>
 
@@ -1300,7 +1321,7 @@
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={border} on:change={() => {if (border) {bbOpacity = 100} else {bbOpacity = 0}; updateOpacity('bb')}} />
+            <input type="checkbox" class="toggle" bind:checked={border} on:change={() => updateVisibility(border)} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Border</h3>
           </div>
           
@@ -1347,7 +1368,7 @@
           
                       <!-- show border color / clikc for color picker -->
                       <button 
-                        style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
+                        style={`background-color: ${link.border.hex? link.border.hex : 'white'}`}
                         on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
                         class="btn w-1/4 rounded-md"></button>
           
@@ -1417,7 +1438,7 @@
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={shadow} on:change={() => {if (shadow) {bsOpacity = 100} else {bsOpacity = 0}; updateOpacity('bs')}} />
+            <input type="checkbox" class="toggle" bind:checked={shadow} on:change={() => updateVisibility(shadow)} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Shadow</h3>
           </div>
           
@@ -1460,7 +1481,7 @@
           
                       <!-- show shadow color / clikc for color picker -->
                       <button 
-                        style={`background-color: ${buttonBorderHexWithOpacity? buttonBorderHexWithOpacity : 'white'}`}
+                        style={`background-color: ${link.border.hex? link.border.hex : 'white'}`}
                         on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
                         class="btn w-1/4 rounded-md"></button>
           
@@ -1526,7 +1547,7 @@
 
       <h3 class="font-input-mono text-white my-2 mt-6">Text Effect</h3>
       <div class="flex space-x-6 items-center ">
-        <input type="checkbox" class="toggle" bind:checked={onHover}>
+        <input type="checkbox" class="toggle" bind:checked={onHover} on:change={() => updateOnHover()}>
         <h4 class="font-input-mono text-white text-[1rem]">On Hover = {onHover}</h4>
       </div>
       <div class="flex flex-wrap justify-between">
@@ -1768,7 +1789,7 @@ class="btn">Save Theme</button>
 }
 
 .custom-gradient {
-  background: linear-gradient(var(--direction, to right), var(--fromHexWithOpacity), var(--toHexWithOpacity));
+  background: linear-gradient(var(--direction, to right), var(--fromHex), var(--toHex));
 }
 
   

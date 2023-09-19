@@ -23,18 +23,21 @@ export interface CustomTheme {
   link: {
     radius: string;
     fill: {
+      visible: boolean,
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     border: {
+      visible: boolean,
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     shadow: {
+      visible: boolean,
       style: string;
       value: string;
       opacity: number;
@@ -65,23 +68,30 @@ export const defaultTheme: CustomTheme = {
     style: 'solid', 
     value: 'lime-400',
     opacity: 100,
+    hex: convert('lime-400', 100)
   },
   link: {
     radius: 'full',
     fill: {
+      visible: true,
       style: 'solid',
       value: 'lime-50',
       opacity: 100,
+      hex: convert('lime-50', 100),
     },
     border: {
+      visible: true,
       style: 'solid',
       value: 'cyan-800',
       opacity: 100,
+      hex: convert('cyan-800', 100),
     },
     shadow: {
+      visible: true,
       style: 'hard',
       value: 'slate-950',
       opacity: 100,
+      hex: convert('slate-950', 100)
     },
     title: {
       value: 'lime-400',
@@ -90,12 +100,14 @@ export const defaultTheme: CustomTheme = {
       opacity: 100,
       effect: 'none',
       onHover: false,
+      hex: convert('lime-400', 100),
     },
   },
   font: {
     family: 'input-mono',
     value: 'lime-200',
     opacity: 100,
+    hex: convert('lime-200', 100)
   },
 };
 
@@ -105,23 +117,30 @@ export const emptyTheme: CustomTheme = {
     style: 'solid', 
     value: '',
     opacity: 100,
+    hex: undefined,
   },
   link: {
     radius: '',
     fill: {
+      visible: true,
       style: 'solid',
       value: '',
       opacity: 100,
+      hex: undefined,
     },
     border: {
+      visible: true,
       style: 'none',
       value: '',
       opacity: 100,
+      hex: undefined,
     },
     shadow: {
+      visible: true,
       style: 'none',
       value: '',
       opacity: 100,
+      hex: undefined,
     },
     title: {
       value: '',
@@ -130,12 +149,14 @@ export const emptyTheme: CustomTheme = {
       opacity: 100,
       effect: 'none',
       onHover: false,
+      hex: undefined,
     },
   },
   font: {
     family: '',
     value: '',
     opacity: 100,
+    hex: undefined,
   },
 };
 
@@ -145,23 +166,30 @@ export const light: CustomTheme = {
     style: 'solid', 
     value: 'slate-50',
     opacity: 100,
+    hex: convert('slate-50', 100)
   },
   link: {
     radius: 'full',
     fill: {
+      visible: true,
       style: 'solid',
       value: 'slate-100',
       opacity: 100,
+      hex: convert('slate-100', 100)
     },
     border: {
+      visible: true,
       style: 'solid',
       value: 'slate-200',
       opacity: 100,
+      hex: convert('slate-200', 100)
     },
     shadow: {
+      visible: true,
       style: 'soft',
       value: 'slate-950',
       opacity: 100,
+      hex: convert('slate-950', 100)
     },
     title: {
       value: 'slate-950',
@@ -170,12 +198,14 @@ export const light: CustomTheme = {
       opacity: 100,
       effect: 'none',
       onHover: false,
+      hex: convert('slate-950', 100)
     },
   },
   font: {
     family: 'input-mono',
     value: 'slate-700',
     opacity: 100,
+    hex: convert('slate-700', 100)
   },
 };
 
@@ -185,23 +215,30 @@ export const dark: CustomTheme = {
     style: 'solid', 
     value: 'slate-950',
     opacity: 100,
+    hex: convert('slate-950', 100)
   },
   link: {
     radius: 'none',
     fill: {
+      visible: true,
       style: 'solid',
       value: 'slate-900',
       opacity: 100,
+      hex: convert('slate-900', 100)
     },
     border: {
+      visible: true,
       style: 'solid',
       value: 'slate-800',
       opacity: 100,
+      hex: convert('slate-800', 100)
     },
     shadow: {
+      visible: true,
       style: 'soft',
       value: 'slate-50',
       opacity: 100,
+      hex: convert('slate-50', 100)
     },
     title: {
       value: 'slate-50',
@@ -210,12 +247,14 @@ export const dark: CustomTheme = {
       opacity: 100,
       effect: 'none',
       onHover: false,
+      hex: convert('slate-50', 100)
     },
   },
   font: {
     family: 'input-mono',
     value: 'slate-300',
     opacity: 100,
+    hex: convert('slate-300' , 100)
   },
 };
 

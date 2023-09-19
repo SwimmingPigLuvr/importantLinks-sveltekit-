@@ -15,6 +15,7 @@ make sure that theme is saved to firestore
 
 
 
+
 loading state
 
 
@@ -2456,3 +2457,27 @@ opacities are switched on and off
 styles create conditional styles
 
 toggling styles should just set style to none instead of toggling opacity that way i can toggle the one wih oacpityies
+
+todo
+
+userlink.svelte
+    convert colors into hex codes
+    update html to consider styles
+        fill.style / border.style / shadow.style
+            if (fill.style !== 'none') {apply the style}
+                !that way the opacity stays the same even when style is toggled on/off
+
+
+hexcodes should be added to db as soon as color values are added.
+    put the convert function in any function that saves a color
+
+
+when toggling the button appearance settings:
+    fill / border / shadow
+        if toggled off: {style = 'none'} but when i toggle back on, how do i get back to the same style?
+        add new field to each section:
+            visible: boolean
+                so style doesn't change at all / opacity doesn't change at all
+
+also add and update onHover so that i can set
+    link.title.onHover === true / false
