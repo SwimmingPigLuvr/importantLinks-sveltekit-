@@ -33,18 +33,21 @@
   let link: {
     radius: string;
     fill: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     border: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     shadow: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
@@ -66,37 +69,40 @@
   let border: boolean;
   let shadow: boolean;
 
-  async function updateVisibility(mode: boolean) {
+  async function updateVisibility(mode: string, isVisible: boolean) {
     const batch = writeBatch(db);
 
     if (mode === 'fill') {
-      batch.set(doc(db, `users/${user!.uid}`), {
+      console.log('updating visibility for fill -> ', mode);
+      batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
           link: {
             fill: {
-              visible: mode
+              isVisible: isVisible
             }
           }
         }
       }, { merge: true });
 
     } else if (mode === 'border') {
-      batch.set(doc(db, `users/${user!.uid}`), {
+      console.log('updating visibility for border -> ', mode);
+      batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
           link: {
             border: {
-              visible: mode
+              isVisible: isVisible
             }
           }
         }
       }, { merge: true });
       
     } else if (mode === 'shadow') {
-      batch.set(doc(db, `users/${user!.uid}`), {
+      console.log('updating visibility for shadow -> ', mode);
+      batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
           link: {
             shadow: {
-              visible: mode
+              isVisible: isVisible
             }
           }
         }
@@ -109,7 +115,7 @@
   async function updateOnHover() {
     const batch = writeBatch(db);
 
-    batch.set(doc(db, `users/${user!.uid}`), {
+    batch.set(doc(db, `users/${$user!.uid}`), {
       customTheme: {
         link: {
           title: {
@@ -145,6 +151,13 @@
   let toHex: string | undefined;
 
   let showBackUp: boolean = false;
+
+  let showRemoveBackground: boolean = false;
+  let showRemoveFill: boolean = false;
+  let showRemoveBorder: boolean = false;
+  let showRemoveShadow: boolean = false;
+  let showRemoveTitle: boolean = false;
+  let showRemoveFont: boolean = false;
 
   export let data: PageData;
 
@@ -250,7 +263,7 @@
     font = customTheme.font;
     background = customTheme.background;
     link = customTheme.link;
-    onHover = link.title.onHover;
+    onHover = link?.title?.onHover;
   }
 
   $: if ($userData && $userData.userThemes && $userData.userThemes.length > 1) {
@@ -540,6 +553,66 @@
     await batch.commit();
   }
 
+  async function setStyle(mode: string, style: string) {
+    const batch = writeBatch(db);
+
+    switch (mode) {
+      case 'border':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              border: {
+                style: style
+              }
+            }
+          }
+        }, { merge: true });
+      break;
+      case 'fill':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              fill: {
+                style: style
+              }
+            }
+          }
+        }, { merge: true });
+      break;
+      case 'shadow':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              shadow: {
+                style: style
+              }
+            }
+          }
+        }, { merge: true });
+      break;
+
+      default: 
+      return;
+    }
+
+    await batch.commit();
+    
+
+    
+  }
+
+  async function setRadius(radius: string) {
+    const batch = writeBatch(db);
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        link: {
+          radius: radius
+        }
+      }
+    }, { merge: true });
+    await batch.commit();
+  }
+
   // save color selections
   // construct hex codes in the db
   async function updateColor(mode: string, value: string, shade: string) {
@@ -553,7 +626,7 @@
     switch (mode) {
 
       // background
-      case 'bg':
+      case 'background':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
@@ -567,8 +640,8 @@
 
         break;
 
-      // button color
-      case 'bc':
+      // link fill
+      case 'link fill':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
@@ -584,8 +657,8 @@
 
         break;
 
-      // button border
-      case 'bb':
+      // link border
+      case 'link border':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
@@ -601,8 +674,8 @@
 
         break;
 
-      // button Shadow
-      case 'bs':
+      // link Shadow
+      case 'link shadow':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
@@ -617,15 +690,15 @@
 
         break;
       
-      // button font
-      case 'bf':
+      // link title
+      case 'link title':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               title: {
                 value: temp,
-                opacity: link.title.opacity,
-                hex: convert(temp, link.title.opacity)
+                opacity: link?.title?.opacity,
+                hex: convert(temp, link?.title?.opacity)
               }
             }
           }
@@ -634,7 +707,7 @@
         break;
       
       // font
-      case 'fc':
+      case 'font':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
@@ -659,7 +732,7 @@
     const batch = writeBatch(db);
 
     switch (mode) {
-      case 'bg': 
+      case 'background': 
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
@@ -668,7 +741,7 @@
           }
         }, { merge: true });
         break;
-      case 'fc': 
+      case 'font': 
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
@@ -677,18 +750,18 @@
           }
         }, { merge: true });
         break;
-      case 'bf':
+      case 'link title':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               title: {
-                opacity: link.title.opacity
+                opacity: link?.title?.opacity
               }
             }
           }
         }, { merge: true });
         break;
-      case 'bc':
+      case 'link fill':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
@@ -699,7 +772,7 @@
           }
         }, { merge: true });
         break;
-      case 'bb':
+      case 'link border':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
@@ -710,7 +783,7 @@
           }
         }, { merge: true });
         break;
-      case 'bs':
+      case 'link shadow':
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
@@ -756,7 +829,7 @@
   customTheme={customTheme}
 />
 
-<main class="flex flex-col">
+<main data-theme="{theme}" class="flex flex-col">
   <div id="top" class="flex flex-col my-20  md:max-w-[62%]">
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Themes</h2>
     <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
@@ -777,7 +850,7 @@
                   on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
                   style={`color: ${fontColorHex}; ${userTheme?.background?.style === 'image' ? `background-image: url(${userTheme?.background?.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme?.background?.style === 'solid' ? `background-color: ${convert(userTheme?.background?.value)}` : '')}`}
                   class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
-                    <div class={`font-${userTheme.font? userTheme.font.family : ''} flex flex-col items-center font`}>
+                    <div class={`font-${userTheme.font? userTheme.font?.family : ''} flex flex-col items-center font`}>
                       <!-- pfp -->
                       <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
                       <!-- Username -->
@@ -886,12 +959,20 @@
 
             <!-- show buttoncolor / clikc for color picker -->
             <button 
-              style={`background-color: ${bgchwo? bgchwo : 'white'}`}
-              on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
-              class="btn w-1/4 rounded-md"></button>
+            style={`background-color: ${background.hex? background.hex: 'hsl(var(--s))'}`}
+              on:mouseenter={() => {if (background.hex !== '') {showRemoveBackground = true}}}
+              on:mouseleave={() => showRemoveBackground = false}
+              on:click={() => {updateColor('background', '', '')}} 
+            class="btn w-1/4 rounded-md relative">
+            {#if showRemoveBackground}
+              <div
+                in:slide out:blur={{amount: 100}}
+                class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
+            {/if}
+          </button>
 
             <!-- select vaklue -->
-            <select placeholder={bgValue} bind:value={bgValue} on:change={() => updateColor('bg', bgValue, bgShade)} class="select select-bordered">
+            <select placeholder={bgValue} bind:value={bgValue} on:change={() => updateColor('background', bgValue, bgShade)} class="select select-bordered">
               <option>slate</option>
               <option>gray</option>
               <option>zinc</option>
@@ -917,7 +998,7 @@
             </select>
 
             <!-- select shade -->
-            <select bind:value={bgShade} on:change={() => updateColor('bg', bgValue, bgShade)} class="select select-bordered">
+            <select bind:value={bgShade} on:change={() => updateColor('background', bgValue, bgShade)} class="select select-bordered">
               <option>50</option>
               <option>100</option>
               <option>200</option>
@@ -1145,8 +1226,8 @@
 
 
 
-    <!-- form here -->
-      {#if showBackgroundImageForm}
+    <!-- background image upload -->
+    {#if showBackgroundImageForm}
       <form 
       in:slide={{ duration: 1000, easing: cubicInOut }}
       out:slide={{ duration: 1000, easing: cubicInOut }}
@@ -1178,26 +1259,14 @@
                     <p class="text-success-content">uploaded successfully</p>
                 </div>
             {/if}
-
         </div>
-    </form>
-
-
-
-
-      {/if}
-      <!-- end form here -->
-
-    {#if showColorPicker && !showGradientPicker}
-      <ColorPicker mode={'background'} customTheme={customTheme}/>
+      </form>
     {/if}
-    {#if showGradientPicker && !showColorPicker}
-      <ColorPicker mode={'gradient'} customTheme={customTheme}/>
-    {/if}
-
+    <!-- end bg image upload here -->
   </div>
 
 
+    <!-- links -->
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Links</h2>
       <!-- main container -->
       <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl space-y-4">
@@ -1206,7 +1275,7 @@
         <div class="flex flex-col flex-wrap justify-between ">
           <!-- Label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={fill} on:change={() => updateVisibility(fill)} />
+            <input type="checkbox" class="toggle" bind:checked={fill} on:change={() => updateVisibility('fill', fill)} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Fill</h3>
           </div>
 
@@ -1227,13 +1296,21 @@
                 <!-- styles -->
                 <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
                   <!-- solid -->
-                  <button class="p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">solid</button>
+                  <button 
+                    on:click={() => setStyle('fill', 'solid')}
+                    class="p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">solid</button>
                   <!-- gradient -->
-                  <button class="p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
+                  <button 
+                    on:click={() => setStyle('fill', 'gradient')}
+                    class="p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
                   <!-- image -->
-                  <button class="hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top filter text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
+                  <button 
+                    on:click={() => setStyle('fill', 'image')}
+                    class="hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top filter text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
                   <!-- custom fill -->
-                  <button class="hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom filter text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
+                  <button 
+                    on:click={() => setStyle('fill', 'gif')}
+                    class="hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom filter text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
                 </div>
               </div>
             </div>
@@ -1252,14 +1329,22 @@
                 </label>      
                 <div id="Fill Color" class="join">
 
-                    <!-- show buttoncolor / clikc for color picker -->
+                    <!-- link fill value -->
                     <button 
-                      style={`background-color: ${bchwo? bchwo : 'white'}`}
-                      on:click={() => {toggleShowButtonColorPicker(); mode = 'buttonColor'}} 
-                      class="btn w-1/4 rounded-md"></button>
+                      style={`background-color: ${link.fill.hex? link.fill.hex : 'hsl(var(--a))'}`}
+                      on:mouseenter={() => {if (link.fill.hex !== '') {showRemoveFill = true}}}
+                      on:mouseleave={() => showRemoveFill = false}
+                      on:click={() => {updateColor('link fill', '', '')}} 
+                      class="btn w-1/4 rounded-md relative">
+                      {#if showRemoveFill}
+                        <div
+                          in:slide out:blur={{amount: 100}}
+                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
+                      {/if}
+                    </button>
 
                     <!-- select value -->
-                    <select placeholder={bcValue} bind:value={bcValue} on:change={() => updateColor('bc', bcValue, bcShade)} class="select select-bordered">
+                    <select placeholder={bcValue} bind:value={bcValue} on:change={() => updateColor('link fill', bcValue, bcShade)} class="select select-bordered">
                       <option>slate</option>
                       <option>gray</option>
                       <option>zinc</option>
@@ -1285,7 +1370,7 @@
                     </select>
 
                     <!-- select shade -->
-                    <select bind:value={bcShade} on:change={() => updateColor('bc', bcValue, bcShade)} class="select select-bordered">
+                    <select bind:value={bcShade} on:change={() => updateColor('link fill', bcValue, bcShade)} class="select select-bordered">
                       <option>50</option>
                       <option>100</option>
                       <option>200</option>
@@ -1307,7 +1392,7 @@
                   <span class="label-text font-input-mono">Opacity</span>
                 </label>
                 <label class="input-group">
-                  <input type="text" min="0" max="100" id="opacity" bind:value={bcOpacity} on:change={() => updateOpacity('bc')} class="input input-bordered w-1/2" />
+                  <input type="text" min="0" max="100" id="opacity" bind:value={bcOpacity} on:change={() => updateOpacity('link fill')} class="input input-bordered w-1/2" />
                   <span>%</span>
                 </label>
               </div>
@@ -1316,12 +1401,11 @@
           {/if}
         </div>
 
-
         <!-- border controls -->
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={border} on:change={() => updateVisibility(border)} />
+            <input type="checkbox" class="toggle" bind:checked={border} on:change={() => updateVisibility('border', border)} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Border</h3>
           </div>
           
@@ -1342,13 +1426,31 @@
                 <!-- styles -->
                 <div class="flex space-x-4 font-input-mono">
                   <!-- solid -->
-                  <button class="p-2 rounded-md btn-accent border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
+                  <button 
+                    on:click={() => setStyle('border', 'solid')}
+                    class="p-2 rounded-md btn-accent border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
                   <!-- dashed -->
-                  <button class="p-2 rounded-md btn-accent border-success w-1/5 border-dashed border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
+                  <button 
+                    on:click={() => setStyle('border', 'dashed')}
+                    class="p-2 rounded-md btn-accent border-success w-1/5 border-dashed border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
                   <!-- double -->
-                  <button class="p-2 rounded-md btn-accent border-success w-1/5 border-double border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
+                  <button 
+                    on:click={() => setStyle('border', 'double')}
+                    class="p-2 rounded-md btn-accent border-success w-1/5 border-double border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
+                  <!-- groove -->
+                  <button 
+                    on:click={() => setStyle('border', 'groove')}
+                    style="border: 4px groove"
+                    class="p-2 rounded-md btn-accent border-success w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">groove</button>
+                  <!-- ridge -->
+                  <button 
+                    on:click={() => setStyle('border', 'ridge')}
+                    style="border: 4px ridge"
+                    class="p-2 rounded-md btn-accent border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">ridge</button>
                   <!-- custom border -->
-                  <button class="p-2 rounded-md btn-accent w-1/5 border-t-primary border-r-primary border-b-info border-l-info border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">custom</button>
+                  <!-- <button 
+                    on:click={() => setStyle('border', 'custom')}
+                    class="p-2 rounded-md btn-accent w-1/5 border-t-primary border-r-primary border-b-info border-l-info border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">custom</button> -->
                 </div>
               </div>
             </div>
@@ -1366,14 +1468,22 @@
                   </label>      
                   <div id="Border Color" class="join">
           
-                      <!-- show border color / clikc for color picker -->
+                      <!-- link border color -->
                       <button 
-                        style={`background-color: ${link.border.hex? link.border.hex : 'white'}`}
-                        on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
-                        class="btn w-1/4 rounded-md"></button>
+                      style={`background-color: ${link.border.hex? link.border.hex : 'hsl(var(--s))'}`}
+                        on:mouseenter={() => {if (link.border.hex !== '') {showRemoveBorder = true}}}
+                        on:mouseleave={() => showRemoveBorder = false}
+                        on:click={() => {updateColor('link border', '', '')}} 
+                      class="btn w-1/4 rounded-md relative">
+                      {#if showRemoveBorder}
+                        <div
+                          in:slide out:blur={{amount: 100}}
+                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
+                      {/if}
+                    </button>
           
                       <!-- select value -->
-                      <select placeholder={bbValue} bind:value={bbValue} on:change={() => updateColor('bb', bbValue, bbShade)} class="select select-bordered">
+                      <select placeholder={bbValue} bind:value={bbValue} on:change={() => updateColor('link border', bbValue, bbShade)} class="select select-bordered">
                         <option>slate</option>
                         <option>gray</option>
                         <option>zinc</option>
@@ -1399,7 +1509,7 @@
                       </select>
           
                       <!-- select shade -->
-                      <select bind:value={bbShade} on:change={() => updateColor('bb', bbValue, bbShade)} class="select select-bordered">
+                      <select bind:value={bbShade} on:change={() => updateColor('link border', bbValue, bbShade)} class="select select-bordered">
                         <option>50</option>
                         <option>100</option>
                         <option>200</option>
@@ -1432,13 +1542,11 @@
 
         </div>
 
-
-
         <!-- shadow controls -->
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
-            <input type="checkbox" class="toggle" bind:checked={shadow} on:change={() => updateVisibility(shadow)} />
+            <input type="checkbox" class="toggle" bind:checked={shadow} on:change={() => updateVisibility('shadow', shadow)} />
             <h3 class="font-input-mono text-white text-[1.5rem]">Shadow</h3>
           </div>
           
@@ -1459,9 +1567,13 @@
                 <!-- styles -->
                 <div class="flex space-x-4 font-input-mono">
                   <!-- soft shadow -->
-                  <button class="btn soft-shadow p-2 rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">soft shadow</button>
+                  <button 
+                    on:click={() => setStyle('shadow', 'soft')}
+                    class="btn soft-shadow p-2 rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">soft shadow</button>
                   <!-- hard shadow -->
-                  <button class="hard-shadow p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">hard shadow</button>
+                  <button 
+                    on:click={() => setStyle('shadow', 'hard')}
+                    class="hard-shadow p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">hard shadow</button>
                 </div>
               </div>
             </div>
@@ -1479,14 +1591,22 @@
                   </label>      
                   <div id="Shadow Color" class="join">
           
-                      <!-- show shadow color / clikc for color picker -->
+                      <!-- link shadow color -->
                       <button 
-                        style={`background-color: ${link.border.hex? link.border.hex : 'white'}`}
-                        on:click={() => {toggleShowButtonColorPicker(); mode = 'borderColor'}} 
-                        class="btn w-1/4 rounded-md"></button>
+                      style={`background-color: ${link.shadow.hex? link.shadow.hex : 'hsl(var(--s))'}`}
+                        on:mouseenter={() => {if (link.shadow.hex !== '') {showRemoveShadow = true}}}
+                        on:mouseleave={() => showRemoveShadow = false}
+                        on:click={() => {updateColor('link shadow', '', '')}} 
+                      class="btn w-1/4 rounded-md relative">
+                      {#if showRemoveShadow}
+                        <div
+                          in:slide out:blur={{amount: 100}}
+                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
+                      {/if}
+                    </button>
           
                       <!-- select value -->
-                      <select placeholder={bsValue} bind:value={bsValue} on:change={() => updateColor('bs', bsValue, bsShade)} class="select select-bordered">
+                      <select placeholder={bsValue} bind:value={bsValue} on:change={() => updateColor('link shadow', bsValue, bsShade)} class="select select-bordered">
                         <option>slate</option>
                         <option>gray</option>
                         <option>zinc</option>
@@ -1512,7 +1632,7 @@
                       </select>
           
                       <!-- select shade -->
-                      <select bind:value={bsShade} on:change={() => updateColor('bs', bsValue, bsShade)} class="select select-bordered">
+                      <select bind:value={bsShade} on:change={() => updateColor('link shadow', bsValue, bsShade)} class="select select-bordered">
                         <option>50</option>
                         <option>100</option>
                         <option>200</option>
@@ -1545,48 +1665,152 @@
 
         </div> 
 
-      <h3 class="font-input-mono text-white my-2 mt-6">Text Effect</h3>
-      <div class="flex space-x-6 items-center ">
-        <input type="checkbox" class="toggle" bind:checked={onHover} on:change={() => updateOnHover()}>
-        <h4 class="font-input-mono text-white text-[1rem]">On Hover = {onHover}</h4>
+        <!-- title controls -->
+        <div class="flex flex-wrap flex-col justify-between">
+          <!-- label -->
+          <div class="flex space-x-6 items-center mt-8">
+            <h3 class="font-input-mono text-white text-[1.5rem]">Link Title</h3>
+          </div>
+          <!-- style + color picker div -->
+          <div 
+            in:slide={{duration: 300, easing: cubicInOut}}
+            out:slide>
+            <!-- style/texteffects div -->
+            <div 
+              in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
+              out:blur
+              class="mt-2 mb-6">
+              
+              <div class="flex flex-col space-x-6 items-start mb-4">
+                <label for="Text Effect" class="label">
+                  <span class="label-text font-input-mono">Text Effect</span>
+                </label>
+                <div class="flex space-x-2">
+                  <input type="checkbox" class="toggle toggle-sm" bind:checked={onHover} on:change={() => updateOnHover()}>
+                  <h4 class="font-input-mono text-info text-[1rem]">
+                    {#if onHover}
+                    <span in:blur>On Hover</span>
+                    {:else}
+                    <span in:blur>Static</span>
+                    {/if}
+                  </h4>
+                </div>
+              </div>
+              <div id="Text Effect">
+                <!-- styles -->
+                <div class="flex space-x-4 font-input-mono">
+                  <!-- glow -->
+                  <button 
+                  on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
+                  class="glow btn p-2 rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Glow</button>
+                  <!-- hard shadow -->
+                  <button 
+                    on:click={() => handleTextEffectSelect('highlight', false)}
+                    class="p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Highlight</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- color selection -->
+            <div 
+              in:fly={{y: 20, duration: 400, easing: backOut, delay: 500}}
+              out:blur
+              class="flex flex-wrap justify-between">
+              <div class="flex justify-start space-x-10 ">
+                <!-- title color -->
+                <div>
+                  <label for="Title Color" class="label">
+                    <span class="label-text font-input-mono">Title Color</span>
+                  </label>      
+                  <div id="Title Color" class="join">
+          
+                      <!-- link title color -->
+                      <button 
+                      style={`background-color: ${link?.title.hex? link?.title.hex : 'hsl(var(--pc))'}`}
+                        on:mouseenter={() => {if (link?.title.hex !== '') {showRemoveTitle = true}}}
+                        on:mouseleave={() => showRemoveTitle = false}
+                        on:click={() => {updateColor('link title', '', '')}} 
+                      class="btn w-1/4 rounded-md relative">
+                      {#if showRemoveTitle}
+                        <div
+                          in:slide out:blur={{amount: 100}}
+                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
+                      {/if}
+                    </button>
+          
+                      <!-- select value -->
+                      <select placeholder={bfValue} bind:value={bfValue} on:change={() => updateColor('link title', bfValue, bfShade)} class="select select-bordered">
+                        <option>slate</option>
+                        <option>gray</option>
+                        <option>zinc</option>
+                        <option>neutral</option>
+                        <option>stone</option>
+                        <option>red</option>
+                        <option>orange</option>
+                        <option>amber</option>
+                        <option>yellow</option>
+                        <option>lime</option>
+                        <option>green</option>
+                        <option>emerald</option>
+                        <option>teal</option>
+                        <option>cyan</option>
+                        <option>sky</option>
+                        <option>blue</option>
+                        <option>indigo</option>
+                        <option>violet</option>
+                        <option>purple</option>
+                        <option>fuchsia</option>
+                        <option>pink</option>
+                        <option>rose</option>
+                      </select>
+          
+                      <!-- select shade -->
+                      <select bind:value={bfShade} on:change={() => updateColor('link title', bfValue, bfShade)} class="select select-bordered">
+                        <option>50</option>
+                        <option>100</option>
+                        <option>200</option>
+                        <option>300</option>
+                        <option>400</option>
+                        <option>500</option>
+                        <option>600</option>
+                        <option>700</option>
+                        <option>800</option>
+                        <option>900</option>
+                        <option>950</option>
+                      </select>
+                  
+                  </div>
+                </div>
+                <!-- opacity -->
+                <div class="form-control">
+                  <label for="opacity" class="label">
+                    <span class="label-text font-input-mono">Opacity</span>
+                  </label>
+                  <label class="input-group">
+                    <input type="text" min="0" max="100" id="opacity" bind:value={bfOpacity} on:change={() => updateOpacity('link title')} class="input input-bordered w-1/2" />
+                    <span>%</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div> 
+
+      <!-- radius control -->
+        <h3 class="font-input-mono text-white my-2 mt-6">Radius</h3>
+        <div class="flex flex-wrap justify-between">
+          <button 
+            on:click={() => setRadius('none')} 
+            class="btn w-1/3 rounded-none mb-4">None</button>
+          <button 
+            on:click={() => setRadius('half')} 
+            class="btn w-1/3 rounded-[0.5rem] mb-4">Half</button>
+          <button 
+            on:click={() => setRadius('full')} 
+            class="btn w-1/4 rounded-full mb-4">Full</button>
       </div>
-      <div class="flex flex-wrap justify-between">
-        <button 
-          on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
-          class="btn w-1/3 rounded-md mb-4 glow">
-          Glow
-        </button>
-        <button on:click|preventDefault={() => handleTextEffectSelect('highlight', false)} class="btn w-1/3 rounded-md mb-4">Highlight</button>
-        <button on:click|preventDefault={() => handleTextEffectSelect('gradient', false)} class="btn w-1/4 rounded-md mb-4">Gradient</button>
-      </div>
-
-      <h3 class="font-input-mono text-white my-2 mt-6">Radius</h3>
-      <div class="flex flex-wrap justify-between">
-        <button 
-          on:mouseenter={() => showOptions = true}
-          on:mouseleaeve={() => showOptions = false}
-          on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
-          class="btn w-1/3 rounded-none mb-4">
-          None
-        </button>
-        <button on:click|preventDefault={() => handleTextEffectSelect('highlight', false)} class="btn w-1/3 rounded-[0.5rem] mb-4">Half</button>
-        <button on:click|preventDefault={() => handleTextEffectSelect('gradient', false)} class="btn w-1/4 rounded-full mb-4">Full</button>
-      </div>
-
-
-
-
-
-        <!-- old stuff -->
-  <!-- container -->
- 
-    
-
-
-      
-  
-      
-      </div>
+    </div>
   
 
       <!-- fonts -->
@@ -1597,9 +1821,9 @@
         <h3 class="font-input-mono text-white my-2">Font</h3>
         <button on:click|preventDefault={() => toggleFontDropdown()} class="btn group border-neutral-200 shadow shadow-neutral-200 bg-white h-20 flex items-center justify-start space-x-4">
           <div class="bg-neutral-200 w-12 h-12 rounded-sm items-center justify-center flex">
-            <p class="m-auto font-{font} text-black text-[1.5rem]">Aa</p>
+            <p class="m-auto font-{font?.family} text-black text-[1.5rem]">Aa</p>
           </div>
-          <p class="font-{font} group-hover:text-neutral-200 text-[1.5rem] text-black">{font}</p>
+          <p class="font-{font?.family} group-hover:text-neutral-200 text-[1.5rem] text-black">{font?.family}</p>
         </button>
  {#if fontDropdown}
       <!-- svelte-ignore missing-declaration -->
@@ -1617,7 +1841,7 @@
           out:slide={{duration: 400, easing: backIn}}
           class="flex justify-start space-x-10 mt-8 ">
 
-        <!-- background color -->
+        <!-- font color -->
         <div>
           <label for="Font Color" class="label">
             <span class="label-text font-input-mono">Font Color</span>
@@ -1626,12 +1850,20 @@
 
               <!-- show fontColor / clikc for color picker -->
               <button 
-                style={`background-color: ${fchwo? fchwo : 'white'}`}
-                on:click={() => {toggleShowColorPicker(); mode = 'fontColor'}} 
-                class="btn w-1/4 rounded-md"></button>
+                style={`background-color: ${font?.hex? font?.hex : 'white'}`}
+                on:mouseenter={() => {if (font?.hex !== '') {showRemoveFont = true}}}
+                on:mouseleave={() => showRemoveFont = false}
+                on:click={() => {updateColor('font', '', '')}} 
+                class="btn w-1/4 rounded-md">
+                {#if showRemoveFont}
+                <div
+                  in:slide out:blur={{amount: 100}}
+                  class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
+                {/if}
+              </button>
 
               <!-- select value -->
-              <select placeholder={fcValue} bind:value={fcValue} on:change={() => updateColor('fc', fcValue, fcShade)} class="select select-bordered">
+              <select placeholder={fcValue} bind:value={fcValue} on:change={() => updateColor('font', fcValue, fcShade)} class="select select-bordered">
                 <option>slate</option>
                 <option>gray</option>
                 <option>zinc</option>
@@ -1657,7 +1889,7 @@
               </select>
 
               <!-- select shade -->
-              <select bind:value={fcShade} on:change={() => updateColor('fc', fcValue, fcShade)} class="select select-bordered">
+              <select bind:value={fcShade} on:change={() => updateColor('font', fcValue, fcShade)} class="select select-bordered">
                 <option>50</option>
                 <option>100</option>
                 <option>200</option>

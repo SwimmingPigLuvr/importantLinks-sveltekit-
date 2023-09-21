@@ -4,15 +4,12 @@
   import type { CustomTheme } from "$lib/theme";
   import Page from "../../routes/+page.svelte";
 
-
-    // one export to rulle them all
-    export let customTheme: CustomTheme;
-    // link data items
-    export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
-    export let iconURLalt = 'ha';
-    export let url = 'foo';
-    export let title = 'some cool title';
-    export let previewMode = false;
+  export let customTheme: CustomTheme;
+  export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
+  export let iconURLalt = 'ha';
+  export let url = 'foo';
+  export let title = 'some cool title';
+  export let previewMode = false;
 
   let background: {
     style: "image" | "gradient" | "solid";
@@ -24,18 +21,21 @@
   let link: {
     radius: string;
     fill: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     border: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     shadow: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
@@ -65,29 +65,17 @@
     font = customTheme.font;
   }
 
-
-  onMount(() => {
-    
-  })
-
-   
-  
 </script>
-      <!-- put this back in the a href style if need be good luk -->
-      <!-- ${fill ? `background-color: ${bchwo};` : ''} -->
 
 <a 
   href="{url}" 
     style={`
-      ${link.fill.style === 'image' ? `background-image: url(${link.fill.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : ''}
-      ${link.fill.style === 'gradient' ? `linear-gradient: 0deg, hsl(var(--s)), hsl(var(--a))` : ''}
-      ${link.fill.style === 'solid' ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : ''}
-      ${link.shadow.style === 'soft' ? `box-shadow: 0 10px 20px -12px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
-      ${link.shadow.style === 'hard' ? `box-shadow: 10px 10px 0px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
-      ${link.border.style === 'solid' ? `border: 3px solid ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
-      ${link.border.style === 'double' ? `border: 3px double ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
-      ${link.border.style === 'dashed' ? `border: 3px dashed ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
-      ${link.border.style === 'custom' ? `border: 3px dashed ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
+      ${link.fill.style === 'solid' && link.fill.isVisible ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : ''}
+      ${link.fill.style === 'gradient' && link.fill.isVisible ? `linear-gradient: 0deg, hsl(var(--s)), hsl(var(--a))` : ''}
+      ${link.fill.style === 'image' && link.fill.isVisible ? `background-image: url(${link.fill.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : ''}
+      ${link.border.isVisible ? `border: ${link.border.width} ${link.border.style} ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
+      ${link.shadow.style === 'soft' && link.shadow.isVisible ? `box-shadow: 0 10px 20px -12px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
+      ${link.shadow.style === 'hard' && link.shadow.isVisible ? `box-shadow: 10px 10px 0px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
     `}    
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
@@ -102,7 +90,7 @@
     <!-- Link title -->
     <p 
     style={`
-      color: ${link.title.hex ? link.title.hex : `hsl(var(--sc))`} 
+      color: ${link.title.hex ? link.title.hex : `hsl(var(--pc))`} 
       ${previewMode ? 'transform: translateX(-1rem); font-size: 1rem;' : 'transform: translateX(-1.6rem);'}
     `}
     class='font-{font.family} {previewMode ? 'text-[0.5rem]' : 'text-[1rem]'}'>{title}

@@ -23,21 +23,21 @@ export interface CustomTheme {
   link: {
     radius: string;
     fill: {
-      visible: boolean,
+      isVisible: boolean,
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     border: {
-      visible: boolean,
+      isVisible: boolean,
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     shadow: {
-      visible: boolean,
+      isVisible: boolean,
       style: string;
       value: string;
       opacity: number;
@@ -73,21 +73,21 @@ export const defaultTheme: CustomTheme = {
   link: {
     radius: 'full',
     fill: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: 'lime-50',
       opacity: 100,
       hex: convert('lime-50', 100),
     },
     border: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: 'cyan-800',
       opacity: 100,
       hex: convert('cyan-800', 100),
     },
     shadow: {
-      visible: true,
+      isVisible: true,
       style: 'hard',
       value: 'slate-950',
       opacity: 100,
@@ -117,30 +117,30 @@ export const emptyTheme: CustomTheme = {
     style: 'solid', 
     value: '',
     opacity: 100,
-    hex: undefined,
+    hex: '',
   },
   link: {
     radius: '',
     fill: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: '',
       opacity: 100,
-      hex: undefined,
+      hex: '',
     },
     border: {
-      visible: true,
-      style: 'none',
+      isVisible: true,
+      style: 'solid',
       value: '',
       opacity: 100,
-      hex: undefined,
+      hex: '',
     },
     shadow: {
-      visible: true,
-      style: 'none',
+      isVisible: true,
+      style: 'hard',
       value: '',
       opacity: 100,
-      hex: undefined,
+      hex: '',
     },
     title: {
       value: '',
@@ -149,14 +149,14 @@ export const emptyTheme: CustomTheme = {
       opacity: 100,
       effect: 'none',
       onHover: false,
-      hex: undefined,
+      hex: '',
     },
   },
   font: {
     family: '',
     value: '',
     opacity: 100,
-    hex: undefined,
+    hex: '',
   },
 };
 
@@ -171,21 +171,21 @@ export const light: CustomTheme = {
   link: {
     radius: 'full',
     fill: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: 'slate-100',
       opacity: 100,
       hex: convert('slate-100', 100)
     },
     border: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: 'slate-200',
       opacity: 100,
       hex: convert('slate-200', 100)
     },
     shadow: {
-      visible: true,
+      isVisible: true,
       style: 'soft',
       value: 'slate-950',
       opacity: 100,
@@ -220,21 +220,21 @@ export const dark: CustomTheme = {
   link: {
     radius: 'none',
     fill: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: 'slate-900',
       opacity: 100,
       hex: convert('slate-900', 100)
     },
     border: {
-      visible: true,
+      isVisible: true,
       style: 'solid',
       value: 'slate-800',
       opacity: 100,
       hex: convert('slate-800', 100)
     },
     shadow: {
-      visible: true,
+      isVisible: true,
       style: 'soft',
       value: 'slate-50',
       opacity: 100,

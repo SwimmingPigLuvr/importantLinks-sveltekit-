@@ -16,6 +16,11 @@ make sure that theme is saved to firestore
 
 
 
+
+
+
+
+
 loading state
 
 
@@ -2481,3 +2486,31 @@ when toggling the button appearance settings:
 
 also add and update onHover so that i can set
     link.title.onHover === true / false
+
+
+
+somehow updateVisibility is saving to another undefined user and not the current user.
+
+
+
+september 20
+
+✅1. let user delete color so they can use the theme color
+    ✅background
+    ✅fill border shadow
+    ✅font !need to make a font color option in the first place
+2. edit page background doesn't work
+3. creating a range selector for the border width
+✅4. update ui to show the border options
+✅5. edit/appearance uses default theme. should use user theme
+6. get the default theme values consitent:
+    bg-secondary
+    link-fill-primary
+    link-border-accent
+    link-shadow-accent
+    link-title-primary-content
+    font-secondary-content
+7. links get deleted from users db but they still appear in the firestore storage?
+    further investigation required
+8. while I'm in the color selectors I will fix the updateOpacity functions
+9. create onHoverToggleFunction for the onHover toggler

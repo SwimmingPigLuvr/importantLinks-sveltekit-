@@ -7,9 +7,9 @@
   import { blur, fly, slide } from "svelte/transition";
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { updateTheme } from "$lib/themeStore";
-  import { convert, type CustomTheme } from "$lib/theme";
   import type { LinkData } from "$lib/firebase";
   import { page } from "$app/stores";
+  import type { CustomTheme } from "$lib/theme";
 
   // states
   let mounted = false;
@@ -35,18 +35,21 @@
   let link: {
     radius: string;
     fill: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     border: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     shadow: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
@@ -78,30 +81,9 @@
     customTheme = data.customTheme;
     theme = data.theme;    
 
-    // set customTheme vars
-    font.family = customTheme?.font?.family;
-    font.value = customTheme?.font?.value;
-
-
-    // the style of backgorund will effect how we apply it
-    // we only need the string value rn
-    background.style = customTheme?.background?.style;
-    background.value = customTheme?.background?.value;
-    background.opacity = customTheme?.background?.opacity;
-
-    // buttons
-    link.fill.value = customTheme?.link?.fill?.value;
-    link.title.value = customTheme?.link?.title?.value;
-
-    // text effect
-    link.title.effect = customTheme?.link?.title?.effect;
-    link.title.onHover = customTheme?.link?.title?.onHover;
-
-    // convert these to hex codes
-    background.hex = background.value ? convert(background.value, background.opacity) : undefined;
-    font.hex = font.value ? convert(font.value, font.opacity) : undefined;
-    link.fill.hex = link.fill.value ? convert(link.fill.value, link.fill.opacity) : undefined;
-    link.title.hex = link.title.value ? convert(link.title.value, link.title.opacity) : undefined;
+    font = customTheme?.font;
+    background = customTheme?.background;
+    link= customTheme?.link;
   }
 
   let gradient: string[];

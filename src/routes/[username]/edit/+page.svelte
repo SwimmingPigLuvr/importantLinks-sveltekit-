@@ -54,18 +54,21 @@
   let link: {
     radius: string;
     fill: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     border: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
       hex: string | undefined;
     }
     shadow: {
+      isVisible: boolean;
       style: string;
       value: string;
       opacity: number;
@@ -100,13 +103,6 @@
     font = customTheme.font;
     background = customTheme.background;
     link = customTheme.link;
-
-    // convert these to hex codes
-    // move these ones into save functions. so they're in the db
-    // background.hex = background.value ? convert(background.value, background.opacity) : undefined;
-    // font.hex = font.value ? convert(font.value, font.opacity) : undefined;
-    // link.fill.hex = link.fill.value ? convert(link.fill.value, link.fill.opacity) : undefined;
-    // link.title.hex = link.title.value ? convert(link.title.value, link.fill.opacity) : undefined;
   }
 
   let gradient: string[];
@@ -115,7 +111,7 @@
   let toHex: string;
   let direction: string;
 
-  $: if (background.style === 'gradient') {
+  $: if (background?.style === 'gradient') {
     gradient = background.value.split(', ');
 
     fromHex = gradient[0];
@@ -259,9 +255,13 @@
 
 <main 
 data-theme={theme}
-style={`color: ${font.hex? font.hex : 'hsl(var(--p))'}; ${background.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; background-attachment: fixed;` : (background.style === 'solid' ? `background-color: ${background.hex};` : (background.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex});` : ''))}`}
+style={`
+  color: ${font?.hex ? font?.hex : 'hsl(var(--p))'} 
+  ${background?.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''} 
+  ${background?.style === 'solid' ? 'background-color: ${background?.hex? background?.hex : `hsl(var(--s))`};' : ''}
+`}
 
-class={`bg-${background ? background : ''} font-${font ? font : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
+class={`bg-secondary font-${font?.family ? font?.family : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
 
 
   <!-- this is an authcheck to make sure  -->
@@ -381,7 +381,7 @@ class={`bg-${background ? background : ''} font-${font ? font : 'input-mono'} -z
         in:slide={{ duration: 700, easing: cubicInOut}}
         out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-{font.value} text-{background} font-{font} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
+        class="bg-{font?.value} text-{background?.value} font-{font?.family} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->

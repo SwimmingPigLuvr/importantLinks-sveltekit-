@@ -32,8 +32,9 @@
     let buttonFontColor: string;
     let buttonFontOpacity: number;
     let opacity: number = 100;
+    
 
-    $: if (customTheme?.font && customTheme?.button && customTheme?.background) {
+    $: if (customTheme?.font && customTheme?.link && customTheme?.background) {
       fontColor = customTheme.font.color;
       fontOpacity = customTheme.font.opacity;
       buttonColor = customTheme.button.color;
