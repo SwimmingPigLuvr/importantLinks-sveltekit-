@@ -16,46 +16,50 @@ export interface CustomTheme {
   name: string; 
   background: {
     style: "image" | "gradient" | "solid";
-    value: string;
-    opacity: number;
     hex: string | undefined;
+    url: string;
+    gradient: string;
+    opacity: number;
   };
   link: {
     radius: string;
     fill: {
       isVisible: boolean,
       style: string;
-      value: string;
-      opacity: number;
+      url: string;
       hex: string | undefined;
+      gradient: string;
+      opacity: number;
     }
     border: {
       isVisible: boolean,
       style: string;
-      value: string;
-      opacity: number;
+      url: string;
       hex: string | undefined;
+      gradient: string;
+      opacity: number;
     }
     shadow: {
       isVisible: boolean,
       style: string;
-      value: string;
-      opacity: number;
+      gradient: string;
       hex: string | undefined;
+      opacity: number;
     }
     title: {
-      value: string;
       size: number;
       tracking: string;
       opacity: number;
       hex: string | undefined;
-      effect: string;
-      onHover: boolean;
+      effect: {
+        effect: string;
+        hex: string;
+        onHover: boolean;
+      }
     }
   };
   font: {
     family: string;
-    value: string;
     opacity: number;
     hex: string | undefined;
   };
@@ -66,46 +70,50 @@ export const defaultTheme: CustomTheme = {
   name: 'default', 
   background: {
     style: 'solid', 
-    value: 'lime-400',
+    url: '',
+    hex: '',
+    gradient: '',
     opacity: 100,
-    hex: convert('lime-400', 100)
   },
   link: {
     radius: 'full',
     fill: {
       isVisible: true,
       style: 'solid',
-      value: 'lime-50',
+      url: '',
+      hex: '',
+      gradient: '',
       opacity: 100,
-      hex: convert('lime-50', 100),
     },
     border: {
       isVisible: true,
       style: 'solid',
-      value: 'cyan-800',
+      url: '',
+      hex: '',
+      gradient: '',
       opacity: 100,
-      hex: convert('cyan-800', 100),
     },
     shadow: {
       isVisible: true,
       style: 'hard',
-      value: 'slate-950',
+      gradient: '',
+      hex: '',
       opacity: 100,
-      hex: convert('slate-950', 100)
     },
     title: {
-      value: 'lime-400',
       size: 1,
       tracking: 'none',
+      effect: {
+        effect: 'none',
+        hex: '',
+        onHover: false,
+      },
+      hex: '',
       opacity: 100,
-      effect: 'none',
-      onHover: false,
-      hex: convert('lime-400', 100),
     },
   },
   font: {
     family: 'input-mono',
-    value: 'lime-200',
     opacity: 100,
     hex: convert('lime-200', 100)
   },
@@ -115,48 +123,52 @@ export const emptyTheme: CustomTheme = {
   name: 'empty', 
   background: {
     style: 'solid', 
-    value: '',
-    opacity: 100,
+    url: '',
     hex: '',
+    gradient: '',
+    opacity: 100,
   },
   link: {
-    radius: '',
+    radius: 'full',
     fill: {
       isVisible: true,
       style: 'solid',
-      value: '',
-      opacity: 100,
+      url: '',
       hex: '',
+      gradient: '',
+      opacity: 100,
     },
     border: {
       isVisible: true,
       style: 'solid',
-      value: '',
-      opacity: 100,
+      url: '',
       hex: '',
+      gradient: '',
+      opacity: 100,
     },
     shadow: {
       isVisible: true,
       style: 'hard',
-      value: '',
-      opacity: 100,
+      gradient: '',
       hex: '',
+      opacity: 100,
     },
     title: {
-      value: '',
       size: 1,
       tracking: 'none',
-      opacity: 100,
-      effect: 'none',
-      onHover: false,
+      effect: {
+        effect: 'none',
+        hex: '',
+        onHover: false,
+      },
       hex: '',
+      opacity: 100,
     },
   },
   font: {
-    family: '',
-    value: '',
+    family: 'input-mono',
     opacity: 100,
-    hex: '',
+    hex: convert('lime-200', 100)
   },
 };
 
@@ -173,9 +185,10 @@ export const light: CustomTheme = {
     fill: {
       isVisible: true,
       style: 'solid',
-      value: 'slate-100',
+      url: '',
+      hex: '#',
+      gradient: '',
       opacity: 100,
-      hex: convert('slate-100', 100)
     },
     border: {
       isVisible: true,

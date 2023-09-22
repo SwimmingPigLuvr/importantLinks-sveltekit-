@@ -532,10 +532,10 @@
 
   async function updateGradient(from: GradientValue, to: GradientValue, direction: string) {
     fromColor = from.value + '-' + from.shade.toString();
-    fromHex = convert(fromColor, from.opacity);
+    fromHex = convert(fromColor, from?.opacity);
 
     toColor = to.value + '-' + to.shade.toString();
-    toHex = convert(toColor, to.opacity);
+    toHex = convert(toColor, to?.opacity);
 
     const batch = writeBatch(db);
 
@@ -616,10 +616,6 @@
   // save color selections
   // construct hex codes in the db
   async function updateColor(mode: string, hex: string) {
-    // mode let's us know hwere to save it in the db
-    // value + shade create the color
-    console.log('updateing colors: ', mode + ': ' + value + '-' + shade);
-    temp = value + '-' + shade.toString();
 
     const batch = writeBatch(db);
 
@@ -630,10 +626,8 @@
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
-              style: 'solid',
-              value: temp,
-              opacity: background.opacity,
-              hex: convert(temp, background.opacity)
+              opacity: background?.opacity,
+              hex: hex
             }
           }
         }, { merge: true });
@@ -646,10 +640,8 @@
           customTheme: {
             link: {
               fill: {
-                style: 'solid',
-                value: temp,
-                opacity: link.fill.opacity,
-                hex: convert(temp, link.fill.opacity)
+                opacity: link.fill?.opacity,
+                hex: convert(temp, link.fill?.opacity)
               }
             }
           }
@@ -664,7 +656,6 @@
             link: {
               border: {
                 // no style because the same color can be used with idfferent styles
-                value: temp,
                 opacity: link.border.opacity,
                 hex: convert(temp, link.border.opacity)
               }
@@ -680,9 +671,8 @@
           customTheme: {
             link: {
               shadow: {
-                value: temp,
-                opacity: link.shadow.opacity,
-                hex: convert(temp, link.shadow.opacity)
+                opacity: link.shadow?.opacity,
+                hex: convert(temp, link.shadow?.opacity)
               }
             }
           }
@@ -696,7 +686,6 @@
           customTheme: {
             link: {
               title: {
-                value: temp,
                 opacity: link?.title?.opacity,
                 hex: convert(temp, link?.title?.opacity)
               }
@@ -711,9 +700,8 @@
       batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
-              value: temp,
-              opacity: font.opacity,
-              hex: convert(temp, font.opacity)
+              opacity: font?.opacity,
+              hex: convert(temp, font?.opacity)
             }
           }
         }, { merge: true });
@@ -736,7 +724,7 @@
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
-              opacity: background.opacity
+              opacity: background?.opacity
             }
           }
         }, { merge: true });
@@ -745,7 +733,7 @@
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
-              opacity: font.opacity
+              opacity: font?.opacity
             }
           }
         }, { merge: true });
@@ -766,7 +754,7 @@
           customTheme: {
             link: {
               fill: {
-                opacity: link.fill.opacity
+                opacity: link.fill?.opacity
               }
             }
           }
@@ -777,7 +765,7 @@
           customTheme: {
             link: {
               border: {
-                opacity: link.border.opacity
+                opacity: link.border?.opacity
               }
             }
           }
@@ -788,7 +776,7 @@
           customTheme: {
             link: {
               shadow: {
-                opacity: link.shadow.opacity
+                opacity: link.shadow?.opacity
               }
             }
           }
@@ -811,6 +799,31 @@
   let gradientHover = 'gradientHover';
 
   let showOptions = false;
+
+  let complementaryColor: string;
+
+  function calcComplementaryColor(color: string, opacity: number) {
+    color = color.substring(1);
+    color = parseInt(color, 16);
+    color = (0xFFFFFF ^ color).toString(16);
+    color = ("000000" + color).slice(-6);
+    if (opacity >= 0 && opacity <= 99) {
+      const paddedOpacity = opacity < 10 ? "0" + opacity.toString() : opacity.toString();
+      return "#" + color.concat(paddedOpacity) ?? "";
+    } else {
+      return "#" + color.concat("FF") ?? "";
+    }
+  }
+
+  function updateComplementaryColor() {
+    console.log('updating color: ', complementaryColor);
+    if (background?.hex && background?.opacity) {
+      complementaryColor = calcComplementaryColor(background?.hex, background?.opacity);
+      console.log('to: ', complementaryColor);
+    } else {
+      complementaryColor = '#00000';
+    } 
+  }
 
 </script>
 
@@ -958,63 +971,27 @@
         <div id="Background Color" class="join">
 
             <!-- show buttoncolor / clikc for color picker -->
-            <button 
-            style={`background-color: ${background.hex? background.hex: 'hsl(var(--s))'}`}
-              on:mouseenter={() => {if (background.hex !== '') {showRemoveBackground = true}}}
-              on:mouseleave={() => showRemoveBackground = false}
-              on:click={() => {updateColor('background', '', '')}} 
-            class="btn w-1/4 rounded-md relative">
-            {#if showRemoveBackground}
-              <div
+              <input 
+                type="color" 
+                id="colorInput"
+                style="width: 3.1rem; height: 3rem; border: 1px ridge {background.hex};" 
+                bind:value={background.hex} 
+                on:mouseenter={() => {if (background?.hex !== '') {showRemoveBackground = true}}}
+                on:mouseleave={() => showRemoveBackground = false}
+                on:change={() => {updateColor('background', background.hex); updateComplementaryColor(); console.log('updating')}}
+                class="relative"
+              >
+              {#if showRemoveBackground}
+              <button
                 in:slide out:blur={{amount: 100}}
-                class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
-            {/if}
-          </button>
-      <div>
-        <p class="text-[2rem]">{background.hex}</p>
-        <input type="color" bind:value={background.hex} on:change={() => updateColor('background', background.hex)}>
-      </div>
+                on:click={() => {updateColor('background', '', '')}} 
+                class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+              {/if}
+          <input type="text" placeholder="#12345" bind:value={background.hex} on:change={() => updateColor('background', background.hex)} class="text-center bg-primary text-primary-content">
 
-            <!-- select vaklue -->
-            <select placeholder={bgValue} bind:value={bgValue} on:change={() => updateColor('background', bgValue, bgShade)} class="select select-bordered">
-              <option>slate</option>
-              <option>gray</option>
-              <option>zinc</option>
-              <option>neutral</option>
-              <option>stone</option>
-              <option>red</option>
-              <option>orange</option>
-              <option>amber</option>
-              <option>yellow</option>
-              <option>lime</option>
-              <option>green</option>
-              <option>emerald</option>
-              <option>teal</option>
-              <option>cyan</option>
-              <option>sky</option>
-              <option>blue</option>
-              <option>indigo</option>
-              <option>violet</option>
-              <option>purple</option>
-              <option>fuchsia</option>
-              <option>pink</option>
-              <option>rose</option>
-            </select>
+            
 
-            <!-- select shade -->
-            <select bind:value={bgShade} on:change={() => updateColor('background', bgValue, bgShade)} class="select select-bordered">
-              <option>50</option>
-              <option>100</option>
-              <option>200</option>
-              <option>300</option>
-              <option>400</option>
-              <option>500</option>
-              <option>600</option>
-              <option>700</option>
-              <option>800</option>
-              <option>900</option>
-              <option>950</option>
-            </select>
+            
         </div>
       </div>
 
@@ -1026,7 +1003,7 @@
         <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
 
         <label class="input-group">
-            <input type="text" min="0" max="100" id="opacity" bind:value={bgOpacity} on:change={() => updateOpacity('bg')} class="input input-bordered w-1/2" />
+            <input type="text" min="0" max="100" id="opacity" bind:value={background.opacity} on:change={() => updateOpacity('background')} class="input input-bordered w-1/2" />
           <span>%</span>
         </label>
         </div>

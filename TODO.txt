@@ -22,6 +22,9 @@ make sure that theme is saved to firestore
 
 
 
+
+
+
 loading state
 
 
@@ -2521,3 +2524,26 @@ september 20
 
 jsut learned about input type="color" haha nice.
 refactoring... everything....😎
+
+
+consider percentages with gradients
+
+let user enter in custom hex next to the color input
+
+
+get this color input squared away on the background color then i should be able to copy and paste everything into the other sections
+
+
+september 22 23
+functionality check:
+    save function
+        Hex?
+        opacity?
+        style?
+        value?
+
+value field should be changed to url
+
+i already have opacity as a separate field in the db so i should just style them separately instead of trying to smash them together
+
+(updating all the changes i self imposed :"'''')
