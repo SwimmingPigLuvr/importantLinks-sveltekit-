@@ -19,6 +19,8 @@
   import type { LinkData } from "$lib/firebase";
   import Nav from "$lib/components/Nav.svelte";
 
+  
+
   // states
   let showDndMessage = false;
   let showChangePfpModal = false;
@@ -100,9 +102,9 @@
     theme = $userData.theme;    
 
     // set customTheme vars
-    font = customTheme.font;
-    background = customTheme.background;
-    link = customTheme.link;
+    font = customTheme?.font;
+    background = customTheme?.background;
+    link = customTheme?.link;
   }
 
   let gradient: string[];
@@ -247,6 +249,7 @@
       previewURL = URL.createObjectURL(file);
     }
   }
+  
 
 </script>
 
@@ -256,9 +259,9 @@
 <main 
 data-theme={theme}
 style={`
-  color: ${font?.hex ? font?.hex : 'hsl(var(--p))'} 
-  ${background?.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''} 
-  ${background?.style === 'solid' ? 'background-color: ${background?.hex? background?.hex : `hsl(var(--s))`};' : ''}
+  color: ${font?.hex};
+  ${background?.style === 'solid' ? `background-color: ${background?.hex}` : ''}
+  ${background?.style === 'image' ? `background-image: url(${background.value}): background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''}
 `}
 
 class={`bg-secondary font-${font?.family ? font?.family : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>

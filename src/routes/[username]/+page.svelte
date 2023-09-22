@@ -141,8 +141,13 @@
 
 <main 
 data-theme={theme}
-style={`color: ${font.hex? font.hex : 'hsl(var(--p))'}; ${background.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (background.style === 'solid' ? `background-color: ${background.hex};` : (background.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex})` : ''))}`}
-class={`font-${font? font : 'input-mono'} bg- -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
+style={`
+  color: ${font.hex? font.hex : 'hsl(var(--p))'}; 
+  ${background.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : 
+  (background.style === 'solid' ? `background-color: ${background.hex};` : 
+  (background.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex})` : ''))}
+`}
+class={`font-${font? font : 'input-mono'} -z-20 h-screen fixed top-0 left-0 w-[100vw] overflow-auto text-center`}>
 
 
   <!-- PFP -->

@@ -615,7 +615,7 @@
 
   // save color selections
   // construct hex codes in the db
-  async function updateColor(mode: string, value: string, shade: string) {
+  async function updateColor(mode: string, hex: string) {
     // mode let's us know hwere to save it in the db
     // value + shade create the color
     console.log('updateing colors: ', mode + ': ' + value + '-' + shade);
@@ -970,6 +970,10 @@
                 class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
             {/if}
           </button>
+      <div>
+        <p class="text-[2rem]">{background.hex}</p>
+        <input type="color" bind:value={background.hex} on:change={() => updateColor('background', background.hex)}>
+      </div>
 
             <!-- select vaklue -->
             <select placeholder={bgValue} bind:value={bgValue} on:change={() => updateColor('background', bgValue, bgShade)} class="select select-bordered">

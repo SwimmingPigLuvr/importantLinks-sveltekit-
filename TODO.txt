@@ -21,6 +21,7 @@ make sure that theme is saved to firestore
 
 
 
+
 loading state
 
 
@@ -2514,3 +2515,9 @@ september 20
     further investigation required
 8. while I'm in the color selectors I will fix the updateOpacity functions
 9. create onHoverToggleFunction for the onHover toggler
+10. onHover toggle needs to be bound to a different value because what we have right now doesn't work wtf
+11. pfp in data div needs to be just a little bit smaller
+
+
+jsut learned about input type="color" haha nice.
+refactoring... everything....😎
