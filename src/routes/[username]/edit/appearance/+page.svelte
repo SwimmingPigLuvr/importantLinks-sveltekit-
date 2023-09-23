@@ -147,8 +147,8 @@
   let toColor: string;
 
   // hex codes
-  let fromHex: string | undefined;
-  let toHex: string | undefined;
+  let fromHex: string | undefined = '#A0A0A0FF';
+  let toHex: string | undefined = '#4A4A4AFF';
 
   let showBackUp: boolean = false;
 
@@ -959,14 +959,17 @@
     <!-- color selection is right below background styles -->
     {#if showBackgroundColorSelect}
     <div 
-      in:slide={{duration: 1000, easing: backOut}}
-      out:slide={{duration: 400, easing: backIn}}
+      in:slide={{duration: 300, easing: backOut}}
+      out:slide={{duration: 300, easing: backIn, delay: 500}}
       class="flex justify-start space-x-10 mt-8 ">
 
       <!-- background color -->
-      <div>
+      <div 
+        in:fly={{x: 100, easing: backOut, delay: 300, duration: 500}}
+        out:fly={{x: 100, easing: backIn, duration: 200}}
+      >
         <label for="Background Color" class="label">
-          <span class="label-text font-input-mono">Background Color</span>
+          <span in:blur={{amount: 100, easing: backOut, delay: 1000, duration: 300}} class="label-text font-input-mono">Background Color</span>
         </label>      
         <div id="Background Color" class="join">
 
@@ -987,7 +990,13 @@
                 on:click={() => {updateColor('background', '', '')}} 
                 class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
               {/if}
-          <input type="text" placeholder="#12345" bind:value={background.hex} on:change={() => updateColor('background', background.hex)} class="text-center bg-primary text-primary-content">
+          <input 
+            type="text" 
+            placeholder="#12345" 
+            bind:value={background.hex} 
+            on:change={() => updateColor('background', background.hex)} 
+            class="input text-center w-[7rem]"
+          >
 
             
 
@@ -996,14 +1005,17 @@
       </div>
 
       <!-- opacity -->
-      <div class="form-control">
+      <div 
+        in:fly={{x: 100, easing: backOut, delay: 800, duration: 200}}
+        out:fly={{x: 100, easing: backIn, duration: 500}}
+        class="form-control">
         <label for="opacity" class="label">
-          <span class="label-text font-input-mono">Opacity</span>
+          <span in:blur={{amount: 100, easing: backOut, delay: 1200, duration: 300}} class="label-text font-input-mono">Opacity</span>
         </label>
         <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
 
         <label class="input-group">
-            <input type="text" min="0" max="100" id="opacity" bind:value={background.opacity} on:change={() => updateOpacity('background')} class="input input-bordered w-1/2" />
+            <input type="text" min="0" max="100" id="opacity" bind:value={background.opacity} on:change={() => updateOpacity('background')} class="input input-bordered w-[4rem]" />
           <span>%</span>
         </label>
         </div>
@@ -1168,7 +1180,7 @@
         class="w-60 border-2 mt-10 border-primary rounded-xl max-w-md h-40 custom-gradient">
 
         </div>
-      <div class="flex flex-col mt-4 ">
+        <div class="flex flex-col mt-4 ">
         <label for="Gradient Direction" class="label">
           <span class="label-text font-input-mono">Direction <span class="text-info">{direction}°</span></span>
         </label>
@@ -1194,13 +1206,26 @@
         </div>
 
         
-      </div>
+        </div>
 
 
       </div>
 
+
+      <!-- input gradient values -->
+      
       <div class="font-input-mono mt-4 bg-accent p-2 px-4">
-        <p>from <span class="text-info">{fromHex}</span> to <span class="text-info">{toHex}</span>, <span class="text-info">{direction}</span>°</p>
+        <p>
+          from 
+          <input 
+            type="text" 
+            class="text-info inline-input w-[5.75rem]" 
+            bind:value={fromHex} 
+          />, 
+          to 
+          <input type="text" class="text-info inline-input w-[5.75rem]" bind:value={toHex} />, 
+          <input type="text" class="text-info inline-input w-[4rem]" bind:value={direction} />
+        </p>
       </div>
     </div>
     {/if}
@@ -2003,6 +2028,13 @@ class="btn">Save Theme</button>
 
 .custom-gradient {
   background: linear-gradient(var(--direction, to right), var(--fromHex), var(--toHex));
+}
+
+.inline-input {
+  background: none;
+  border: none;
+  outline: none;
+  /* More styles here as needed */
 }
 
   

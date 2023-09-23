@@ -5,10 +5,10 @@
     import { backOut } from "svelte/easing";
   import type { CustomTheme } from "$lib/theme";
 
-  // customTHeme prop
+  // user's customTheme settings 
   export let customTheme: CustomTheme;
 
-  // user data
+  // user's data
   export let username: string = '';
   export let photoURL: string = '';
   export let bio: string = '';
@@ -16,52 +16,60 @@
   export let theme: string = '';
 
   let background: {
-    style: string,
-    value: string,
-    opacity: number,
+    gradient: string,
     hex: string | undefined,
+    opacity: number,
+    style: string,
+    url: string,
   }
 
   let font: {
     family: string,
-    value: string,
-    opacity: number,
     hex: string | undefined,
+    opacity: number,
   }
 
   let link: {
-    radius: string;
-    fill: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
-      hex: string | undefined;
-    }
     border: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+      gradient: string;
       hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      url: string;
+      width: string;
     }
-    shadow: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+    fill: {
+      gradient: string;
       hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      url: string;
+    }
+    radius: string;
+    shadow: {
+      direction: string;
+      gradient: string;
+      hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
     }
     title: {
-      value: string;
+      effect: {
+        effect: string;
+        hex: string;
+        onHover: boolean;
+      }
+      font: {
+        size: string;
+        tracking: string;
+        hex: string | undefined;
+      }
       opacity: number;
-      hex: string | undefined;
-      size: number;
-      tracking: string;
-      effect: string;
-      onHover: boolean;
     }
-  }
+  };
 
   $: if (customTheme) {
     background = customTheme.background;
@@ -69,15 +77,16 @@
     link = customTheme.link;
   }
 
+  // gradient constructors
   let gradient: string[];
   // gradient values
   let fromHex: string;
   let toHex: string;
   let direction: string;
 
-  $: if (background?.style === 'gradient') {
+  $: if (background?.style === 'gradient' && background.hex) {
     // split the background var into from, to, direction
-    gradient = background.value.split(', ');
+    gradient = background.hex.split(', ');
     fromHex = gradient[0];
     toHex = gradient[1];
     direction = gradient[2];
@@ -102,27 +111,18 @@
   $: previewMode = !showPreview;
 
   onMount(() => { 
-    
-    mounted = true;
-    console.log('mounted');
-
-    function handleResize() {
-      if (window.innerWidth >= 768) {
-        showPreview = false
+      mounted = true;
+      console.log('mounted');
+      function handleResize() {
+        if (window.innerWidth >= 768) {
+          showPreview = false
+        }
       }
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      console.log('showPreview: ', showPreview)
     }
-    
-    window.addEventListener('resize', handleResize);
-
-    handleResize();
-    console.log('showPreview: ', showPreview)
-
-    
-      }
   );
-    
-
-    
 
 </script>
 

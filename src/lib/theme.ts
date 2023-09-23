@@ -15,53 +15,57 @@ export interface GradientValue {
 export interface CustomTheme {
   name: string; 
   background: {
-    style: "image" | "gradient" | "solid";
-    hex: string | undefined;
-    url: string;
     gradient: string;
+    hex: string | undefined;
     opacity: number;
+    style: "image" | "gradient" | "solid";
+    url: string;
   };
   link: {
-    radius: string;
-    fill: {
-      isVisible: boolean,
-      style: string;
-      url: string;
-      hex: string | undefined;
-      gradient: string;
-      opacity: number;
-    }
     border: {
+      gradient: string;
+      hex: string | undefined;
       isVisible: boolean,
+      opacity: number;
       style: string;
       url: string;
-      hex: string | undefined;
-      gradient: string;
-      opacity: number;
+      width: string;
     }
-    shadow: {
-      isVisible: boolean,
-      style: string;
+    fill: {
       gradient: string;
       hex: string | undefined;
+      isVisible: boolean,
       opacity: number;
+      style: string;
+      url: string;
+    }
+    radius: string;
+    shadow: {
+      direction: string;
+      gradient: string;
+      hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
     }
     title: {
-      size: number;
-      tracking: string;
-      opacity: number;
-      hex: string | undefined;
       effect: {
         effect: string;
         hex: string;
         onHover: boolean;
       }
+      font: {
+        size: string;
+        tracking: string;
+        hex: string | undefined;
+      }
+      opacity: number;
     }
   };
   font: {
     family: string;
-    opacity: number;
     hex: string | undefined;
+    opacity: number;
   };
 }
 
@@ -115,7 +119,7 @@ export const defaultTheme: CustomTheme = {
   font: {
     family: 'input-mono',
     opacity: 100,
-    hex: convert('lime-200', 100)
+    hex: '',
   },
 };
 
@@ -176,9 +180,10 @@ export const light: CustomTheme = {
   name: 'light', 
   background: {
     style: 'solid', 
-    value: 'slate-50',
+    url: '',
     opacity: 100,
-    hex: convert('slate-50', 100)
+    gradient: '',
+    hex: '#F5F5F5',
   },
   link: {
     radius: 'full',
@@ -186,90 +191,98 @@ export const light: CustomTheme = {
       isVisible: true,
       style: 'solid',
       url: '',
-      hex: '#',
+      hex: '#FFFFFF',
       gradient: '',
       opacity: 100,
     },
     border: {
       isVisible: true,
       style: 'solid',
-      value: 'slate-200',
+      url: '',
+      hex: '#D1D1D1',
+      gradient: '',
       opacity: 100,
-      hex: convert('slate-200', 100)
     },
     shadow: {
       isVisible: true,
       style: 'soft',
-      value: 'slate-950',
+      gradient: '',
       opacity: 100,
-      hex: convert('slate-950', 100)
+      hex: '#B0B0B0'
     },
     title: {
-      value: 'slate-950',
+      hex: '#333333',
       size: 1,
       tracking: 'none',
       opacity: 100,
-      effect: 'none',
-      onHover: false,
-      hex: convert('slate-950', 100)
+      effect: {
+        effect: 'none',
+        onHover: false,
+        hex: '#000000'
+      }
     },
   },
   font: {
     family: 'input-mono',
-    value: 'slate-700',
     opacity: 100,
-    hex: convert('slate-700', 100)
+    hex: '#4A4A4A'
   },
 };
 
 export const dark: CustomTheme = {
-  name: 'dark', 
+  name: 'light', 
   background: {
     style: 'solid', 
-    value: 'slate-950',
+    url: '',
     opacity: 100,
-    hex: convert('slate-950', 100)
+    gradient: '',
+    hex: '#121212',
   },
   link: {
-    radius: 'none',
+    radius: 'full',
     fill: {
       isVisible: true,
       style: 'solid',
-      value: 'slate-900',
+      url: '',
+      hex: '#1F1F1F',
+      gradient: '',
       opacity: 100,
-      hex: convert('slate-900', 100)
     },
     border: {
       isVisible: true,
       style: 'solid',
-      value: 'slate-800',
+      url: '',
+      hex: '#393939',
+      gradient: '',
       opacity: 100,
-      hex: convert('slate-800', 100)
     },
     shadow: {
       isVisible: true,
       style: 'soft',
-      value: 'slate-50',
+      gradient: '',
       opacity: 100,
-      hex: convert('slate-50', 100)
+      hex: '#000000'
     },
     title: {
-      value: 'slate-50',
+      hex: '#333333',
       size: 1,
       tracking: 'none',
       opacity: 100,
-      effect: 'none',
-      onHover: false,
-      hex: convert('slate-50', 100)
+      effect: {
+        effect: 'none',
+        onHover: false,
+        hex: '#E0E0E0'
+      }
     },
   },
   font: {
     family: 'input-mono',
-    value: 'slate-300',
     opacity: 100,
-    hex: convert('slate-300' , 100)
+    hex: '#B0B0B0'
   },
 };
+
+
 
 export function convert(value: string, opacity: number): string {
   const [color, shade] = value.split('-');

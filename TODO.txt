@@ -2547,3 +2547,8 @@ value field should be changed to url
 i already have opacity as a separate field in the db so i should just style them separately instead of trying to smash them together
 
 (updating all the changes i self imposed :"'''')
+
+
+september 23
+
+create hex inputs for the gradients
