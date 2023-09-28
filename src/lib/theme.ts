@@ -15,34 +15,87 @@ export interface GradientValue {
 export interface CustomTheme {
   name: string; 
   background: {
-    gradient: string;
+    gradient: {
+      from: {
+        hex: string,
+        opacity: number,
+      },
+      to: {
+        hex: string,
+        opacity: number,
+      },
+      direction: string
+    };
     hex: string | undefined;
+    image: {
+      position: string,
+      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+      size: "auto" | "contain" | "cover",
+      url: string,
+    };
     opacity: number;
     style: "image" | "gradient" | "solid";
-    url: string;
   };
   link: {
     border: {
-      gradient: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      image: {
+        url: string,
+        repeat: "stretch" | "repeat" | "round" | "space",
+      }
       isVisible: boolean,
       opacity: number;
       style: string;
-      url: string;
       width: string;
     }
     fill: {
-      gradient: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
       isVisible: boolean,
       opacity: number;
       style: string;
-      url: string;
+      image: {
+        position: string,
+        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+        size: "auto" | "contain" | "cover",
+        url: string,
+      };
     }
     radius: string;
     shadow: {
       direction: string;
-      gradient: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
       isVisible: boolean,
       opacity: number;
@@ -71,155 +124,253 @@ export interface CustomTheme {
 
 
 export const defaultTheme: CustomTheme = {
-  name: 'default', 
+  name: 'default',
   background: {
-    style: 'solid', 
-    url: '',
+    gradient: {
+      from: { hex: '', opacity: 100 },
+      to: { hex: '', opacity: 100 },
+      direction: '0deg',
+    },
     hex: '',
-    gradient: '',
+    image: {
+      position: '',
+      repeat: "repeat",
+      size: "auto",
+      url: '',
+    },
     opacity: 100,
+    style: 'solid',
   },
   link: {
     radius: 'full',
     fill: {
-      isVisible: true,
-      style: 'solid',
-      url: '',
+      gradient: {
+        from: { hex: '', opacity: 100 },
+        to: { hex: '', opacity: 100 },
+        direction: '0deg',
+      },
       hex: '',
-      gradient: '',
+      isVisible: true,
       opacity: 100,
+      style: 'solid',
+      image: {
+        position: '',
+        repeat: "repeat",
+        size: "auto",
+        url: '',
+      },
     },
     border: {
-      isVisible: true,
-      style: 'solid',
-      url: '',
+      gradient: {
+        from: { hex: '', opacity: 100 },
+        to: { hex: '', opacity: 100 },
+        direction: '0deg',
+      },
       hex: '',
-      gradient: '',
+      image: {
+        url: '',
+        repeat: "repeat",
+      },
+      isVisible: true,
       opacity: 100,
+      style: 'solid',
+      width: '0.5rem',
     },
     shadow: {
-      isVisible: true,
-      style: 'hard',
-      gradient: '',
+      direction: '',
+      gradient: {
+        from: { hex: '', opacity: 100 },
+        to: { hex: '', opacity: 100 },
+        direction: '0deg',
+      },
       hex: '',
+      isVisible: true,
       opacity: 100,
+      style: 'hard',
     },
     title: {
-      size: 1,
-      tracking: 'none',
       effect: {
         effect: 'none',
         hex: '',
         onHover: false,
       },
-      hex: '',
+      font: {
+        hex: '',
+        size: '1rem',
+        tracking: '',
+      },
       opacity: 100,
     },
   },
   font: {
     family: 'input-mono',
-    opacity: 100,
     hex: '',
+    opacity: 100,
   },
 };
 
 export const emptyTheme: CustomTheme = {
-  name: 'empty', 
+  name: 'empty',
   background: {
-    style: 'solid', 
-    url: '',
+    gradient: {
+      from: { hex: '', opacity: 100 },
+      to: { hex: '', opacity: 100 },
+      direction: '0deg',
+    },
     hex: '',
-    gradient: '',
+    image: {
+      position: '',
+      repeat: "repeat",
+      size: "auto",
+      url: '',
+    },
     opacity: 100,
+    style: 'solid',
   },
   link: {
     radius: 'full',
     fill: {
-      isVisible: true,
-      style: 'solid',
-      url: '',
+      gradient: {
+        from: { hex: '', opacity: 100 },
+        to: { hex: '', opacity: 100 },
+      },
       hex: '',
-      gradient: '',
+      isVisible: true,
       opacity: 100,
+      style: 'solid',
+      image: {
+        position: '',
+        repeat: "repeat",
+        size: "auto",
+        url: '',
+      },
     },
     border: {
-      isVisible: true,
-      style: 'solid',
-      url: '',
+      gradient: {
+        from: { hex: '', opacity: 100 },
+        to: { hex: '', opacity: 100 },
+      },
       hex: '',
-      gradient: '',
+      image: {
+        url: '',
+        repeat: "repeat",
+      },
+      isVisible: true,
       opacity: 100,
+      style: 'solid',
+      width: '0.1rem',
     },
     shadow: {
-      isVisible: true,
-      style: 'hard',
-      gradient: '',
+      direction: '',
+      gradient: {
+        from: { hex: '', opacity: 100 },
+        to: { hex: '', opacity: 100 },
+      direction: '0deg',
+      },
       hex: '',
+      isVisible: true,
       opacity: 100,
+      style: 'hard',
     },
     title: {
-      size: 1,
-      tracking: 'none',
       effect: {
         effect: 'none',
         hex: '',
         onHover: false,
       },
-      hex: '',
+      font: {
+        hex: '',
+        size: '1rem',
+        tracking: '',
+      },
       opacity: 100,
     },
   },
   font: {
     family: 'input-mono',
+    hex: '',
     opacity: 100,
-    hex: convert('lime-200', 100)
   },
 };
+
 
 export const light: CustomTheme = {
   name: 'light', 
   background: {
-    style: 'solid', 
-    url: '',
-    opacity: 100,
-    gradient: '',
+    style: 'gradient', 
     hex: '#F5F5F5',
+    gradient: {
+      from: { hex: '#FFFFFF', opacity: 100 },
+      to: { hex: '#F5F5F5', opacity: 100 },
+      direction: '0deg',
+    },
+    opacity: 100,
+    image: {
+      position: '',
+      repeat: "no-repeat",
+      size: "cover",
+      url: '',
+    },
   },
   link: {
     radius: 'full',
     fill: {
       isVisible: true,
-      style: 'solid',
-      url: '',
+      style: 'gradient',
       hex: '#FFFFFF',
-      gradient: '',
+      gradient: {
+        from: { hex: '#EDEDED', opacity: 100 },
+        to: { hex: '#FFFFFF', opacity: 100 },
+        direction: '0deg',
+      },
       opacity: 100,
+      image: {
+        position: '',
+        repeat: "no-repeat",
+        size: "cover",
+        url: '',
+      },
     },
     border: {
-      isVisible: true,
-      style: 'solid',
-      url: '',
+      gradient: {
+        from: { hex: '#D0D0D0', opacity: 100 },
+        to: { hex: '#D1D1D1', opacity: 100 },
+        direction: '0deg',
+      },
       hex: '#D1D1D1',
-      gradient: '',
+      isVisible: true,
       opacity: 100,
+      style: 'solid',
+      image: {
+        url: '',
+        repeat: "repeat",
+      },
+      width: '0.1rem',
     },
     shadow: {
+      direction: '',
+      gradient: {
+        from: { hex: '#AFAFAF', opacity: 1 },
+        to: { hex: '#B0B0B0', opacity: 100 },
+        direction: '0deg',
+      },
+      hex: '#B0B0B0',
       isVisible: true,
       style: 'soft',
-      gradient: '',
       opacity: 100,
-      hex: '#B0B0B0'
     },
     title: {
-      hex: '#333333',
-      size: 1,
-      tracking: 'none',
-      opacity: 100,
+      font: {
+        hex: '#333333',
+        tracking: '',
+        size: '1rem',
+      },
       effect: {
         effect: 'none',
         onHover: false,
         hex: '#000000'
-      }
+      },
+      opacity: 100,
     },
   },
   font: {
@@ -230,49 +381,82 @@ export const light: CustomTheme = {
 };
 
 export const dark: CustomTheme = {
-  name: 'light', 
+  name: 'dark', 
   background: {
-    style: 'solid', 
-    url: '',
-    opacity: 100,
-    gradient: '',
+    style: 'gradient', 
     hex: '#121212',
+    gradient: {
+      from: { hex: '#121212', opacity: 100 },
+      to: { hex: '#000000', opacity: 100 },
+        direction: '0deg',
+    },
+    opacity: 100,
+    image: {
+      position: '',
+      repeat: "no-repeat",
+      size: "cover",
+      url: '',
+    },
   },
   link: {
     radius: 'full',
     fill: {
       isVisible: true,
-      style: 'solid',
-      url: '',
+      style: 'gradient',
       hex: '#1F1F1F',
-      gradient: '',
+      gradient: {
+        from: { hex: '#1D1D1D', opacity: 100 },
+        to: { hex: '#1F1F1F', opacity: 100 },
+        direction: '0deg',
+      },
       opacity: 100,
+      image: {
+        position: '',
+        repeat: "no-repeat",
+        size: "cover",
+        url: '',
+      },
     },
     border: {
-      isVisible: true,
-      style: 'solid',
-      url: '',
+      gradient: {
+        from: { hex: '#373737', opacity: 100 },
+        to: { hex: '#393939', opacity: 100 },
+        direction: '0deg',
+      },
       hex: '#393939',
-      gradient: '',
+      isVisible: true,
+      style: 'double',
+      image: {
+        url: '',
+        repeat: "repeat",
+      },
       opacity: 100,
+      width: '0.2rem'
     },
     shadow: {
+      direction: '',
+      gradient: {
+        from: { hex: '#000000', opacity: 100 },
+        to: { hex: '#010101', opacity: 100 },
+        direction: '0deg',
+      },
+      hex: '#000000',
       isVisible: true,
       style: 'soft',
-      gradient: '',
       opacity: 100,
-      hex: '#000000'
     },
     title: {
-      hex: '#333333',
-      size: 1,
-      tracking: 'none',
-      opacity: 100,
+      font: {
+        hex: '#D0D0D0',
+        tracking: 'none',
+        size: '1rem',
+      },
       effect: {
         effect: 'none',
         onHover: false,
         hex: '#E0E0E0'
-      }
+      },
+      opacity: 100,
     },
   },
   font: {
@@ -281,22 +465,6 @@ export const dark: CustomTheme = {
     hex: '#B0B0B0'
   },
 };
-
-
-
-export function convert(value: string, opacity: number): string {
-  const [color, shade] = value.split('-');
-  const hex = (colors as any)[color]?.[shade];
-
-  if (opacity >= 0 && opacity <= 99) {
-    // If opacity is a single digit, prepend a '0' for formatting.
-    const paddedOpacity =
-      opacity < 10 ? "0" + opacity.toString() : opacity.toString();
-    return hex?.concat(paddedOpacity) ?? "";
-  } else {
-    return hex?.concat("FF") ?? "";
-  }
-}
 
 export const themeStore = writable(defaultTheme);
 

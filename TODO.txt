@@ -2552,3 +2552,105 @@ i already have opacity as a separate field in the db so i should just style them
 september 23
 
 create hex inputs for the gradients
+
+radius selection divs can be smaller
+
+todo list:
+
+
+✅finish adding gradient cases to update color function
+
+✅get rid of convert functions we use hex codes here
+
+refactor all of the color + opacity inputs
+    background
+        ✅solid
+            ✅hex
+            ✅opacity
+        gradient
+            from
+                hex
+                opacity
+            to
+                hex
+                opacity
+    link
+        fill
+            solid
+            gradient
+        border
+            one color
+            gradient
+        shadow
+            one color
+            gradient
+        title
+            font color
+            effect color
+    font
+        
+
+handle opacity and hex values separately
+
+create more custom styles
+
+
+
+link styles
+    link tree style
+        short, wide
+        left: custom icon 
+        center: Link Title
+
+    hoo bee style
+        social media icons
+        tall, wide links
+            background: custom photo / gif
+            bottom left: title
+            bottom right: (optional) link type icon
+        grid of smaller square links
+
+    remilia style
+        ?
+        ??
+        ???
+
+    swimming style
+        links on one side hover link to show preview on the other side
+        links in the same spot, hover link to change the background
+
+
+is there a way to let user's sign up without email? just wallet?
+
+can i let a user define a grid for the drag and drop component?
+
+
+fill out the todolist above
+
+background gradient:
+    going to test if this works:
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            background: {
+              style: "gradient",
+              gradient: {
+                from: {hex: fromHex, opacity: fromOpacity},
+                to: {hex: toHex, opacity: toOpacity},
+              }
+            }
+          }
+        }, { merge: true });
+
+        or if this works
+
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            background: {
+              style: "gradient",
+              gradient: {
+                from: from,
+                to: to,
+              }
+            }
+          }
+        }, { merge: true });

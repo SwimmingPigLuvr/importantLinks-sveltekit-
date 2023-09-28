@@ -4,7 +4,7 @@
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { db, user, userData, storage, userTheme } from "$lib/firebase";
-  import { setTheme, type CustomTheme, defaultTheme, emptyTheme, type GradientValue, convert } from "$lib/theme";
+  import { setTheme, type CustomTheme, defaultTheme, emptyTheme, type GradientValue } from "$lib/theme";
   import { doc, getDoc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { flip } from "svelte/animate";
@@ -17,53 +17,113 @@
   import { onMount } from "svelte";
 
   let background: {
-    style: string,
-    value: string,
-    opacity: number,
-    hex: string | undefined,
-  }
-
-  let font: {
-    family: string,
-    value: string,
-    opacity: number,
-    hex: string | undefined,
-  }
+    gradient: {
+      from: {
+        hex: string,
+        opacity: number,
+      },
+      to: {
+        hex: string,
+        opacity: number,
+      },
+      direction: string
+    };
+    hex: string | undefined;
+    image: {
+      position: string,
+      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+      size: "auto" | "contain" | "cover",
+      url: string,
+    };
+    opacity: number;
+    style: "image" | "gradient" | "solid";
+  };
 
   let link: {
-    radius: string;
-    fill: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
-      hex: string | undefined;
-    }
     border: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      image: {
+        url: string,
+        repeat: "stretch" | "repeat" | "round" | "space",
+      }
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      width: string;
     }
-    shadow: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+    fill: {
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      image: {
+        position: string,
+        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+        size: "auto" | "contain" | "cover",
+        url: string,
+      };
+    }
+    radius: string;
+    shadow: {
+      direction: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
+      hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
     }
     title: {
-      value: string;
+      effect: {
+        effect: string;
+        hex: string;
+        onHover: boolean;
+      }
+      font: {
+        size: string;
+        tracking: string;
+        hex: string | undefined;
+      }
       opacity: number;
-      hex: string | undefined;
-      size: number;
-      tracking: string;
-      effect: string;
-      onHover: boolean;
     }
-  }
+  };
 
+  let font: {
+    family: string;
+    hex: string | undefined;
+    opacity: number;
+  };
 
   let fill: boolean;
   let border: boolean;
@@ -266,6 +326,12 @@
     onHover = link?.title?.onHover;
   }
 
+  if (customTheme) {
+    fill = customTheme.link.fill.isVisible;
+    border = customTheme.link.border.isVisible;
+    shadow = customTheme.link.shadow.isVisible;
+  }
+
   $: if ($userData && $userData.userThemes && $userData.userThemes.length > 1) {
     const uniqueThemeName = Object.keys(userThemes[1])[0];
     console.log('userthemes: ', userThemes);
@@ -451,19 +517,35 @@
   }
   
   const themes = [
-      'retro',
-      'garden',
-      'forest',
-      'luxury',
-      'aqua',
-      'night',
-      'red',
-      'coffee',
-      'methyleneBlue',
-      'acid',
-      'black',
-      'cyberpunk',
-      'lemonade'
+    "business",
+    "cmyk",
+    "dracula",
+    "fantasy",
+    "wireframe",
+    "cupcake",
+    "bumblebee",
+    "emerald",
+    "corporate",
+    "synthwave",
+    "valentine",
+    "halloween",
+    "lofi",
+    "winter",
+    "autumn",
+    "pastel",
+    "retro",
+    "garden",
+    "black",
+    "luxury",
+    "aqua",
+    "night",
+    "coffee",
+    "acid",
+    "forest",
+    "cyberpunk",
+    "lemonade",
+    "red",
+    "methyleneBlue"
   ];
 
   let allThemes = userThemes.concat(themes);
@@ -496,10 +578,16 @@
       const result = await uploadBytes(storageRef, file);
       const url = await getDownloadURL(result.ref);
 
-      const updatedBackground = { ...customTheme, background: { style: 'image', value: url } };
-
-
-      batch.update(doc(db, 'users', $user!.uid), { "customTheme.background.style": 'image', "customTheme.background.value": url });
+      batch.set(doc(db, `users/${$user!.uid}`), {
+        customTheme: {
+          background: {
+            image: {
+              url: url
+            },
+            style: 'image',
+          }
+        }
+      }, { merge: true });
 
       await batch.commit();
 
@@ -514,9 +602,7 @@
 
   async function updateStyle(mode: string, style: string) {
     console.log('updating style of ', mode, ' to: ', style);
-
     const batch = writeBatch(db);
-
     if (mode === 'bg') {
       batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
@@ -526,30 +612,6 @@
         }
       }, { merge: true });
     }
-    await batch.commit();
-  }
-
-
-  async function updateGradient(from: GradientValue, to: GradientValue, direction: string) {
-    fromColor = from.value + '-' + from.shade.toString();
-    fromHex = convert(fromColor, from?.opacity);
-
-    toColor = to.value + '-' + to.shade.toString();
-    toHex = convert(toColor, to?.opacity);
-
-    const batch = writeBatch(db);
-
-    batch.set(doc(db, `users/${$user!.uid}`), {
-      customTheme: {
-        background: {
-          style: 'gradient',
-          value: `${fromColor}, ${toColor}, ${direction}`,
-          opacity: 100,
-          hex: `${fromHex}, ${toHex}, ${direction}`,
-        }
-      }
-    }, { merge: true });
-
     await batch.commit();
   }
 
@@ -615,18 +677,13 @@
 
   // save color selections
   // construct hex codes in the db
-  async function updateColor(mode: string, hex: string) {
-
+  async function updateColor(mode: string, hex: string, opacity: number) {
     const batch = writeBatch(db);
-
     switch (mode) {
-
-      // background
       case 'background':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
-              opacity: background?.opacity,
               hex: hex
             }
           }
@@ -634,14 +691,13 @@
 
         break;
 
-      // link fill
+      
       case 'link fill':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               fill: {
-                opacity: link.fill?.opacity,
-                hex: convert(temp, link.fill?.opacity)
+                hex: hex
               }
             }
           }
@@ -649,15 +705,12 @@
 
         break;
 
-      // link border
       case 'link border':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               border: {
-                // no style because the same color can be used with idfferent styles
-                opacity: link.border.opacity,
-                hex: convert(temp, link.border.opacity)
+                hex: hex
               }
             }
           }
@@ -665,14 +718,12 @@
 
         break;
 
-      // link Shadow
       case 'link shadow':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               shadow: {
-                opacity: link.shadow?.opacity,
-                hex: convert(temp, link.shadow?.opacity)
+                hex: hex
               }
             }
           }
@@ -680,14 +731,12 @@
 
         break;
       
-      // link title
       case 'link title':
-      batch.set(doc(db, `users/${$user!.uid}`), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               title: {
-                opacity: link?.title?.opacity,
-                hex: convert(temp, link?.title?.opacity)
+                hex: hex
               }
             }
           }
@@ -695,36 +744,91 @@
 
         break;
       
-      // font
       case 'font':
-      batch.set(doc(db, `users/${$user!.uid}`), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
-              opacity: font?.opacity,
-              hex: convert(temp, font?.opacity)
+              hex: hex
             }
           }
         }, { merge: true });
 
         break;
-      default:
+
+      
+      case 'background gradient from':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            background: {
+              style: "gradient",
+              gradient: {
+                from: {hex: hex, opacity: opacity},
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'background gradient to':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            background: {
+              style: "gradient",
+              gradient: {
+                to: {hex: hex, opacity: opacity},
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'link.fill gradient':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              fill: {
+                style: 'gradient',
+                hex: `${fromHex}, ${toHex}, ${direction}`
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'link.border gradient':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              border: {
+                hex: `${fromHex}, ${toHex}, ${direction}`
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'link.shadow gradient':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              border: {
+                hex: `${fromHex}, ${toHex}, ${direction}`
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+        default:
         console.log('error: unidentified mode.');
         return;
     }
-
     await batch.commit();
   }
 
-  // save opacities in the db
-  async function updateOpacity(mode: string) {
+  async function updateOpacity(mode: string, opacity: number) {
     const batch = writeBatch(db);
-
     switch (mode) {
       case 'background': 
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             background: {
-              opacity: background?.opacity
+              opacity: opacity
             }
           }
         }, { merge: true });
@@ -733,50 +837,76 @@
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             font: {
-              opacity: font?.opacity
+              opacity: opacity
             }
           }
         }, { merge: true });
         break;
       case 'link title':
-      batch.set(doc(db, `users/${$user!.uid}`), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               title: {
-                opacity: link?.title?.opacity
+                opacity: opacity
               }
             }
           }
-        }, { merge: true });
+          }, { merge: true });
         break;
       case 'link fill':
-      batch.set(doc(db, `users/${$user!.uid}`), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               fill: {
-                opacity: link.fill?.opacity
+                opacity: opacity
               }
             }
           }
         }, { merge: true });
         break;
       case 'link border':
-      batch.set(doc(db, `users/${$user!.uid}`), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               border: {
-                opacity: link.border?.opacity
+                opacity: opacity
               }
             }
           }
         }, { merge: true });
         break;
       case 'link shadow':
-      batch.set(doc(db, `users/${$user!.uid}`), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               shadow: {
-                opacity: link.shadow?.opacity
+                opacity: opacity
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'background gradient from':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            background: {
+              gradient: {
+                from: {
+                  opacity: opacity
+                }
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'background gradient to':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            background: {
+              gradient: {
+                to: {
+                  opacity: opacity
+                }
               }
             }
           }
@@ -785,7 +915,6 @@
       default:
         return;
     }
-
     await batch.commit();
   }
 
@@ -800,39 +929,7 @@
 
   let showOptions = false;
 
-  let complementaryColor: string;
-
-  function calcComplementaryColor(color: string, opacity: number) {
-    color = color.substring(1);
-    color = parseInt(color, 16);
-    color = (0xFFFFFF ^ color).toString(16);
-    color = ("000000" + color).slice(-6);
-    if (opacity >= 0 && opacity <= 99) {
-      const paddedOpacity = opacity < 10 ? "0" + opacity.toString() : opacity.toString();
-      return "#" + color.concat(paddedOpacity) ?? "";
-    } else {
-      return "#" + color.concat("FF") ?? "";
-    }
-  }
-
-  function updateComplementaryColor() {
-    console.log('updating color: ', complementaryColor);
-    if (background?.hex && background?.opacity) {
-      complementaryColor = calcComplementaryColor(background?.hex, background?.opacity);
-      console.log('to: ', complementaryColor);
-    } else {
-      complementaryColor = '#00000';
-    } 
-  }
-
 </script>
-
-<!-- <svelte:window on:scroll={handleScroll} /> -->
-
-
-<!-- put these props back incase hehe -->
-
-<!--   -->
 
 <LivePreview 
   username={username} 
@@ -843,7 +940,9 @@
 />
 
 <main data-theme="{theme}" class="flex flex-col">
-  <div id="top" class="flex flex-col my-20  md:max-w-[62%]">
+
+  <h1 id="custom" class="font-input-mono text-[1.5rem] lg:text-[2.5rem] -tracking-widest">👁️‍🗨️🌴 Customize your profile.</h1>
+  <div id="top" class="flex flex-col my-8  md:max-w-[62%]">
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Themes</h2>
     <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
     <!-- themes -->
@@ -859,24 +958,24 @@
         <!-- user made themes -->
         {#each userThemes as userTheme, index}
           <div class="">
-                <button 
-                  on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
-                  style={`color: ${fontColorHex}; ${userTheme?.background?.style === 'image' ? `background-image: url(${userTheme?.background?.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme?.background?.style === 'solid' ? `background-color: ${convert(userTheme?.background?.value)}` : '')}`}
-                  class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
-                    <div class={`font-${userTheme.font? userTheme.font?.family : ''} flex flex-col items-center font`}>
-                      <!-- pfp -->
-                      <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
-                      <!-- Username -->
-                      <p class="text-[0.5rem]">@{$userData?.username}</p>
-                      <!-- bio -->
-                      <p class="text-[0.33rem]">{$userData?.bio}</p>
-                    </div>
-                    <!-- links -->
-                    <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
-                    <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
-                    <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
-                </button>
-              <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{userTheme.name}</h3>
+            <button 
+              on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
+              style={`color: ${fontColorHex}; ${userTheme?.background?.style === 'image' ? `background-image: url(${userTheme?.background?.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme?.background?.style === 'solid' ? `background-color: ${userTheme?.background?.hex}` : '')}`}
+              class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
+                <div class={`font-${userTheme.font? userTheme.font?.family : ''} flex flex-col items-center font`}>
+                  <!-- pfp -->
+                  <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+                  <!-- Username -->
+                  <p class="text-[0.5rem]">@{$userData?.username}</p>
+                  <!-- bio -->
+                  <p class="text-[0.33rem]">{$userData?.bio}</p>
+                </div>
+                <!-- links -->
+                <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
+                <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
+                <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
+            </button>
+            <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{userTheme.name}</h3>
           </div> 
         {/each}
 
@@ -909,15 +1008,8 @@
 
   <div class="my-4">
 
-    <h2 id="custom" class="m-2 p-2 font-input-mono text-[1.5rem]">Custom Appearance</h2>
-    <div class="m-auto mb-6 px-6">
-      <p class="font-input-mono">Completely customize your swimmingPig profile. 
-        Change your background with colors, gradients and images. 
-        Choose a button style, change the typeface and more.</p>
-    </div>
   </div>
-
-
+    
     <!-- backgrounds -->
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Background</h2>
 
@@ -956,20 +1048,18 @@
 
     </div>
 
-    <!-- color selection is right below background styles -->
+<!-- solid background color picker -->
+
     {#if showBackgroundColorSelect}
     <div 
-      in:slide={{duration: 300, easing: backOut}}
-      out:slide={{duration: 300, easing: backIn, delay: 500}}
+      in:slide={{duration: 500, easing: backOut}}
+      out:slide={{duration: 300, easing: backIn }}
       class="flex justify-start space-x-10 mt-8 ">
 
       <!-- background color -->
-      <div 
-        in:fly={{x: 100, easing: backOut, delay: 300, duration: 500}}
-        out:fly={{x: 100, easing: backIn, duration: 200}}
-      >
+      <div>
         <label for="Background Color" class="label">
-          <span in:blur={{amount: 100, easing: backOut, delay: 1000, duration: 300}} class="label-text font-input-mono">Background Color</span>
+          <span class="label-text font-input-mono">Background Color</span>
         </label>      
         <div id="Background Color" class="join">
 
@@ -977,11 +1067,130 @@
               <input 
                 type="color" 
                 id="colorInput"
-                style="width: 3.1rem; height: 3rem; border: 1px ridge {background.hex};" 
+                style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.hex};" 
                 bind:value={background.hex} 
                 on:mouseenter={() => {if (background?.hex !== '') {showRemoveBackground = true}}}
                 on:mouseleave={() => showRemoveBackground = false}
-                on:change={() => {updateColor('background', background.hex); updateComplementaryColor(); console.log('updating')}}
+                on:change={() => updateColor('background', background.hex, background.opacity)}
+                class="relative"
+              >
+              {#if showRemoveBackground}
+              <button
+                in:slide out:blur={{amount: 100}}
+                on:click={() => {updateColor('background', '', 100)}} 
+                class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+              {/if}
+          <input 
+            type="text" 
+            placeholder="#12345" 
+            bind:value={background.hex} 
+            on:change={() => updateColor('background', background.hex, background.opacity)} 
+            class="input text-center w-[13rem]"
+          >
+
+            
+
+            
+        </div>
+      </div>
+
+      <!-- opacity -->
+      <div class="form-control">
+        <label for="opacity" class="label">
+          <span class="label-text font-input-mono">Opacity</span>
+        </label>
+        <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
+
+        <label class="input-group">
+            <input type="text" min="0" max="100" id="opacity" bind:value={background.opacity} on:change={() => updateOpacity('background', background.opacity)} class="input input-bordered w-[4rem]" />
+          <span>%</span>
+        </label>
+        </div>
+      </div>
+    </div>
+    {/if}
+
+<!-- gradient background color pickers -->
+
+    {#if showBackgroundGradientSelect}
+    <!-- from color -->
+    <div 
+      in:slide={{duration: 300, easing: backOut}}
+      out:slide={{duration: 300, easing: backIn, delay: 500}}
+      class="flex justify-start space-x-10 mt-8">
+      
+      <!-- from color -->
+      <div>
+        <label for="From" class="label">
+          <span class="label-text font-input-mono">From</span>
+        </label>      
+        <div id="From" class="join">
+
+            <!-- from input -->
+            <input 
+              type="color" 
+              id="colorInput"
+              style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.gradient?.from?.hex};" 
+              bind:value={background.gradient.from.hex} 
+              on:mouseenter={() => {if (background?.gradient?.from?.hex !== '') {showRemoveBackground = true}}}
+              on:mouseleave={() => showRemoveBackground = false}
+              on:change={() => updateColor('background gradient from', background.gradient.from.hex, background.gradient.from.opacity)}
+              class="relative">
+
+            <!-- remove color to revert back to theme color -->
+            {#if showRemoveBackground}
+            <button
+              in:slide out:blur={{amount: 100}}
+              on:click={() => {updateColor('background', '', '')}} 
+              class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+            {/if}
+
+            <!-- hex input -->
+          <input 
+            type="text" 
+            placeholder="#12345" 
+            bind:value={background.gradient.from.hex} 
+            on:change={() => updateColor('background', background.gradient.from.hex)} 
+            class="input text-center w-[13rem]">
+        </div>
+      </div>
+
+      <!-- opacity -->
+      <div class="form-control">
+        <label for="opacity" class="label">
+          <span class="label-text font-input-mono">Opacity</span>
+        </label>
+        <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity might cause background to reflect diffently in preview than it will on your site"`}>
+        <label class="input-group">
+            <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.from.opacity} on:change={() => updateOpacity('background', background.gradient.from.opacity)} class="input input-bordered w-[4rem]" />
+          <span>%</span>
+        </label>
+        </div>
+      </div>
+
+    </div>
+    <!-- to color -->
+    <div 
+      in:slide={{duration: 300, easing: backOut}}
+      out:slide={{duration: 300, easing: backIn, delay: 500}}
+      class="flex justify-start space-x-10 mt-8 ">
+
+      <!-- to color -->
+      <div>
+        <label for="to Color" class="label">
+          <span class="label-text font-input-mono">To</span>
+        </label>      
+        <div id="Background Color" class="join">
+
+            <!-- show buttoncolor / clikc for color picker -->
+              <input 
+                type="color" 
+                id="colorInput"
+                style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.gradient?.to?.hex};" 
+                bind:value={background.gradient.to.hex} 
+                on:mouseenter={() => {if (background?.gradient?.to?.hex !== '') {showRemoveBackground = true}}}
+                on:mouseleave={() => showRemoveBackground = false}
+                on:change={() => updateColor('background', background.gradient.to.hex, background.gradient.to.opacity)} 
                 class="relative"
               >
               {#if showRemoveBackground}
@@ -994,8 +1203,8 @@
             type="text" 
             placeholder="#12345" 
             bind:value={background.hex} 
-            on:change={() => updateColor('background', background.hex)} 
-            class="input text-center w-[7rem]"
+            on:change={() => updateColor('background', background.gradient.to.hex, background.gradient.to.opacity)} 
+            class="input text-center w-[13rem]"
           >
 
             
@@ -1005,25 +1214,22 @@
       </div>
 
       <!-- opacity -->
-      <div 
-        in:fly={{x: 100, easing: backOut, delay: 800, duration: 200}}
-        out:fly={{x: 100, easing: backIn, duration: 500}}
-        class="form-control">
+      <div class="form-control">
         <label for="opacity" class="label">
-          <span in:blur={{amount: 100, easing: backOut, delay: 1200, duration: 300}} class="label-text font-input-mono">Opacity</span>
+          <span class="label-text font-input-mono">Opacity</span>
         </label>
         <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
 
         <label class="input-group">
-            <input type="text" min="0" max="100" id="opacity" bind:value={background.opacity} on:change={() => updateOpacity('background')} class="input input-bordered w-[4rem]" />
+            <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.to.opacity} on:change={() => updateOpacity('background', background.gradient.to.opacity)} class="input input-bordered w-[4rem]" />
           <span>%</span>
         </label>
         </div>
       </div>
     </div>
-    {/if}
 
-    {#if showBackgroundGradientSelect}
+
+    <!-- old styles -->
     <div 
       in:slide={{duration: 1000, easing: backOut}}
       out:slide={{duration: 400, easing: backIn}}
@@ -1043,46 +1249,7 @@
                 on:click={() => {toggleShowColorPicker(); mode = 'background'}} 
                 class="btn w-1/4 rounded-md"></button>
 
-              <!-- select vaklue -->
-              <select placeholder={from.value} bind:value={from.value} on:change={() => updateGradient(from, to, direction)} class="select select-bordered">
-                <option>slate</option>
-                <option>gray</option>
-                <option>zinc</option>
-                <option>neutral</option>
-                <option>stone</option>
-                <option>red</option>
-                <option>orange</option>
-                <option>amber</option>
-                <option>yellow</option>
-                <option>lime</option>
-                <option>green</option>
-                <option>emerald</option>
-                <option>teal</option>
-                <option>cyan</option>
-                <option>sky</option>
-                <option>blue</option>
-                <option>indigo</option>
-                <option>violet</option>
-                <option>purple</option>
-                <option>fuchsia</option>
-                <option>pink</option>
-                <option>rose</option>
-              </select>
-
-              <!-- select shade -->
-              <select bind:value={from.shade} on:change={() => updateGradient(from, to, direction)} class="select select-bordered">
-                <option>50</option>
-                <option>100</option>
-                <option>200</option>
-                <option>300</option>
-                <option>400</option>
-                <option>500</option>
-                <option>600</option>
-                <option>700</option>
-                <option>800</option>
-                <option>900</option>
-                <option>950</option>
-              </select>
+              
           </div>
         </div>
         <!-- opacity -->

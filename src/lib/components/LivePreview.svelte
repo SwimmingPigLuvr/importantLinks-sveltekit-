@@ -16,41 +16,88 @@
   export let theme: string = '';
 
   let background: {
-    gradient: string,
-    hex: string | undefined,
-    opacity: number,
-    style: string,
-    url: string,
-  }
-
-  let font: {
-    family: string,
-    hex: string | undefined,
-    opacity: number,
-  }
+    gradient: {
+      from: {
+        hex: string,
+        opacity: number,
+      },
+      to: {
+        hex: string,
+        opacity: number,
+      },
+      direction: string
+    };
+    hex: string | undefined;
+    image: {
+      position: string,
+      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+      size: "auto" | "contain" | "cover",
+      url: string,
+    };
+    opacity: number;
+    style: "image" | "gradient" | "solid";
+  };
 
   let link: {
     border: {
-      gradient: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      image: {
+        url: string,
+        repeat: "stretch" | "repeat" | "round" | "space",
+      }
       isVisible: boolean,
       opacity: number;
       style: string;
-      url: string;
       width: string;
     }
     fill: {
-      gradient: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
       isVisible: boolean,
       opacity: number;
       style: string;
-      url: string;
+      image: {
+        position: string,
+        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+        size: "auto" | "contain" | "cover",
+        url: string,
+      };
     }
     radius: string;
     shadow: {
       direction: string;
-      gradient: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
       isVisible: boolean,
       opacity: number;
@@ -71,6 +118,12 @@
     }
   };
 
+  let font: {
+    family: string;
+    hex: string | undefined;
+    opacity: number;
+  };
+
   $: if (customTheme) {
     background = customTheme.background;
     font = customTheme.font;
@@ -78,18 +131,21 @@
   }
 
   // gradient constructors
-  let gradient: string[];
+  let gradient;
   // gradient values
   let fromHex: string;
+  let fromOpacity: number;
   let toHex: string;
+  let toOpacity: number;
   let direction: string;
 
-  $: if (background?.style === 'gradient' && background.hex) {
-    // split the background var into from, to, direction
-    gradient = background.hex.split(', ');
-    fromHex = gradient[0];
-    toHex = gradient[1];
-    direction = gradient[2];
+  $: if (background?.style === 'gradient') {
+    gradient = background?.gradient;
+    fromHex = gradient?.from?.hex;
+    fromOpacity = gradient?.from?.opacity;
+    toHex = gradient?.to?.hex;
+    toOpacity = gradient?.to?.opacity;
+    direction = gradient?.direction;
 
     console.log('🐉' + fromHex, toHex, direction);
   }
@@ -174,7 +230,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
         style={`
           ${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} 
           color: ${font?.hex? font?.hex : `hsl(var(--a))`}; 
-          ${background?.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''} 
+          ${background?.style === 'image' ? `background-image: url(${background.image.url}); background-size: ${background.image.size}; background-repeat: ${background.image.repeat}; background-position: ${background.image.position};` : ''} 
           ${background?.style === 'solid' ? `background-color: ${background?.hex? background?.hex : `hsl(var(--s))`};` : (background?.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex});` : '')}
           
         `}
@@ -224,7 +280,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
           ${link?.radius === 'full' ? `rounded-full` : ''}
           ${link?.radius === 'half' ? `rounded-[0.5rem]` : ''}
           ${link?.radius === 'none' ? `rounded-none` : ''}
-          bg-${link?.fill?.value} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen flex
+          bg-${link?.fill?.hex} fixed top-0 left-1/2 -translate-x-1/2 w-screen h-screen flex
         `}>
           <!-- data -->
           <div class="m-auto">
@@ -259,6 +315,8 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
   <!-- preview end -->
   {/if}
 
-<!-- why isnt the customTheme being reflected in the livepreview? -->
+<style>
 
-<!-- find out where the error is -->
+
+
+</style>

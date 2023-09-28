@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { convert } from "$lib/theme";
   import { onMount } from "svelte";
   import type { CustomTheme } from "$lib/theme";
   import Page from "../../routes/+page.svelte";
@@ -12,52 +11,113 @@
   export let previewMode = false;
 
   let background: {
-    style: "image" | "gradient" | "solid";
-    value: string;
-    opacity: number;
+    gradient: {
+      from: {
+        hex: string,
+        opacity: number,
+      },
+      to: {
+        hex: string,
+        opacity: number,
+      },
+      direction: string
+    };
     hex: string | undefined;
-  }
+    image: {
+      position: string,
+      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+      size: "auto" | "contain" | "cover",
+      url: string,
+    };
+    opacity: number;
+    style: "image" | "gradient" | "solid";
+  };
 
   let link: {
-    radius: string;
-    fill: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
-      hex: string | undefined;
-    }
     border: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      image: {
+        url: string,
+        repeat: "stretch" | "repeat" | "round" | "space",
+      }
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      width: string;
     }
-    shadow: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+    fill: {
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      image: {
+        position: string,
+        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+        size: "auto" | "contain" | "cover",
+        url: string,
+      };
+    }
+    radius: string;
+    shadow: {
+      direction: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
+      hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
     }
     title: {
-      value: string;
+      effect: {
+        effect: string;
+        hex: string;
+        onHover: boolean;
+      }
+      font: {
+        size: string;
+        tracking: string;
+        hex: string | undefined;
+      }
       opacity: number;
-      hex: string | undefined;
-      size: number;
-      tracking: string;
-      effect: string;
-      onHover: boolean;
     }
-  }
+  };
 
   let font: {
     family: string;
-    value: string;
-    opacity: number;
     hex: string | undefined;
-  }
+    opacity: number;
+  };
 
   $: if (customTheme && customTheme.link) {
     background = customTheme.background;

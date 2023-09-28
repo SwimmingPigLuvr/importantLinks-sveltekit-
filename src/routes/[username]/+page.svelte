@@ -26,52 +26,113 @@
 
 
   let background: {
-    style: "image" | "gradient" | "solid";
-    value: string;
-    opacity: number;
+    gradient: {
+      from: {
+        hex: string,
+        opacity: number,
+      },
+      to: {
+        hex: string,
+        opacity: number,
+      },
+      direction: string
+    };
     hex: string | undefined;
-  }
+    image: {
+      position: string,
+      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+      size: "auto" | "contain" | "cover",
+      url: string,
+    };
+    opacity: number;
+    style: "image" | "gradient" | "solid";
+  };
 
   let link: {
-    radius: string;
-    fill: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
-      hex: string | undefined;
-    }
     border: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      image: {
+        url: string,
+        repeat: "stretch" | "repeat" | "round" | "space",
+      }
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      width: string;
     }
-    shadow: {
-      isVisible: boolean;
-      style: string;
-      value: string;
-      opacity: number;
+    fill: {
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
       hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
+      image: {
+        position: string,
+        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
+        size: "auto" | "contain" | "cover",
+        url: string,
+      };
+    }
+    radius: string;
+    shadow: {
+      direction: string;
+      gradient: {
+        from: {
+          hex: string,
+          opacity: number,
+        },
+        to: {
+          hex: string,
+          opacity: number,
+        },
+        direction: string,
+      };
+      hex: string | undefined;
+      isVisible: boolean,
+      opacity: number;
+      style: string;
     }
     title: {
-      value: string;
+      effect: {
+        effect: string;
+        hex: string;
+        onHover: boolean;
+      }
+      font: {
+        size: string;
+        tracking: string;
+        hex: string | undefined;
+      }
       opacity: number;
-      hex: string | undefined;
-      size: number;
-      tracking: string;
-      effect: string;
-      onHover: boolean;
     }
-  }
+  };
 
   let font: {
     family: string;
-    value: string;
-    opacity: number;
     hex: string | undefined;
-  }
+    opacity: number;
+  };
 
   $: if (data) {
     bio = data.bio;
@@ -86,18 +147,21 @@
     link= customTheme?.link;
   }
 
-  let gradient: string[];
+  let gradient;
 
   let fromHex: string;
+  let fromOpacity: number;
   let toHex: string;
+  let toOpacity: number;
   let direction: string;
 
   $: if (background.style === 'gradient') {
-    gradient = background.value.split(', ');
-
-    fromHex = gradient[0];
-    toHex = gradient[1];
-    direction = gradient[2];
+    gradient = background.gradient;
+    fromHex = gradient.from.hex;
+    fromOpacity = gradient.from.opacity;
+    toHex = gradient.to.hex;
+    toOpacity = gradient.to.opacity;
+    direction = gradient.direction;
   }
    
  
