@@ -25,6 +25,9 @@ make sure that theme is saved to firestore
 
 
 
+
+
+
 loading state
 
 
@@ -2654,3 +2657,30 @@ background gradient:
             }
           }
         }, { merge: true });
+
+
+
+9 28 23
+
+
+upload image -> if success { show image style options }
+
+
+set up background style choices
+
+    background-size: auto, cover, contain
+    background-position: 
+           top left, top center, top right,
+               left, center, right
+        bottom left, bottom center, bottom right
+    background-repeat: repeat, repeat-x, repeat-y, no-repeat, space, round
+
+stop nit picking the design and just get something out there get the buttons and the functions
+get the buttons sand the funtctions
+
+
+add a teeny tiny toast notification that lets the user know that their change was successfully saved to the db
+
+keep trach of user selected value so that i can style that differently that way the user doesn't have to remember what they have
+
+let user fill in their own css where applicable. i want to give them a sense of accomplishment. i want them to feel smart for using my app

@@ -16,6 +16,12 @@
   import colors from "tailwindcss/colors";
   import { onMount } from "svelte";
 
+
+  let openPosition: boolean;
+  let openSize: boolean;
+  let openRepeat: boolean;
+  let customSize: string;
+
   let background: {
     gradient: {
       from: {
@@ -124,6 +130,55 @@
     hex: string | undefined;
     opacity: number;
   };
+
+  async function setBackgroundPosition(position: string) {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        background: {
+          image: {
+            position: position
+          }
+        }
+      }
+    }, { merge: true });
+    
+    await batch.commit();
+  }
+
+  async function setBackgroundSize(size: string) {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        background: {
+          image: {
+            size: size
+          }
+        }
+      }
+    }, { merge: true });
+    
+    await batch.commit();
+  }
+
+  async function setBackgroundRepeat(repeat: string) {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        background: {
+          image: {
+            repeat: repeat
+          }
+        }
+      }
+    }, { merge: true });
+    
+    await batch.commit();
+  }
+
 
   let fill: boolean;
   let border: boolean;
@@ -1401,17 +1456,18 @@
 
     <!-- background image upload -->
     {#if showBackgroundImageForm}
-      <form 
+      <div 
       in:slide={{ duration: 1000, easing: cubicInOut }}
       out:slide={{ duration: 1000, easing: cubicInOut }}
-      class="">
-        <div class="form-control w-full max-w-xs my-10 mx-auto text-center">
+      class="flex space-x-8">
+        <!-- image upload -->
+        <div class="form-control w-[231px] max-w-xs text-center bg-lime-300">
             <img 
                 src="{previewURL ?? $userData?.photoURL ?? "/sonic.jpeg"}" 
                 alt="photoURL"
-                width="256"
-                height="256"
-                class="mx-auto"
+                width="231"
+                height="231"
+                class={`${uploading? 'filter grayscale' : 'grayscale-0'}`}
             />
             <label for="photoURL" class="label">
                 <span class="label-text"></span>
@@ -1420,7 +1476,7 @@
                 on:change={uploadBackground}
                 name="photoURL"
                 type="file"
-                class="file-input file-input-bordered w-full max-w-xs"
+                class="file-input file-input-xs file-input-bordered w-[231px] max-w-xs"
                 accept="image/png, image/jpeg, image/gif, image/webp"
             />
             {#if uploading}
@@ -1433,7 +1489,56 @@
                 </div>
             {/if}
         </div>
-      </form>
+        <!-- image style options -->
+        <div class="flex flex-col text-secondary-content font-input-mono text-[1rem] space-y-4">
+          <!-- background-position -->
+          <div class="flex flex-col space-y-2 ">
+            <button on:click={() => {openPosition = !openPosition; openSize = false; openRepeat = false}}>Background Position</button>
+            {#if openPosition}
+              <div in:fade class=" flex-col space-y-2">
+                <div class="flex space-x-2">
+                  <button on:click={() => setBackgroundPosition('left top')} class="btn">↖</button>
+                  <button on:click={() => setBackgroundPosition('center top')} class="btn">↑</button>
+                  <button on:click={() => setBackgroundPosition('right top')} class="btn">↗</button>
+                </div>
+                <div class="flex space-x-2">
+                  <button on:click={() => setBackgroundPosition('left')} class="btn">←</button>
+                  <button on:click={() => setBackgroundPosition('center')} class="btn">☯︎</button>
+                  <button on:click={() => setBackgroundPosition('right')} class="btn">→</button>
+                </div>
+                <div class="flex space-x-2">
+                  <button on:click={() => setBackgroundPosition('left bottom')} class="btn">↙</button>
+                  <button on:click={() => setBackgroundPosition('center bottom')} class="btn">↓</button>
+                  <button on:click={() => setBackgroundPosition('right bottom')} class="btn">↘</button>
+                </div>
+              </div>
+            {/if}
+          </div>
+          <!-- background-size -->
+          <button on:click={() => {openSize = !openSize; openPosition = false; openRepeat = false}}>Background Size</button>
+          {#if openSize}
+            <div in:fade class="flex space-x-2 flex-wrap">
+              <button on:click={() => setBackgroundSize('auto')} class="btn btn-xs">auto</button>
+              <button on:click={() => setBackgroundSize('contain')} class="btn btn-xs">contain</button>
+              <button on:click={() => setBackgroundSize('cover')} class="btn btn-xs">cover</button>
+              <input type="text" bind:value={customSize} placeholder="custom" on:change={() => setBackgroundSize(customSize)} class="btn"/>
+
+            </div> 
+          {/if}
+          <!-- background-repeat -->
+          <button on:click={() => {openRepeat = !openRepeat; openPosition = false; openSize = false}}>Background Repeat</button>
+          {#if openRepeat}
+            <div in:fade class="flex space-y-1 flex-wrap">
+              <button on:click={() => setBackgroundRepeat('repeat')} class="btn btn-xs">repeat</button>
+              <button on:click={() => setBackgroundRepeat('no-repeat')} class="btn btn-xs">no-repeat</button>
+              <button on:click={() => setBackgroundRepeat('space')} class="btn btn-xs">space</button>
+              <button on:click={() => setBackgroundRepeat('round')} class="btn btn-xs">round</button>
+              <button on:click={() => setBackgroundRepeat('repeat-x')} class="btn btn-xs">repeat-x</button>
+              <button on:click={() => setBackgroundRepeat('repeat-y')} class="btn btn-xs">repeat-y</button>
+            </div> 
+          {/if}
+        </div>
+      </div>
     {/if}
     <!-- end bg image upload here -->
   </div>
