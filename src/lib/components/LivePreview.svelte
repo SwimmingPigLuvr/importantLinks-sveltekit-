@@ -35,7 +35,7 @@
       url: string,
     };
     opacity: number;
-    style: "image" | "gradient" | "solid" | "radial gradient";
+    style: string;
   };
 
   let link: {

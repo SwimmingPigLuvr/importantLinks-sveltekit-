@@ -2735,3 +2735,11 @@ link toggles:
     checking and unchecking should update visibility 
     solution: updateVisibility('fill', !fill)
         the !fill is crucial
+
+
+figure out the styling conflict between fill and the rest:
+
+fill only works if it is the only one that is visible
+
+get the degree, fromHex, toHex vars inittiated for each: fill, border, style
+    

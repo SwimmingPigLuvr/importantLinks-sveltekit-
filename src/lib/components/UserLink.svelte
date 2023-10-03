@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import type { CustomTheme } from "$lib/theme";
   import Page from "../../routes/+page.svelte";
+  import { browserLocalPersistence } from "firebase/auth";
 
   export let customTheme: CustomTheme;
   export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
@@ -125,6 +126,104 @@
     font = customTheme.font;
   }
 
+  // gradient constructors
+  let fillGradient;
+  // values
+  let fillFromHex: string;
+  let fillToHex: string;
+  let fillDirection: string;
+  // opacity
+  let fillFromOpacity: number;
+  let fillToOpacity: number;
+
+  $: if (link?.fill?.style === 'gradient') {
+    fillGradient = link?.fill?.gradient;
+
+    fillFromHex = fillGradient?.from?.hex;
+    fillToHex = fillGradient?.to?.hex;
+
+    fillDirection = fillGradient?.direction;
+
+    fillToOpacity = fillGradient?.to?.opacity;
+    fillFromOpacity = fillGradient?.from?.opacity;
+
+  }
+
+  // gradient constructors for border
+  let borderGradient;
+  // values
+  let borderFromHex: string;
+  let borderToHex: string;
+  let borderDirection: string;
+  // opacity
+  let borderFromOpacity: number;
+  let borderToOpacity: number;
+
+  $: if (link?.border?.style === 'gradient') {
+      borderGradient = link?.border?.gradient;
+
+      borderFromHex = borderGradient?.from?.hex;
+      borderToHex = borderGradient?.to?.hex;
+
+      borderDirection = borderGradient?.direction;
+
+      borderToOpacity = borderGradient?.to?.opacity;
+      borderFromOpacity = borderGradient?.from?.opacity;
+  }
+
+  // gradient constructors for shadow
+  let shadowGradient;
+  // values
+  let shadowFromHex: string;
+  let shadowToHex: string;
+  let shadowDirection: string;
+  // opacity
+  let shadowFromOpacity: number;
+  let shadowToOpacity: number;
+
+  $: if (link?.shadow?.style === 'gradient') {
+      shadowGradient = link?.shadow?.gradient;
+
+      shadowFromHex = shadowGradient?.from?.hex;
+      shadowToHex = shadowGradient?.to?.hex;
+
+      shadowDirection = shadowGradient?.direction;
+
+      shadowToOpacity = shadowGradient?.to?.opacity;
+      shadowFromOpacity = shadowGradient?.from?.opacity;
+  }
+
+
+
+  const style: string[] = [];
+
+  $: if (link?.fill?.isVisible) {
+    switch (link?.fill?.style) {
+      case 'solid':
+        style.push(`background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}`);
+        break;
+      case 'gradient':
+        style.push(`background: linear-gradient(${fillDirection ?? '0deg'}, ${fillFromHex ?? `hsl(var(--p))`}, ${fillToHex ?? `hsl(var(--a))`})`);
+        break;
+      case 'image':
+        style.push(`
+          background-image: url(${link.fill.image.url});
+          background-size: ${link.fill.image.size ?? `auto`};
+          background-repeat: ${link.fill.image.repeat ?? `round`};
+          background-position: ${link.fill.image.position ?? `center`};
+        `)
+        break;
+      default:
+        break;
+    }
+  }
+
+  $: if (link?.border?.isVisible) {
+    
+  }
+
+  const combinedStyle = style.join('; ');
+
 </script>
 
 <a 
@@ -132,10 +231,12 @@
     style={`
       ${link.fill.style === 'solid' && link.fill.isVisible ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : ''}
       ${link.fill.style === 'gradient' && link.fill.isVisible ? `linear-gradient: 0deg, hsl(var(--s)), hsl(var(--a))` : ''}
-      ${link.fill.style === 'image' && link.fill.isVisible ? `background-image: url(${link.fill.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : ''}
+      ${link.fill.style === 'image' && link.fill.isVisible ? `background-image: url(${link.fill.image.url}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : ''}
       ${link.border.isVisible ? `border: ${link.border.width} ${link.border.style} ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
       ${link.shadow.style === 'soft' && link.shadow.isVisible ? `box-shadow: 0 10px 20px -12px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
       ${link.shadow.style === 'hard' && link.shadow.isVisible ? `box-shadow: 10px 10px 0px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
+
+      ${link.fill.isVisible ? (link.fill.style === 'solid' ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : '') : ''}
     `}    
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
@@ -150,7 +251,7 @@
     <!-- Link title -->
     <p 
     style={`
-      color: ${link.title.hex ? link.title.hex : `hsl(var(--pc))`} 
+      color: ${link.title.font.hex ? link.title.font.hex : `hsl(var(--pc))`} 
       ${previewMode ? 'transform: translateX(-1rem); font-size: 1rem;' : 'transform: translateX(-1.6rem);'}
     `}
     class='font-{font.family} {previewMode ? 'text-[0.5rem]' : 'text-[1rem]'}'>{title}
