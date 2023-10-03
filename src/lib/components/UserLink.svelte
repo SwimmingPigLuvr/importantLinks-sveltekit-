@@ -11,29 +11,6 @@
   export let title = 'some cool title';
   export let previewMode = false;
 
-  let background: {
-    gradient: {
-      from: {
-        hex: string,
-        opacity: number,
-      },
-      to: {
-        hex: string,
-        opacity: number,
-      },
-      direction: string
-    };
-    hex: string | undefined;
-    image: {
-      position: string,
-      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover",
-      url: string,
-    };
-    opacity: number;
-    style: "image" | "gradient" | "solid";
-  };
-
   let link: {
     border: {
       gradient: {
@@ -121,7 +98,6 @@
   };
 
   $: if (customTheme && customTheme.link) {
-    background = customTheme.background;
     link = customTheme.link;
     font = customTheme.font;
   }
@@ -193,51 +169,71 @@
       shadowFromOpacity = shadowGradient?.from?.opacity;
   }
 
+  let style: string[] = [];
+  let combinedStyle: string;
 
-
-  const style: string[] = [];
-
-  $: if (link?.fill?.isVisible) {
-    switch (link?.fill?.style) {
-      case 'solid':
-        style.push(`background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}`);
-        break;
-      case 'gradient':
-        style.push(`background: linear-gradient(${fillDirection ?? '0deg'}, ${fillFromHex ?? `hsl(var(--p))`}, ${fillToHex ?? `hsl(var(--a))`})`);
-        break;
-      case 'image':
-        style.push(`
-          background-image: url(${link.fill.image.url});
-          background-size: ${link.fill.image.size ?? `auto`};
-          background-repeat: ${link.fill.image.repeat ?? `round`};
-          background-position: ${link.fill.image.position ?? `center`};
-        `)
-        break;
-      default:
-        break;
-    }
-  }
-
-  $: if (link?.border?.isVisible) {
+$: if (link) {
+    let newStyles = [];
     
-  }
+    if (link?.fill?.isVisible) {
+        switch (link?.fill?.style) {
+            case 'solid':
+                newStyles.push(`background-color: ${link.fill.hex || `hsl(var(--p))`};`);
+                break;
+            case 'gradient':
+                newStyles.push(`background: linear-gradient(${fillDirection || '0deg'}, ${fillFromHex || `hsl(var(--p))`}, ${fillToHex || `hsl(var(--a))`});`);
+                break;
+            case 'image':
+                newStyles.push(`background-image: url(${link.fill.image.url}); background-size: ${link.fill.image.size || `auto`}; background-repeat: ${link.fill.image.repeat || `round`}; background-position: ${link.fill.image.position || `center`};`);
+                break;
+            default:
+                break;
+        }
+    }
 
-  const combinedStyle = style.join('; ');
+    if (link?.border?.isVisible) {
+        switch (link?.border?.style) {
+            case 'image':
+                newStyles.push(`border: ${link.border.width} solid; border-image: url(${link.border.image.url}) ${link.border.image.repeat};`);
+                break;
+            case 'solid':
+                newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+                break;
+            case 'gradient':
+                newStyles.push(`border: ${link.border.width} solid; border-image: linear-gradient(${borderDirection || `0deg`}, ${borderFromHex || `hsl(var(--s))`}, ${borderToHex || `hsl(var(--in))`});`);
+                break;
+            default: 
+                break;
+        }
+    }
+
+    if (link?.shadow?.isVisible) {
+        switch (link?.shadow?.style) {
+            case 'soft':
+                newStyles.push(`box-shadow: 0 10px 20px -12px ${link.shadow.hex || `hsl(var(--a))`};`);
+                break;
+            case 'hard':
+                newStyles.push(`box-shadow: 10px 10px 0px ${link.shadow.hex || `hsl(var(--a))`};`);
+                break;
+            default:
+                break;
+        }
+    }
+
+    style = newStyles;
+    combinedStyle = style.join('; ');
+
+    console.log("style array:", style);
+    console.log("combostyle", combinedStyle);
+}
+
+
 
 </script>
 
 <a 
   href="{url}" 
-    style={`
-      ${link.fill.style === 'solid' && link.fill.isVisible ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : ''}
-      ${link.fill.style === 'gradient' && link.fill.isVisible ? `linear-gradient: 0deg, hsl(var(--s)), hsl(var(--a))` : ''}
-      ${link.fill.style === 'image' && link.fill.isVisible ? `background-image: url(${link.fill.image.url}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : ''}
-      ${link.border.isVisible ? `border: ${link.border.width} ${link.border.style} ${link.border.hex ? link.border.hex : 'hsl(var(--a))'};` : ''}
-      ${link.shadow.style === 'soft' && link.shadow.isVisible ? `box-shadow: 0 10px 20px -12px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
-      ${link.shadow.style === 'hard' && link.shadow.isVisible ? `box-shadow: 10px 10px 0px ${link.shadow.hex ? link.shadow.hex : 'hsl(var(--a))'};` : ''}
-
-      ${link.fill.isVisible ? (link.fill.style === 'solid' ? `background-color: ${link.fill.hex ? link.fill.hex : `hsl(var(--p))`}` : '') : ''}
-    `}    
+    style={`${combinedStyle}`} 
     class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
      hover:translate-x-1 hover:translate-y-1 

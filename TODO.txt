@@ -2742,4 +2742,33 @@ figure out the styling conflict between fill and the rest:
 fill only works if it is the only one that is visible
 
 get the degree, fromHex, toHex vars inittiated for each: fill, border, style
-    
+
+
+border styles
+
+css to apply 
+
+all styles besides image and gradient:
+    `border-color: ${link.border.hex}`
+    `border-style: ${link.border.style}`
+    `border-width: ${link.border.width}`
+
+if border style = image:
+    `border-image: url(${linke.border.image.url}) ${link.border.image.repeat}`
+    `border-style: solid`
+    `border-width: ${link.border.width}`
+
+    gradient:
+    `border-image: linear-gradient(${borderDirection}, ${borderFromHex}, ${borderToHex})`
+    `border-style: solid`
+    `border-width: ${link.border.width}`
+
+now just keep going with shadow
+
+
+
+border image repeat options
+stretch
+repeat
+round
+space
