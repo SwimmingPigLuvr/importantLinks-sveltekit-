@@ -34,7 +34,7 @@ export interface CustomTheme {
       url: string,
     };
     opacity: number;
-    style: "image" | "gradient" | "solid";
+    style: string;
   };
   link: {
     border: {

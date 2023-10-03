@@ -35,7 +35,7 @@
       url: string,
     };
     opacity: number;
-    style: "image" | "gradient" | "solid";
+    style: "image" | "gradient" | "solid" | "radial gradient";
   };
 
   let link: {
@@ -231,7 +231,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
           ${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} 
           color: ${font?.hex? font?.hex : `hsl(var(--a))`}; 
           ${background?.style === 'image' ? `background-image: url(${background.image.url}); background-size: ${background.image.size}; background-repeat: ${background.image.repeat}; background-position: ${background.image.position};` : ''} 
-          ${background?.style === 'solid' ? `background-color: ${background?.hex? background?.hex : `hsl(var(--s))`};` : (background?.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex});` : '')}
+          ${background?.style === 'solid' ? `background-color: ${background?.hex? background?.hex : `hsl(var(--s))`};` : (background?.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex? fromHex : 'hsl(var(--a))'}, ${toHex? toHex : 'hsl(var(--p))'});` : (background?.style === 'radial gradient' ? `background: radial-gradient(${fromHex? fromHex : 'hsl(var(--a))'}, ${toHex? toHex : 'hsl(var(--p))' })` : ''))}
           
         `}
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} flex flex-col justify-start overflow-auto">

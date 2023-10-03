@@ -2684,3 +2684,54 @@ add a teeny tiny toast notification that lets the user know that their change wa
 keep trach of user selected value so that i can style that differently that way the user doesn't have to remember what they have
 
 let user fill in their own css where applicable. i want to give them a sense of accomplishment. i want them to feel smart for using my app
+
+
+next todos:
+    ui for background image settings.
+    get rid of old color selection methods
+    show save messages for every change made.
+    delete change message after 1s
+
+
+october 2
+keep updating the color selections
+
+
+
+october 3
+
+site inspection notes:
+    pressing the gradient button resets the style to 'gradient'
+        but we want to be able to keep style as 'radial gradient' if that's what it was before
+            solution: if style === 'gradient' | 'radial gradient', style = style
+    should the settings for the given background style just be opened?
+        that way they won't even have to be toggled by the user
+change saved message needs to self delete after 0.5s.
+    copy the one from monkeytype
+radial gradient needs to be reflected in the gradient preview
+    if i am going to keep the line at the bottom that restates all of the users choices,
+        i think that i should make it more of a declaration:
+            "Linear Gradient from color1 to color2 at 0deg."
+        or just show the css line:
+            background: linear-gradient(0deg, #color1, #color2)
+        or  background: radial-gradient(#color1, #color2)
+
+yes lookiing back at the background styles div I think that the styles should be open all the time to the corresponding style.
+although the image style should only set the background style to image after the image is uploaded
+    saving an image is too much of a commitment to keep changing it every time the user presses a button
+
+updateStyle() && setStyle() are redundant. updateStyle() just handles bgs anyways so let's consolidate them into setStyle
+
+updatedSuccessfully needs to auto delete after 0.5s as well
+
+now i need to apply the same logic to showing the fill border and shadow options
+
+not sure how but i broke it
+
+
+
+link toggles:
+    bind:checked={fill} stays stuck on fill because it is reactively using the db value to stay the same always all of the time every time
+    checking and unchecking should update visibility 
+    solution: updateVisibility('fill', !fill)
+        the !fill is crucial
