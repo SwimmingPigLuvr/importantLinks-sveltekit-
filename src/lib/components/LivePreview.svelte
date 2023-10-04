@@ -14,6 +14,7 @@
   export let bio: string = '';
   export let links: any[] = [];
   export let theme: string = '';
+  let previewMode: boolean = true;
 
   let background: {
     gradient: {
@@ -164,7 +165,6 @@
     showData = !showData;
   }
 
-  $: previewMode = !showPreview;
 
   onMount(() => { 
       mounted = true;
@@ -263,6 +263,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
                 title={link.title}
                 url={link.url}
                 customTheme={customTheme}
+                previewMode={previewMode}
               />
             </li>
           {/each}

@@ -28,6 +28,7 @@ make sure that theme is saved to firestore
 
 
 
+
 loading state
 
 
@@ -2772,3 +2773,23 @@ stretch
 repeat
 round
 space
+
+
+
+styles are all reactive and working well together
+
+    todo:
+        update color pickers.
+        jsut like the above divs:
+            only show the options for the given styles
+
+        update handling the styles for every single border style
+        fill image upload
+        border image upload
+
+todo:
+    center link text in the livepreview
+        and possibly all other instances
+
+    link gradient should be able to have opacities because that would be cool
+    background still don't deserve opacities because that wouldn't make sense

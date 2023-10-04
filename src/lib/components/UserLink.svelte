@@ -9,7 +9,7 @@
   export let iconURLalt = 'ha';
   export let url = 'foo';
   export let title = 'some cool title';
-  export let previewMode = false;
+  export let previewMode: boolean;
 
   let link: {
     border: {
@@ -222,9 +222,6 @@ $: if (link) {
 
     style = newStyles;
     combinedStyle = style.join('; ');
-
-    console.log("style array:", style);
-    console.log("combostyle", combinedStyle);
 }
 
 
@@ -234,7 +231,7 @@ $: if (link) {
 <a 
   href="{url}" 
     style={`${combinedStyle}`} 
-    class="{previewMode ? 'h-[43px]  p-[0.1rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
+    class="{previewMode ? 'h-[40px]  p-[0.2rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
      hover:translate-x-1 hover:translate-y-1 
      flex justify-between m-auto items-center no-underline">
@@ -247,10 +244,9 @@ $: if (link) {
     <!-- Link title -->
     <p 
     style={`
-      color: ${link.title.font.hex ? link.title.font.hex : `hsl(var(--pc))`} 
-      ${previewMode ? 'transform: translateX(-1rem); font-size: 1rem;' : 'transform: translateX(-1.6rem);'}
+      color: ${link.title.font.hex ? `hsl(var(--pc))` : ''} 
     `}
-    class='font-{font.family} {previewMode ? 'text-[0.5rem]' : 'text-[1rem]'}'>{title}
+    class='font-{font.family} {previewMode ? 'text-[1.23rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
     </p>
 </a>
 

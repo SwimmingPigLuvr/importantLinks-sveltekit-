@@ -258,6 +258,10 @@
   let border: boolean;
   let shadow: boolean;
 
+  let solidLinkFill: boolean;
+  let gradientLinkFill: boolean;
+  let imageLinkFill: boolean;
+
   async function updateVisibility(mode: string, isVisible: boolean) {
     const batch = writeBatch(db);
 
@@ -511,6 +515,24 @@
     shadow = true;
   } else {
     shadow = false;
+  }
+
+  $: if (link?.fill?.style === 'solid') {
+    solidLinkFill = true;
+  } else {
+    solidLinkFill = false;
+  }
+
+  $: if (link?.fill?.style === 'gradient') {
+    gradientLinkFill = true;
+  } else {
+    gradientLinkFill = false;
+  }
+
+  $: if (link?.fill?.style === 'image') {
+    imageLinkFill = true;
+  } else {
+    imageLinkFill = false;
   }
 
 
@@ -939,42 +961,85 @@
           }
         }, { merge: true });
         break;
-      case 'link.fill gradient':
+      case 'link gradient from':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               fill: {
-                style: 'gradient',
-                hex: `${fromHex}, ${toHex}, ${direction}`
+                gradient: {
+                  from: {hex: hex, opacity: opacity}
+                }
               }
             }
           }
         }, { merge: true });
         break;
-      case 'link.border gradient':
+      case 'link gradient to':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              fill: {
+                gradient: {
+                  to: {hex: hex, opacity: opacity}
+                }
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'border gradient from':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               border: {
-                hex: `${fromHex}, ${toHex}, ${direction}`
+                gradient: {
+                  from: {hex: hex, opacity: opacity}
+                }
               }
             }
           }
         }, { merge: true });
         break;
-      case 'link.shadow gradient':
+      case 'border gradient to':
         batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: {
             link: {
               border: {
-                hex: `${fromHex}, ${toHex}, ${direction}`
+                gradient: {
+                  to: {hex: hex, opacity: opacity}
+                }
               }
             }
           }
         }, { merge: true });
         break;
-        default:
-        console.log('error: unidentified mode.');
+      case 'shadow gradient from':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              shadow: {
+                gradient: {
+                  from: {hex: hex, opacity: opacity}
+                }
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      case 'shadow gradient to':
+        batch.set(doc(db, `users/${$user!.uid}`), {
+          customTheme: {
+            link: {
+              shadow: {
+                gradient: {
+                  to: {hex: hex, opacity: opacity}
+                }
+              }
+            }
+          }
+        }, { merge: true });
+        break;
+      default:
         return;
     }
     await batch.commit();
@@ -1634,88 +1699,250 @@
               </div>
             </div>
 
-            <!-- color selection -->
+            <!-- solid color selection -->
+            {#if solidLinkFill}
             <div 
-              in:fly={{x: 20, duration: 400, easing: backOut, delay: 500}}
-              out:blur
-              class="flex justify-start space-x-10 0">
-
+              in:slide={{duration: 500, easing: cubicInOut}}
+              out:slide={{duration: 500, easing: cubicInOut}}
+              class="flex justify-start space-x-10">
               
-              <!-- button color -->
+              <!-- link color -->
               <div class="">
                 <label for="Fill Color" class="label">
                   <span class="label-text font-input-mono text-right">Fill Color</span>
                 </label>      
                 <div id="Fill Color" class="join">
 
-                    <!-- link fill value -->
-                    <button 
-                      style={`background-color: ${link.fill.hex? link.fill.hex : 'hsl(var(--a))'}`}
-                      on:mouseenter={() => {if (link.fill.hex !== '') {showRemoveFill = true}}}
-                      on:mouseleave={() => showRemoveFill = false}
-                      on:click={() => {updateColor('link fill', '', '')}} 
-                      class="btn w-1/4 rounded-md relative">
-                      {#if showRemoveFill}
-                        <div
-                          in:slide out:blur={{amount: 100}}
-                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
-                      {/if}
-                    </button>
-
-                    <!-- select value -->
-                    <select placeholder={bcValue} bind:value={bcValue} on:change={() => updateColor('link fill', bcValue, bcShade)} class="select select-bordered">
-                      <option>slate</option>
-                      <option>gray</option>
-                      <option>zinc</option>
-                      <option>neutral</option>
-                      <option>stone</option>
-                      <option>red</option>
-                      <option>orange</option>
-                      <option>amber</option>
-                      <option>yellow</option>
-                      <option>lime</option>
-                      <option>green</option>
-                      <option>emerald</option>
-                      <option>teal</option>
-                      <option>cyan</option>
-                      <option>sky</option>
-                      <option>blue</option>
-                      <option>indigo</option>
-                      <option>violet</option>
-                      <option>purple</option>
-                      <option>fuchsia</option>
-                      <option>pink</option>
-                      <option>rose</option>
-                    </select>
-
-                    <!-- select shade -->
-                    <select bind:value={bcShade} on:change={() => updateColor('link fill', bcValue, bcShade)} class="select select-bordered">
-                      <option>50</option>
-                      <option>100</option>
-                      <option>200</option>
-                      <option>300</option>
-                      <option>400</option>
-                      <option>500</option>
-                      <option>600</option>
-                      <option>700</option>
-                      <option>800</option>
-                      <option>900</option>
-                      <option>950</option>
-                    </select>
+                  <input 
+                    type="color" 
+                    id="colorInput"
+                    style="width: 3.1rem; height: 3rem; border: 1px ridge {link?.fill?.hex};" 
+                    bind:value={link.fill.hex} 
+                    on:mouseenter={() => {if (link?.fill?.hex !== '') {showRemoveBackground = true}}}
+                    on:mouseleave={() => showRemoveBackground = false}
+                    on:change={() => updateColor('link fill', link.fill.hex, link.fill.opacity)}
+                    class="relative"
+                  >
+                  {#if showRemoveBackground}
+                  <button
+                    in:slide out:blur={{amount: 100}}
+                    on:click={() => {updateColor('link fill', '', 100)}} 
+                    class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+                  {/if}
+                  <input 
+                    type="text" 
+                    placeholder="#12345" 
+                    bind:value={link.fill.hex} 
+                    on:change={() => updateColor('link fill', link.fill.hex, link.fill.opacity)} 
+                    class="input text-center w-[13rem]"
+                  >
+                    
                 </div>
               </div>
 
               <!-- opacity -->
               <div class="form-control">
-                <label for="opacity" class="label">
+                <label for="link fillopacity" class="label">
                   <span class="label-text font-input-mono">Opacity</span>
                 </label>
                 <label class="input-group">
-                  <input type="text" min="0" max="100" id="opacity" bind:value={bcOpacity} on:change={() => updateOpacity('link fill')} class="input input-bordered w-1/2" />
+                  <input type="text" min="0" max="100" id="opacity" bind:value={link.fill.opacity} on:change={() => updateOpacity('link fill')} class="input input-bordered w-1/2" />
                   <span>%</span>
                 </label>
               </div>
             </div>
+            {/if}
+
+            {#if gradientLinkFill}
+              <!-- entire gradient div -->
+              <!-- radial? or linear? -->
+            <div 
+              in:slide={{ duration: 1000, easing: cubicInOut }}
+              out:slide={{ duration: 1000, easing: cubicInOut }}
+              class="flex-col flex space-y-4 my-4">
+              <div class="flex space-x-4">
+                <button class:bg-success={link?.fill?.style === 'gradient'} on:click={() => setStyle('fill', 'gradient')} class="btn btn-outline">Linear</button>
+                <button class:bg-success={link?.fill?.style === 'radial gradient'} on:click={() => setStyle('fill', 'radial gradient')} class="btn btn-outline">Radial</button>
+              </div>
+
+              <!-- colors -->
+              <div class="flex">
+                <!-- from color -->
+                <div class="flex justify-start space-x-4">
+                  
+                  <!-- from color -->
+                  <div>
+                    <label for="From" class="label">
+                      <span class="label-text font-input-mono text-[1rem]">From</span>
+                    </label>      
+                    <div id="From" class="join">
+
+                        <!-- from input -->
+                        <input 
+                          type="color" 
+                          id="colorInput"
+                          style="width: 3.1rem; height: 3rem; border: 1px ridge {link?.fill?.gradient?.from?.hex};" 
+                          bind:value={link.fill.gradient.from.hex} 
+                          on:mouseenter={() => {if (link?.fill?.gradient?.from?.hex !== '') {showRemoveBackground = true}}}
+                          on:mouseleave={() => showRemoveBackground = false}
+                          on:change={() => updateColor('link gradient from', link?.fill?.gradient?.from?.hex, link?.fill?.gradient?.from?.opacity)}
+                          class="relative">
+
+                        <!-- remove color to revert back to theme color -->
+                        {#if showRemoveBackground}
+                        <button
+                          in:slide out:blur={{amount: 100}}
+                          on:click={() => {updateColor('link gradient from', '', 100)}} 
+                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+                        {/if}
+
+                        <!-- hex input -->
+                        <input 
+                          type="text" 
+                          placeholder="#12345" 
+                          bind:value={link.fill.gradient.from.hex} 
+                          on:change={() => updateColor('link gradient from', link?.fill?.gradient?.from?.hex)} 
+                          class="input text-center w-1/2">
+                      </div>
+                    </div>
+
+                  <!-- no opacities for backgrounds until further notice -->
+                  <!-- opacity -->
+                  <!-- <div class="form-control">
+                    <label for="opacity" class="label">
+                      <span class="label-text font-input-mono">Opacity</span>
+                    </label>
+                    <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity might cause background to reflect diffently in preview than it will on your site"`}>
+                    <label class="input-group">
+                        <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.from.opacity} on:change={() => updateOpacity('background', background?.gradient?.from?.opacity)} class="input input-bordered w-[4rem]" />
+                      <span>%</span>
+                    </label>
+                    </div>
+                  </div> -->
+
+                </div>
+
+                <!-- to color -->
+                <div class="flex justify-start space-x-4">
+
+                  <!-- to color -->
+                  <div>
+                    <label for="to Color" class="label">
+                      <span class="label-text font-input-mono text-[1rem]">To</span>
+                    </label>      
+                    <div id="Background Color" class="join">
+
+                        <!-- show buttoncolor / clikc for color picker -->
+                          <input 
+                            type="color" 
+                            id="colorInput"
+                            style="width: 3.1rem; height: 3rem; border: 1px ridge {link?.fill?.gradient?.to?.hex};" 
+                            bind:value={link.fill.gradient.to.hex} 
+                            on:mouseenter={() => {if (link?.fill?.gradient?.to?.hex !== '') {showRemoveBackground = true}}}
+                            on:mouseleave={() => showRemoveBackground = false}
+                            on:change={() => updateColor('link gradient to', link?.fill?.gradient?.to?.hex, link?.fill?.gradient?.to?.opacity)} 
+                            class="relative"
+                          >
+                          {#if showRemoveBackground}
+                          <button
+                            in:slide out:blur={{amount: 100}}
+                            on:click={() => {updateColor('background gradient to', '', '')}} 
+                            class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+                          {/if}
+                      <input 
+                        type="text" 
+                        placeholder="#12345" 
+                        bind:value={link.fill.gradient.to.hex} 
+                        on:change={() => updateColor('link gradient to', link?.fill?.gradient?.to?.hex, link?.fill?.gradient?.to?.opacity)} 
+                        class="input text-center w-1/2"
+                      >
+
+                        
+
+                        
+                    </div>
+                  </div>
+
+                  <!-- opacity -->
+                  <!-- <div class="form-control">
+                    <label for="opacity" class="label">
+                      <span class="label-text font-input-mono">Opacity</span>
+                    </label>
+                    <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
+
+                    <label class="input-group">
+                        <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.to.opacity} on:change={() => updateOpacity('background', background?.gradient?.to?.opacity)} class="input input-bordered w-[4rem]" />
+                      <span>%</span>
+                    </label>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+              <!-- gradient direction -->
+              <div class="flex flex-col justify-start">
+
+                <!-- preview + selection container -->
+                <div class="flex justify-start space-x-4">
+
+                  <!-- gradient preview -->
+                  <div 
+                    style={`background: linear-gradient(${backgroundDirection}, ${backgroundFromHex}, ${backgroundToHex});`}
+                    class="w-60 border-2 mt-10 border-primary rounded-xl max-w-md h-40 ">
+                  </div>
+                  <!-- gradient direction -->
+                  <div class="flex flex-col mt-4">
+                    <label for="Gradient Direction" class="label">
+                      <span class="label-text font-input-mono">Direction <span class="text-info">{backgroundDirection}°</span></span>
+                    </label>
+                  <div class="flex">
+
+                  <div id="Gradient Direction" class="flex flex-col text-white  join">
+                    <div class="join text-white flex justify-evenly">
+                      <button on:click={() => setGradientDirection('background', 315)} class="btn bg-opacity-0 text-5xl">↖</button>
+                      <button on:click={() => setGradientDirection('background', 0)} class="btn bg-opacity-0 text-5xl">↑</button>
+                      <button on:click={() => setGradientDirection('background', 4)} class="btn bg-opacity-0 text-5xl">↗</button>
+                    </div>
+                    <div class="join flex justify-evenly">
+                      <button on:click={() => setGradientDirection('background', 270)} class="btn bg-opacity-0 text-5xl">←</button>
+                      <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
+                      <button on:click={() => setGradientDirection('background', 90)} class="btn bg-opacity-0 text-5xl">→</button>
+                    </div>
+                    <div class="join flex justify-evenly">
+                      <button on:click={() => setGradientDirection('background', 215)} class="btn bg-opacity-0 text-5xl">↙</button>
+                      <button on:click={() => setGradientDirection('background', 180)} class="btn bg-opacity-0 text-5xl">↓</button>
+                      <button on:click={() => setGradientDirection('background', 135)} class="btn bg-opacity-0 text-5xl">↘</button>
+                    </div>
+                  </div>
+                  </div>
+
+                  
+                  </div>
+
+
+                </div>
+
+
+                <!-- input gradient values -->
+                
+                <div class="font-input-mono mt-4 bg-accent p-2 px-4">
+                  <p>
+                    from 
+                    <input 
+                      type="text" 
+                      class="text-info inline-input w-[5.75rem]" 
+                      bind:value={backgroundFromHex} 
+                    />, 
+                    to 
+                    <input type="text" class="text-info inline-input w-[5.75rem]" bind:value={backgroundToHex} />, 
+                    <input type="text" class="text-info inline-input w-[4rem]" bind:value={backgroundDirection} />
+                  </p>
+                </div>
+              </div>
+
+            </div>
+            <!-- end of entire gradient div -->
+            {/if}
+
           </div>
           {/if}
         </div>
