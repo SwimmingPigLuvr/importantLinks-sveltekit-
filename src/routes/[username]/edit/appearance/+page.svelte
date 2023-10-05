@@ -1330,7 +1330,8 @@
                 class="input text-center w-[13rem]">
               {#if background?.hex !== ''}
                 <button
-                  in:slide out:blur={{amount: 100}}
+                  in:fly={{y: 10, duration: 200, easing: backOut}} 
+                  out:blur={{amount: 10, duration: 1000}}
                   on:mouseenter={() => showRemoveBackground = true}
                   on:mouseleave={() => showRemoveBackground = false}
                   on:click={() => {updateColor('background', '', 100)}} 
@@ -1339,8 +1340,8 @@
                 </button>
                 {#if showRemoveBackground}
                   <p 
-                    in:fade
-                    out:fade
+                    in:slide={{duration: 500, easing: backOut}}
+                    out:blur={{amount: 10, duration: 1000}}
                     class="absolute -top-10 -right-1/3 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove custom color?</p>
                 {/if}
               {/if}
@@ -1402,7 +1403,7 @@
                   <!-- remove color to revert back to theme color -->
                 {#if background?.gradient?.from?.hex !== ''}
                   <button
-                    in:slide out:blur={{amount: 100}}
+                    in:fly={{y: 10, duration: 200, easing: backOut}} out:blur={{amount: 100}}
                     on:mouseenter={() => showRemoveFromColor = true}
                     on:mouseleave={() => showRemoveFromColor = false}
                     on:click={() => {updateColor('background gradient from', '', 100)}} 
@@ -1466,7 +1467,7 @@
                   class="input text-center w-1/2">
                 {#if background?.gradient?.to?.hex !== ''}
                   <button
-                    in:slide out:blur={{amount: 100}}
+                    in:fly={{y: 10, duration: 200, easing: backOut}} out:blur={{amount: 100}}
                     on:mouseenter={() => showRemoveToColor = true}
                     on:mouseleave={() => showRemoveToColor = false}
                     on:click={() => {updateColor('background gradient to', '', '')}} 
@@ -1509,36 +1510,39 @@
           <!-- gradient preview -->
           <div 
             style={`background: linear-gradient(${backgroundDirection}, ${backgroundFromHex}, ${backgroundToHex});`}
-            class="w-60 border-2 mt-10 border-primary rounded-xl max-w-md h-40 ">
+            class="w-full border-2 mt-10 border-primary rounded-xl h-40 ">
           </div>
+          {#if background?.style === 'gradient'}
           <!-- gradient direction -->
-          <div class="flex flex-col mt-4">
+          <div 
+            in:fade={{duration: 300}}
+            out:fade={{duration: 300}}
+            class="flex flex-col mt-4">
             <label for="Gradient Direction" class="label">
               <span class="label-text font-input-mono">Direction <span class="text-info">{backgroundDirection}°</span></span>
             </label>
-          <div class="flex">
+            <div class="flex">
 
-          <div id="Gradient Direction" class="flex flex-col text-white  join">
-            <div class="join text-white flex justify-evenly">
-              <button on:click={() => setGradientDirection('background', 315)} class="btn bg-opacity-0 text-5xl">↖</button>
-              <button on:click={() => setGradientDirection('background', 0)} class="btn bg-opacity-0 text-5xl">↑</button>
-              <button on:click={() => setGradientDirection('background', 4)} class="btn bg-opacity-0 text-5xl">↗</button>
+            <div id="Gradient Direction" class="flex flex-col text-white  join">
+              <div class="join text-white flex justify-evenly">
+                <button class:bg-info={background?.gradient?.direction === '315deg'} on:click={() => setGradientDirection('background', 315)} class="btn-outline btn text-5xl">↖</button>
+                <button class:bg-info={background?.gradient?.direction === '0deg'} on:click={() => setGradientDirection('background', 0)} class="btn btn-outline text-5xl">↑</button>
+                <button class:bg-info={background?.gradient?.direction === '45deg'} on:click={() => setGradientDirection('background', 45)} class="btn btn-outline text-5xl">↗</button>
+              </div>
+              <div class="join flex justify-evenly">
+                <button class:bg-info={background?.gradient?.direction === '270deg'} on:click={() => setGradientDirection('background', 270)} class="btn btn-outline text-5xl">←</button>
+                <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
+                <button class:bg-info={background?.gradient?.direction === '90deg'} on:click={() => setGradientDirection('background', 90)} class="btn btn-outline text-5xl">→</button>
+              </div>
+              <div class="join flex justify-evenly">
+                <button class:bg-info={background?.gradient?.direction === '215deg'} on:click={() => setGradientDirection('background', 215)} class="btn btn-outline text-5xl">↙</button>
+                <button class:bg-info={background?.gradient?.direction === '180deg'} on:click={() => setGradientDirection('background', 180)} class="btn btn-outline text-5xl">↓</button>
+                <button class:bg-info={background?.gradient?.direction === '135deg'} on:click={() => setGradientDirection('background', 135)} class="btn btn-outline text-5xl">↘</button>
+              </div>
             </div>
-            <div class="join flex justify-evenly">
-              <button on:click={() => setGradientDirection('background', 270)} class="btn bg-opacity-0 text-5xl">←</button>
-              <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
-              <button on:click={() => setGradientDirection('background', 90)} class="btn bg-opacity-0 text-5xl">→</button>
-            </div>
-            <div class="join flex justify-evenly">
-              <button on:click={() => setGradientDirection('background', 215)} class="btn bg-opacity-0 text-5xl">↙</button>
-              <button on:click={() => setGradientDirection('background', 180)} class="btn bg-opacity-0 text-5xl">↓</button>
-              <button on:click={() => setGradientDirection('background', 135)} class="btn bg-opacity-0 text-5xl">↘</button>
             </div>
           </div>
-          </div>
-
-          
-          </div>
+          {/if}
 
 
         </div>
@@ -1546,18 +1550,29 @@
 
         <!-- input gradient values -->
         
-        <div class="font-input-mono mt-4 bg-accent p-2 px-4">
+        <div class="text-[1.5rem] font-input-mono mt-4 border-accent bg-primary bg-opacity-100 text-primary-content border-2 p-4 px-6 flex flex-col space-y-4">
+          {#if background?.style === 'gradient'}
+            <p>Linear Gradient</p>
+          {/if}
+          {#if background?.style === 'radial gradient'}
+            <p>Radial Gradient</p>
+          {/if}
+
           <p>
-            from 
+            from:
             <input 
               type="text" 
               class="text-info inline-input w-[5.75rem]" 
               bind:value={backgroundFromHex} 
-            />, 
-            to 
-            <input type="text" class="text-info inline-input w-[5.75rem]" bind:value={backgroundToHex} />, 
-            <input type="text" class="text-info inline-input w-[4rem]" bind:value={backgroundDirection} />
+            />,
           </p>
+          <p>
+            to: 
+            <input type="text" class="text-info inline-input w-[5.75rem]" bind:value={backgroundToHex} />, 
+          </p>
+          {#if background?.style === 'gradient'}
+            <input type="text" class="text-info inline-input w-[7rem]" bind:value={backgroundDirection} />
+          {/if}
         </div>
       </div>
 

@@ -2808,3 +2808,28 @@ then then then what i really want to do is turn the gradient into a cool declari
 and update the ui based on the gradient style: linear vs. radial... vs. conical???
 
 gradient preview is not showing up idk idk
+
+show active button states for all active styles
+
+if small scrn stack like this
+
+Linear Gradient
+from: primary,
+to: secondary,
+90deg
+
+i like the idea of restating the gradient but it needs to be way smaller it needs to be an afterthought
+
+
+do i want to go style by style for the fill border shadow combo stack oro or or or or or
+do i want to hit each color picker to get this over with
+
+i need to start thinking more modually. i need to make all of these crazy shits into components
+
+october 5 goal.
+
+image upload and image style components
+
+that way all of the relevant functions are called fron the component
+
+as a matter of fact let's work on this task right now because im sick of repeating html shit over and over and over and over and over
