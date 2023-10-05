@@ -346,6 +346,8 @@
   let showBackUp: boolean = false;
 
   let showRemoveBackground: boolean = false;
+  let showRemoveFromColor: boolean = false;
+  let showRemoveToColor: boolean = false;
   let showRemoveFill: boolean = false;
   let showRemoveBorder: boolean = false;
   let showRemoveShadow: boolean = false;
@@ -1308,32 +1310,43 @@
         <label for="Background Color" class="label">
           <span class="label-text font-input-mono">Background Color</span>
         </label>      
-        <div id="Background Color" class="join">
+        <div id="Background Color" class="flex flex-col">
 
             <!-- show buttoncolor / clikc for color picker -->
+            <div class="flex relative">
               <input 
                 type="color" 
                 id="colorInput"
                 style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.hex};" 
                 bind:value={background.hex} 
-                on:mouseenter={() => {if (background?.hex !== '') {showRemoveBackground = true}}}
-                on:mouseleave={() => showRemoveBackground = false}
                 on:change={() => updateColor('background', background.hex, background.opacity)}
                 class="relative"
               >
-              {#if showRemoveBackground}
-              <button
-                in:slide out:blur={{amount: 100}}
-                on:click={() => {updateColor('background', '', 100)}} 
-                class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+              <input 
+                type="text" 
+                placeholder="#12345" 
+                bind:value={background.hex} 
+                on:change={() => updateColor('background', background.hex, background.opacity)} 
+                class="input text-center w-[13rem]">
+              {#if background?.hex !== ''}
+                <button
+                  in:slide out:blur={{amount: 100}}
+                  on:mouseenter={() => showRemoveBackground = true}
+                  on:mouseleave={() => showRemoveBackground = false}
+                  on:click={() => {updateColor('background', '', 100)}} 
+                  class="absolute -top-1 -right-1 btn btn-xs font-input-mono">
+                    ❌
+                </button>
+                {#if showRemoveBackground}
+                  <p 
+                    in:fade
+                    out:fade
+                    class="absolute -top-10 -right-1/3 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove custom color?</p>
+                {/if}
               {/if}
-          <input 
-            type="text" 
-            placeholder="#12345" 
-            bind:value={background.hex} 
-            on:change={() => updateColor('background', background.hex, background.opacity)} 
-            class="input text-center w-[13rem]"
-          >
+            </div>
+              
+              
 
             
 
@@ -1368,34 +1381,44 @@
             <label for="From" class="label">
               <span class="label-text font-input-mono text-[1rem]">From</span>
             </label>      
-            <div id="From" class="join">
-
+            <div id="From" class="flex flex-col">
+              <div class="flex relative">
                 <!-- from input -->
                 <input 
                   type="color" 
                   id="colorInput"
-                  style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.gradient?.from?.hex};" 
+                  style={`width: 3.1rem; height: 3rem; background-color: ${background?.gradient?.to?.hex ?? `hsl(var(--a))`};`}
                   bind:value={background.gradient.from.hex} 
                   on:mouseenter={() => {if (background?.gradient?.from?.hex !== '') {showRemoveBackground = true}}}
                   on:mouseleave={() => showRemoveBackground = false}
                   on:change={() => updateColor('background gradient from', background?.gradient?.from?.hex, background?.gradient?.from?.opacity)}
                   class="relative">
+                <input 
+                  type="text" 
+                  placeholder="#12345" 
+                  bind:value={background.gradient.from.hex} 
+                  on:change={() => updateColor('background gradient from', background?.gradient?.from?.hex, background?.gradient?.from?.opacity)} 
+                  class="input text-center w-1/2">
+                  <!-- remove color to revert back to theme color -->
+                {#if background?.gradient?.from?.hex !== ''}
+                  <button
+                    in:slide out:blur={{amount: 100}}
+                    on:mouseenter={() => showRemoveFromColor = true}
+                    on:mouseleave={() => showRemoveFromColor = false}
+                    on:click={() => {updateColor('background gradient from', '', 100)}} 
+                    class="absolute -top-1 right-[4.69rem] btn btn-xs font-input-mono">
+                      ❌
+                  </button>
+                  {#if showRemoveFromColor}
+                    <p 
+                      in:fade
+                      out:fade
+                      class="absolute -top-10 -right-4 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove first color?</p>
+                  {/if}
+                {/if}
+                </div>
 
-                <!-- remove color to revert back to theme color -->
-                <!-- {#if showRemoveBackground} -->
-                <button
-                  in:slide out:blur={{amount: 100}}
-                  on:click={() => {updateColor('background gradient from', '', '')}} 
-                  class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
-                <!-- {/if} -->
-
-                <!-- hex input -->
-              <input 
-                type="text" 
-                placeholder="#12345" 
-                bind:value={background.gradient.from.hex} 
-                on:change={() => updateColor('background', background?.gradient?.from?.hex)} 
-                class="input text-center w-1/2">
+              
             </div>
           </div>
 
@@ -1423,35 +1446,41 @@
             <label for="to Color" class="label">
               <span class="label-text font-input-mono text-[1rem]">To</span>
             </label>      
-            <div id="Background Color" class="join">
-
+            <div id="to Color" class="flex flex-col">
+              <div class="flex relative">
                 <!-- show buttoncolor / clikc for color picker -->
-                  <input 
-                    type="color" 
-                    id="colorInput"
-                    style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.gradient?.to?.hex};" 
-                    bind:value={background.gradient.to.hex} 
-                    on:mouseenter={() => {if (background?.gradient?.to?.hex !== '') {showRemoveBackground = true}}}
-                    on:mouseleave={() => showRemoveBackground = false}
-                    on:change={() => updateColor('background gradient to', background?.gradient?.to?.hex, background?.gradient?.to?.opacity)} 
-                    class="relative"
-                  >
-                  {#if showRemoveBackground}
+                <input 
+                  type="color" 
+                  id="colorInput"
+                  style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.gradient?.to?.hex ?? `hsl(var(--p))`};" 
+                  bind:value={background.gradient.to.hex} 
+                  on:mouseenter={() => {if (background?.gradient?.to?.hex !== '') {showRemoveBackground = true}}}
+                  on:mouseleave={() => showRemoveBackground = false}
+                  on:change={() => updateColor('background gradient to', background?.gradient?.to?.hex, background?.gradient?.to?.opacity)} 
+                  class="relative">
+                <input 
+                  type="text" 
+                  placeholder="#12345" 
+                  bind:value={background.gradient.to.hex} 
+                  on:change={() => updateColor('background gradient to', background?.gradient?.to?.hex, background?.gradient?.to?.opacity)} 
+                  class="input text-center w-1/2">
+                {#if background?.gradient?.to?.hex !== ''}
                   <button
                     in:slide out:blur={{amount: 100}}
+                    on:mouseenter={() => showRemoveToColor = true}
+                    on:mouseleave={() => showRemoveToColor = false}
                     on:click={() => {updateColor('background gradient to', '', '')}} 
-                    class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
+                    class="absolute -top-1 right-[4.69rem] btn btn-xs font-input-mono">
+                      ❌
+                  </button>
+                  {#if showRemoveToColor}
+                    <p 
+                      in:fade
+                      out:fade
+                      class="absolute -top-10 -right-4 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove second color?</p>
                   {/if}
-              <input 
-                type="text" 
-                placeholder="#12345" 
-                bind:value={background.gradient.to.hex} 
-                on:change={() => updateColor('background gradient to', background?.gradient?.to?.hex, background?.gradient?.to?.opacity)} 
-                class="input text-center w-1/2"
-              >
-
-                
-
+                {/if}
+              </div>
                 
             </div>
           </div>

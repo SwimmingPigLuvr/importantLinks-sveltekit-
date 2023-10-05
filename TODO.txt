@@ -2793,3 +2793,18 @@ todo:
 
     link gradient should be able to have opacities because that would be cool
     background still don't deserve opacities because that wouldn't make sense
+
+
+updating color selector for the fourteenth time lolololol
+
+theme colors? / custom Hex?
+primary         color picker
+secondary       hex input
+etc
+
+update the remove custom color on the background gradient to color option. holy shit this is a lot
+
+then then then what i really want to do is turn the gradient into a cool declaritive statement
+and update the ui based on the gradient style: linear vs. radial... vs. conical???
+
+gradient preview is not showing up idk idk
