@@ -2833,3 +2833,106 @@ image upload and image style components
 that way all of the relevant functions are called fron the component
 
 as a matter of fact let's work on this task right now because im sick of repeating html shit over and over and over and over and over
+
+
+
+ImageUpload.svelte component
+
+what do we need to know?
+    what mode we are in
+        background / link
+    the data from the user:
+        background: { image: { url, position, size, repeat } }
+        link: { fill: { image: { url, position, size, repeat } } }
+    ui conditions?
+        uploadSuccess? => show style settings:
+            position
+            size
+            repeat
+                if one of these is open then we hide the others based on these booleans
+                    openPosition
+                    openSize
+                    openRepeat
+
+
+i think my component is complete
+
+i just need to chagne one thing.
+
+right now the state of the active styles are set AFTER they are applied with the function but
+if the user wants to see what they have active when they first visit the appearance page they won't see anything
+
+so i need to pass in the relevant info
+
+
+these will be set by the db
+
+backgroundPosition
+backgroundSize
+backgroundRepeat
+linkPosition
+linkSize
+linkRepeat
+
+i think i can just pass in the background.image and link.image objects because that's all i should need
+
+
+in the link fill section i need to enable the radial gradient shit
+
+also need to fix the preview gradient and the gradient direction is not being applied correctly
+
+i might have to bite the bullet and make the gradient selection into a component too
+
+
+i think the the preview for the different link border styles should have no background
+
+i need more margin between the styles there is too much on the screen
+
+the margin should just be under the above sections style options because what the sections are listed without the styles there is too much of a gap
+
+having a margin under the styles makes all of the sections fold and unfold weirdly when they are switched
+
+fill image should also check if fill isVisible
+
+fill styles:
+    when switching to solid the buttons shrink a little bit
+
+
+
+
+components:
+
+what code am i constantly reusing and reusing and reusing???
+
+    image form: ✅
+    color input: used 8 times so i definitely should be using a component
+
+        ColorInput.svelte outline
+
+            modes:
+                background
+                    solid
+                    gradient
+                link fill
+                    solid
+                    gradient
+                link border
+                    solid
+                    gradient
+                link shadow
+                    solid
+                    gradient
+
+        save functions:
+            updateColor
+
+            updateOpacity
+
+            these functions should handle the hex and the opacity separately
+
+            also the arguments should be really simple updatColor(mode, hex)
+            that's it. the mode should do all of the work
+
+            also i should let the user select the daisy ui theme colors! 
+
+                    

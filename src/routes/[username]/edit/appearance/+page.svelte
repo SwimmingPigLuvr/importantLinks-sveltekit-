@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ColorPicker from "$lib/components/ColorPicker.svelte";
   import Fonts from "$lib/components/Fonts.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
@@ -15,7 +14,7 @@
   import Nav from "$lib/components/Nav.svelte";
   import colors from "tailwindcss/colors";
   import { onMount } from "svelte";
-  import Saving from "$lib/components/Saving.svelte";
+  import ImageUpload from "$lib/components/ImageUpload.svelte";
 
 
   let openPosition: boolean;
@@ -39,7 +38,7 @@
     image: {
       position: string,
       repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover",
+      size: "auto" | "contain" | "cover" | "100% 100%",
       url: string,
     };
     opacity: number;
@@ -88,7 +87,7 @@
       image: {
         position: string,
         repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-        size: "auto" | "contain" | "cover",
+        size: "auto" | "contain" | "cover" | "100% 100%",
         url: string,
       };
     }
@@ -187,6 +186,7 @@
     saveSuccess = true;
     saving = false;
   }
+
 
   async function setGradientDirection(mode: string, degree: number) {
     const batch = writeBatch(db);
@@ -446,6 +446,9 @@
 
   let onHover: boolean;
 
+  let backgroundImage;
+  let linkImage;
+
   $: if ($userData) {
     username = $userData.username;
     bio = $userData.bio;
@@ -459,6 +462,10 @@
     background = customTheme.background;
     link = customTheme.link;
     onHover = link?.title?.onHover;
+
+    // objects for the ImageUpload component
+    backgroundImage = background.image;
+    linkImage = link.fill.image;
   }
 
   
@@ -505,6 +512,12 @@
     fill = true
   } else {
     fill = false
+  }
+
+  $: if (link?.fill?.style === 'image' && link?.fill?.isVisible) {
+    linkImageForm = true;
+  } else {
+    linkImageForm = false;
   }
 
   $: if (link?.border?.isVisible) {
@@ -740,11 +753,8 @@
   // img upload
   let files: FileList;
   let backgroundImageForm = false;
+  let linkImageForm = false;
 
-  function toggleBackgroundImageForm() {
-    showBackgroundImageForm = !showBackgroundImageForm;
-  }
-  
   let previewURL: string;
   let uploading: boolean = false;
   let uploadSuccess: boolean = false;
@@ -1162,11 +1172,6 @@
 
 </script>
 
-<!-- <Saving 
-  saving={saving}
-  saveSuccess={saveSuccess}
-/> -->
-
 <div class="fixed z-50 bottom-2 right-2">
   {#if saving}
     <div in:slide class="flex w-full bg-success-content p-1 px-2">
@@ -1303,7 +1308,7 @@
     <div 
       in:slide={{ duration: 1000, easing: cubicInOut }}
       out:slide={{ duration: 1000, easing: cubicInOut }}
-      class="flex justify-start space-x-10 mt-8 ">
+      class="flex justify-start space-x-10 mt-8 bg-rose-500">
 
       <!-- background color -->
       <div>
@@ -1360,9 +1365,6 @@
 <!-- gradient background color pickers -->
 
     {#if backgroundGradientSelect}
-    <!-- entire gradient div -->
-
-    <!-- radial? or linear? -->
     <div 
       in:slide={{ duration: 1000, easing: cubicInOut }}
       out:slide={{ duration: 1000, easing: cubicInOut }}
@@ -1584,110 +1586,7 @@
 
     <!-- background image upload -->
     {#if backgroundImageForm}
-      <div 
-        in:slide={{ duration: 1000, easing: cubicInOut }}
-        out:slide={{ duration: 1000, easing: cubicInOut }}
-        class="flex space-x-8 my-12 justify-start">
-        <!-- image upload -->
-        <div class="form-control lg:w-[256px] max-w-xs text-center">
-            <img 
-                src="{previewURL ?? $userData?.photoURL ?? "/sonic.jpeg"}" 
-                alt="photoURL"
-                width="231"
-                height="231"
-                class={`${uploading? 'filter grayscale' : 'grayscale-0'}`}
-            />
-            <label for="photoURL" class="label">
-                <span class="label-text"></span>
-            </label>
-            <input
-                on:change={uploadBackground}
-                name="photoURL"
-                type="file"
-                class="file-input file-input-xs file-input-bordered w-[231px] max-w-xs"
-                accept="image/png, image/jpeg, image/gif, image/webp"
-            />
-            {#if uploading}
-              <p class="text-info-content mt-6">uploading...</p>
-              <progress class="progress progress-secondary w-56 mt-2 m-auto" />
-            {/if}
-            {#if uploadSuccess}
-              <button in:blur out:blur on:click={() => uploadSuccess = false} class="bg-success-content rounded-md p-2 mt-6 w-3/4 m-auto relative">
-                  <p class="hover:bg-primary -top-1 -right-1 absolute p-2 rounded-full border-2 border-success bg-success-content text-xs text-success">X</p>
-                  <p class="text-success">uploaded successfully</p>
-              </button>
-            {/if}
-        </div>
-
-        {#if background?.style === 'image'}
-          <!-- image style options -->
-          <div 
-            in:slide={{duration: 2000, easing: cubicInOut}}
-            class="flex flex-col text-accent font-input-mono text-[1rem] space-y-4 justify-start">
-
-            <!-- background-position -->
-            <div class="flex flex-col space-y-2 justify-start rounded-none ">
-              <button class="font-input-mono text-white text-[1.5rem] text-left border-b-8 border-accent w-28 hover:w-36 transform transition-all duration-500 ease-[backOut]" on:click={() => {openPosition = !openPosition; openSize = false; openRepeat = false}}>Position</button>
-              {#if openPosition}
-                <div in:slide out:slide class=" flex-col space-y-2 justify-start ">
-                  <div class="flex space-x-2 ">
-                    <button class:bg-info={background?.image?.position === 'left top'} on:click={() => setBackgroundPosition('left top')} class="btn btn-outline text-[2rem]">↖</button>
-                    <button class:bg-info={background?.image?.position === 'center top'} on:click={() => setBackgroundPosition('center top')} class="btn btn-outline text-[2rem]">↑</button>
-                    <button class:bg-info={background?.image?.position === 'right top'} on:click={() => setBackgroundPosition('right top')} class="btn btn-outline text-[2rem]">↗</button>
-                  </div>
-                  <div class="flex space-x-2">
-                    <button class:bg-info={background?.image?.position === 'left'} on:click={() => setBackgroundPosition('left')} class="btn btn-outline text-[2rem]">←</button>
-                    <button class:bg-info={background?.image?.position === 'center'} on:click={() => setBackgroundPosition('center')} class="btn btn-outline text-[2rem]">☯︎</button>
-                    <button class:bg-info={background?.image?.position === 'right'} on:click={() => setBackgroundPosition('right')} class="btn btn-outline text-[2rem]">→</button>
-                  </div>
-                  <div class="flex space-x-2">
-                    <button class:bg-info={background?.image?.position === 'left bottom'} on:click={() => setBackgroundPosition('left bottom')} class="btn btn-outline text-[2rem]">↙</button>
-                    <button class:bg-info={background?.image?.position === 'center bottom'} on:click={() => setBackgroundPosition('center bottom')} class="btn btn-outline text-[2rem]">↓</button>
-                    <button class:bg-info={background?.image?.position === 'right bottom'} on:click={() => setBackgroundPosition('right bottom')} class="btn btn-outline text-[2rem]">↘</button>
-                  </div>
-                </div>
-              {/if}
-            </div>  
-
-            <!-- background-size -->
-            <div class="flex flex-col space-y-2 justify-start rounded-none ">
-              <button class=" text-white text-[1.5rem] text-left border-b-8 border-accent w-12 hover:w-20 transform transition-all duration-500 ease-[backOut]" on:click={() => {openSize = !openSize; openPosition = false; openRepeat = false}}>Size</button>
-              {#if openSize}
-                <div in:slide out:slide class="flex flex-wrap gap-2">
-                  <button class:bg-info={background?.image?.size === 'auto'} on:click={() => setBackgroundSize('auto')} class="btn btn-sm btn-outline">auto</button>
-                  <button class:bg-info={background?.image?.size === 'cover'} on:click={() => setBackgroundSize('cover')} class="btn btn-sm btn-outline">cover</button>
-                  <button class:bg-info={background?.image?.size === 'contain'} on:click={() => setBackgroundSize('contain')} class="btn btn-sm btn-outline">contain</button>
-                  <button class:bg-info={background?.image?.size === '100% 100%'} on:click={() => setBackgroundSize('100% 100%')} class="btn btn-sm btn-outline">100% 100%</button>
-                  <input 
-                    type="text" 
-                    bind:value={customSize} 
-                    placeholder="custom" 
-                    on:change={() => setBackgroundSize(customSize)} 
-                    on:keypress={(e) => {if (e.key === 'Enter') setBackgroundSize(customSize);}}
-                    class:bg-info={background?.image?.size === customSize}
-                    class="input input-sm w-1/2"/>
-                </div> 
-              {/if}
-            </div>
-
-            <!-- background-repeat -->
-            <div class="flex flex-col space-y-2 justify-start rounded-none ">
-              <button class="font-input-mono text-white text-[1.5rem] text-left w-20 hover:w-32 border-b-8 border-accent hover:border-separate transform transition-all duration-500 ease-[backOut]" on:click={() => {openRepeat = !openRepeat; openSize = false; openPosition = false}}>Repeat</button>
-              {#if openRepeat}
-                <div in:slide out:slide class="flex flex-wrap gap-2">
-                  <button class:bg-info={background?.image?.repeat === 'repeat'} on:click={() => setBackgroundRepeat('repeat')} class="btn btn-xs btn-outline">repeat</button>
-                  <button class:bg-info={background?.image?.repeat === 'no-repeat'} on:click={() => setBackgroundRepeat('no-repeat')} class="btn btn-xs btn-outline">no-repeat</button>
-                  <button class:bg-info={background?.image?.repeat === 'space'} on:click={() => setBackgroundRepeat('space')} class="btn btn-xs btn-outline">space</button>
-                  <button class:bg-info={background?.image?.repeat === 'round'} on:click={() => setBackgroundRepeat('round')} class="btn btn-xs btn-outline">round</button>
-                  <button class:bg-info={background?.image?.repeat === 'repeat-x'} on:click={() => setBackgroundRepeat('repeat-x')} class="btn btn-xs btn-outline">repeat-x</button>
-                  <button class:bg-info={background?.image?.repeat === 'repeat-y'} on:click={() => setBackgroundRepeat('repeat-y')} class="btn btn-xs btn-outline">repeat-y</button>
-                </div> 
-              {/if}
-            </div> 
-          </div>
-        {/if}
-
-      </div>
+      <ImageUpload image={backgroundImage} mode={'background'}/>
     {/if}
     <!-- end bg image upload here -->
   </div>
@@ -1737,7 +1636,7 @@
                     class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
                   <!-- custom fill -->
                   <button 
-                    on:click={() => setStyle('fill', 'gif')}
+                    on:click={() => setStyle('fill', 'image')}
                     class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
                 </div>
               </div>
@@ -1803,10 +1702,10 @@
             <div 
               in:slide={{ duration: 1000, easing: cubicInOut }}
               out:slide={{ duration: 1000, easing: cubicInOut }}
-              class="flex-col flex space-y-4 my-4">
+              class="flex-col flex space-y-4">
               <div class="flex space-x-4">
-                <button class:bg-success={link?.fill?.style === 'gradient'} on:click={() => setStyle('fill', 'gradient')} class="btn btn-outline">Linear</button>
-                <button class:bg-success={link?.fill?.style === 'radial gradient'} on:click={() => setStyle('fill', 'radial gradient')} class="btn btn-outline">Radial</button>
+                <button class:bg-success={link?.fill?.style === 'gradient'} on:click={() => setStyle('fill', 'gradient')} class="btn btn-sm btn-outline">Linear</button>
+                <button class:bg-success={link?.fill?.style === 'radial gradient'} on:click={() => setStyle('fill', 'radial gradient')} class="btn btn-sm btn-outline">Radial</button>
               </div>
 
               <!-- colors -->
@@ -1989,6 +1888,11 @@
 
           </div>
           {/if}
+          {#if linkImageForm}
+          <div class="">
+            <ImageUpload mode={'link'} image={linkImage} />
+          </div>
+          {/if}
         </div>
 
         <!-- border controls -->
@@ -2018,25 +1922,25 @@
                   <!-- solid -->
                   <button 
                     on:click={() => setStyle('border', 'solid')}
-                    class="p-2 rounded-md btn-accent border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
+                    class="p-2 rounded-md border-success w-1/5 border-2 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
                   <!-- dashed -->
                   <button 
                     on:click={() => setStyle('border', 'dashed')}
-                    class="p-2 rounded-md btn-accent border-success w-1/5 border-dashed border-4 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
+                    class="p-2 rounded-md border-success w-1/5 border-dashed border-2 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
                   <!-- double -->
                   <button 
                     on:click={() => setStyle('border', 'double')}
-                    class="p-2 rounded-md btn-accent border-success w-1/5 border-double border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
+                    class="p-2 rounded-md border-success w-1/5 border-double border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
                   <!-- groove -->
                   <button 
                     on:click={() => setStyle('border', 'groove')}
                     style="border: 4px groove"
-                    class="p-2 rounded-md btn-accent border-success w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">groove</button>
+                    class="p-2 rounded-md border-success w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">groove</button>
                   <!-- ridge -->
                   <button 
                     on:click={() => setStyle('border', 'ridge')}
                     style="border: 4px ridge"
-                    class="p-2 rounded-md btn-accent border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">ridge</button>
+                    class="p-2 rounded-md border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">ridge</button>
                   <!-- custom border -->
                   <!-- <button 
                     on:click={() => setStyle('border', 'custom')}
