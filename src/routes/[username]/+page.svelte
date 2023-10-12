@@ -68,6 +68,7 @@
       }
       isVisible: boolean,
       opacity: number;
+      fillStyle: string;
       style: string;
       width: string;
     }

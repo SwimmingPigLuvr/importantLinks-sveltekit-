@@ -95,6 +95,7 @@ export interface UserData {
   links: LinkData[];
   customTheme: CustomTheme;
   theme: string;
+  header: string;
 }
 
 export interface DataToSave {

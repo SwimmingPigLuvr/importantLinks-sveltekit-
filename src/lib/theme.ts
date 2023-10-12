@@ -56,6 +56,7 @@ export interface CustomTheme {
       }
       isVisible: boolean,
       opacity: number;
+      fillStyle: string;
       style: string;
       width: string;
     }
@@ -173,6 +174,7 @@ export const defaultTheme: CustomTheme = {
       },
       isVisible: true,
       opacity: 100,
+      fillStyle: 'color',
       style: 'solid',
       width: '0.5rem',
     },
@@ -186,7 +188,7 @@ export const defaultTheme: CustomTheme = {
       hex: '',
       isVisible: true,
       opacity: 100,
-      style: 'hard',
+      style: 'hard-shadow',
     },
     title: {
       effect: {
@@ -228,11 +230,12 @@ export const emptyTheme: CustomTheme = {
     style: 'solid',
   },
   link: {
-    radius: 'full',
+    radius: 'half',
     fill: {
       gradient: {
         from: { hex: '', opacity: 100 },
         to: { hex: '', opacity: 100 },
+        direction: '0deg',
       },
       hex: '',
       isVisible: true,
@@ -249,6 +252,7 @@ export const emptyTheme: CustomTheme = {
       gradient: {
         from: { hex: '', opacity: 100 },
         to: { hex: '', opacity: 100 },
+        direction: '0deg',
       },
       hex: '',
       image: {
@@ -257,6 +261,7 @@ export const emptyTheme: CustomTheme = {
       },
       isVisible: true,
       opacity: 100,
+      fillStyle: 'color',
       style: 'solid',
       width: '0.1rem',
     },
@@ -270,7 +275,7 @@ export const emptyTheme: CustomTheme = {
       hex: '',
       isVisible: true,
       opacity: 100,
-      style: 'hard',
+      style: 'hard-shadow',
     },
     title: {
       effect: {
@@ -340,6 +345,7 @@ export const light: CustomTheme = {
       hex: '#D1D1D1',
       isVisible: true,
       opacity: 100,
+      fillStyle: 'color',
       style: 'solid',
       image: {
         url: '',
@@ -425,6 +431,7 @@ export const dark: CustomTheme = {
       },
       hex: '#393939',
       isVisible: true,
+      fillStyle: 'color',
       style: 'double',
       image: {
         url: '',

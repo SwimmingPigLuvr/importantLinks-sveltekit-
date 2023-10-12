@@ -11,6 +11,8 @@
   export let title = 'some cool title';
   export let previewMode: boolean;
 
+  let element: HTMLElement;
+
   let link: {
     border: {
       gradient: {
@@ -31,6 +33,7 @@
       }
       isVisible: boolean,
       opacity: number;
+      fillStyle: string;
       style: string;
       width: string;
     }
@@ -172,8 +175,12 @@
   let style: string[] = [];
   let combinedStyle: string;
 
+  let customClass: string[] = [];
+  let combinedClass: string;
+
 $: if (link) {
     let newStyles = [];
+    let newClasses = [];
     
     if (link?.fill?.isVisible) {
         switch (link?.fill?.style) {
@@ -192,37 +199,52 @@ $: if (link) {
     }
 
     if (link?.border?.isVisible) {
+      if (link?.border?.fillStyle === 'color') {
         switch (link?.border?.style) {
-            case 'image':
-                newStyles.push(`border: ${link.border.width} solid; border-image: url(${link.border.image.url}) ${link.border.image.repeat};`);
-                break;
-            case 'solid':
-                newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-                break;
-            case 'gradient':
-                newStyles.push(`border: ${link.border.width} solid; border-image: linear-gradient(${borderDirection || `0deg`}, ${borderFromHex || `hsl(var(--s))`}, ${borderToHex || `hsl(var(--in))`});`);
-                break;
-            default: 
-                break;
+          case 'image':
+            newStyles.push(`border: ${link.border.width} solid; border-image: url(${link.border.image.url}) ${link.border.image.repeat};`);
+            break;
+          case 'solid':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'dashed':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'double':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'groove':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'ridge':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'inset':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'outset':
+            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
+            break;
+          case 'gradient':
+            newStyles.push(`border: ${link.border.width} solid; border-image: linear-gradient(${borderDirection || `0deg`}, ${borderFromHex || `hsl(var(--s))`}, ${borderToHex || `hsl(var(--in))`});`);
+            break;
+          default: 
+            break;
         }
+      }
     }
 
     if (link?.shadow?.isVisible) {
-        switch (link?.shadow?.style) {
-            case 'soft':
-                newStyles.push(`box-shadow: 0 10px 20px -12px ${link.shadow.hex || `hsl(var(--a))`};`);
-                break;
-            case 'hard':
-                newStyles.push(`box-shadow: 10px 10px 0px ${link.shadow.hex || `hsl(var(--a))`};`);
-                break;
-            default:
-                break;
-        }
+      newClasses.push(link.shadow.style);
     }
 
     style = newStyles;
     combinedStyle = style.join('; ');
+    customClass = newClasses;
+    combinedClass = customClass.join(' ');
 }
+
+
 
 
 
@@ -230,10 +252,11 @@ $: if (link) {
 
 <a 
   href="{url}" 
+    bind:this={element}
     style={`${combinedStyle}`} 
-    class="{previewMode ? 'h-[40px]  p-[0.2rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
+    class="{combinedClass} {previewMode ? 'h-[40px]  p-[0.2rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
-     hover:translate-x-1 hover:translate-y-1 
+    
      flex justify-between m-auto items-center no-underline">
      <!-- link icon -->
     <img 
@@ -244,10 +267,14 @@ $: if (link) {
     <!-- Link title -->
     <p 
     style={`
-      color: ${link.title.font.hex ? `hsl(var(--pc))` : ''} 
+      color: ${link.title.font.hex || `hsl(var(--pc))`} 
     `}
-    class='font-{font.family} {previewMode ? 'text-[1.23rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
+    class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect} {previewMode ? 'text-[1.23rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
     </p>
 </a>
+
+<style>
+  
+</style>
 
 

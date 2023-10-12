@@ -2935,4 +2935,46 @@ what code am i constantly reusing and reusing and reusing???
 
             also i should let the user select the daisy ui theme colors! 
 
+
+            how can i handle the props based on different modes???? thinking emoji face thinking thoughts face.
+            gradient:
+                join the hex + opacity inputs
+                fix the bottom gradient desription: smaller is better
+
+
+todo october 7
+
+everything looks great
+    need to add the colorInput components to the right places
+    and then i need to handle the styles for the edit pagge and home page
+    choosing the radial gradient needs to reactively change the ui.
+        it is saving correctly in the db but it needs a reload to show up
+
+
+    colorinput.svelte:
+        get everything saving into the db correctly
+
+fix everything.
+
+make it work
+
+enable header even if background style !== image
+
+
+october 12 2023
+
+todo: 
+
+fix old issues
+add new styles
+
+hard shadow is showing up even tho shadow is toggled off
+
+since i can't dynamically inject styles into a style="" ill just put them in the class
+
+cant make a var with the name class: 
+change this: let class: string[] = []; to this: let customClass: string[] = string[];
+
+
+
                     

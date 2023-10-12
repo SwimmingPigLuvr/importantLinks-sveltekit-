@@ -9,10 +9,6 @@
         return $page.url.pathname === path;
     }
     
-    console.log('$page.url.pathname: ', $page.url.pathname);
-    console.log('$page.params.username: ', $page.params.username);
-
-
     export let username = '';
     let openNav = false;
 

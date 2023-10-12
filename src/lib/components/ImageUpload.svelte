@@ -1,17 +1,29 @@
 <script lang="ts">
-  import { db, user, storage, userData } from "$lib/firebase";
-  import { doc, writeBatch } from "firebase/firestore";
-  import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-  import { cubicInOut } from "svelte/easing";
-  import { slide, blur } from "svelte/transition";
+    import { db, user, storage, userData } from "$lib/firebase";
+    import { doc, writeBatch } from "firebase/firestore";
+    import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+    import { backInOut, cubicInOut } from "svelte/easing";
+    import { slide, blur, fly } from "svelte/transition";
+    import Cropper from 'svelte-easy-crop';
+
+    let crop = { x: 0, y: 0 };
+    let zoom = 1;
 
     export let mode: string;
-    export let image: {
+    export let currentImage: {
         position: string,
         repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
         size: "auto" | "contain" | "cover" | "100% 100%",
         url: string,
     };
+    let image: string;
+
+    let headerDefault: string = '/headerDefault.png';
+    let backgroundDefault: string = '/backgroundDefault.png';
+    let linkDefault: string = '/linkDefault.png';
+    let borderDefault: string = '/borderDefault.png';
+
+    let deleteBanner: boolean;
 
     let saving: boolean = false;
     let saveSuccess: boolean = false;
@@ -30,11 +42,11 @@
     let isRepeat: string;
     let isUrl: string;
 
-    if (image) {
-        isPosition = image.position;
-        isSize = image.size;
-        isRepeat = image.repeat;
-        isUrl = image.url;
+    if (currentImage) {
+        isPosition = currentImage.position;
+        isSize = currentImage.size;
+        isRepeat = currentImage.repeat;
+        isUrl = currentImage.url;
     }
 
     async function setPosition(mode: string, position: string) {
@@ -64,7 +76,7 @@
                     }
                 }
             }, { merge: true });
-        } 
+        }
         await batch.commit();
         saveSuccess = true;
         isPosition = position;
@@ -132,30 +144,42 @@
                     }
                 }
             }, { merge: true });
-        } 
+        } else if (mode === 'border') {
+            batch.set(doc(db, `users${$user!.uid}`), {
+                customTheme: {
+                    link: {
+                        border: {
+                            image: {
+                                repeat: repeat
+                            }
+                        }
+                    }
+                }
+            }, { merge: true});
+        }
         await batch.commit();
         saveSuccess = true;
         isRepeat = repeat;
         saving = false;
     }
 
-    async function uploadBackground(mode: string, e: any) {
+    async function uploadImage(mode: string, e: any) {
         uploadSuccess = false;
         uploading = true;
 
-        console.log('uploading bg image');
+        console.log('uploading image');
+
+        // get user uploaded file into a URL
+        const file = e.target.files[0];
+        previewURL = URL.createObjectURL(file);
+        const storageRef = ref(storage, `users/${$user!.uid}/background.png`);
+        const result = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(result.ref);
 
         const batch = writeBatch(db);
 
         try {
             if (mode === 'background') {
-                // get user uploaded file into a URL
-                const file = e.target.files[0];
-                previewURL = URL.createObjectURL(file);
-                const storageRef = ref(storage, `users/${$user!.uid}/background.png`);
-                const result = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(result.ref);
-
                 batch.set(doc(db, `users/${$user!.uid}`), {
                     customTheme: {
                         background: {
@@ -168,13 +192,6 @@
                 }, { merge: true });
 
             } else if (mode === 'link') {
-                // get user uploaded file into a URL
-                const file = e.target.files[0];
-                previewURL = URL.createObjectURL(file);
-                const storageRef = ref(storage, `users/${$user!.uid}/linkBackground.png`);
-                const result = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(result.ref);
-
                 batch.set(doc(db, `users/${$user!.uid}`), {
                     customTheme: {
                         link: {
@@ -187,6 +204,10 @@
                         }
                     }
                 }, { merge: true });
+            } else if (mode === 'header') {
+                batch.set(doc(db, `users/${$user!.uid}`), {
+                    header: url
+                }, { merge: true }); 
             }
 
             await batch.commit();
@@ -200,12 +221,21 @@
         }
     }
 
-    function handleBgFileChange(e: any) {
-        uploadBackground('background', e);
+    async function deleteImage(mode: string) {
+        const batch = writeBatch(db);
+
+        batch.set(doc(db, `users/${$user!.uid}`), {
+            header: ''
+        }, { merge: true });
+        await batch.commit();
     }
 
-    function handleLinkFileChange(e: any) {
-        uploadBackground('link', e);
+    function getImageUrl(mode: string) {
+        if (mode === 'header') return $userData?.header || headerDefault;
+        if (mode === 'background') return $userData?.customTheme?.background?.image?.url || backgroundDefault;
+        if (mode === 'link') return $userData?.customTheme?.link?.fill?.image?.url || linkDefault;
+        if (mode === 'border') return $userData?.customTheme?.link?.border?.image?.url || borderDefault;
+        return ''; // default fallback
     }
 
 
@@ -215,22 +245,47 @@
 <div 
   in:slide={{ duration: 1000, easing: cubicInOut }}
   out:slide={{ duration: 1000, easing: cubicInOut }}
-  class="flex space-x-8 my-12 justify-start">
+  class:justify-center={mode === 'header'}
+  class="flex space-x-4 my-12 justify-start">
 
   <div class="form-control lg:w-[256px] max-w-xs text-center">
     <!-- image preview -->
+      <div class="relative">
+        {#if mode === 'header'}
+            <Cropper 
+                {image}
+                aspect={3}
+                bind:crop
+                bind:zoom
+                on:cropcomplete={e => console.log(e.detail)}
+            />
+        {/if}
+
       <img 
-          src="{isUrl ?? previewURL ?? $userData?.photoURL ?? "/sonic.jpeg"}" 
-          alt="photoURL"
-          width="231"
-          height="231"
+          src="{getImageUrl(mode)}" 
+          alt="preview"
+          width="432"
+          height="432"
           class={`${uploading? 'filter grayscale' : 'grayscale-0'}`}
       />
+      {#if mode === 'header' && $userData?.header !== ''}
+        <button 
+        on:mouseenter={() => deleteBanner = true}
+        on:mouseleave={() => deleteBanner = false}
+        class="-top-6 -right-6 z-50 btn btn-circle btn-outline hover:bg-info text-sm absolute">
+        ❌
+        {#if deleteBanner}
+            <button on:click={() => deleteImage('header')} in:fly={{y: 100, duration: 1000, easing: backInOut}} class="bg-success p-2 absolute -top-5">Delete Banner?</button>
+
+        {/if}
+        </button>
+        {/if}
+      </div>
       <label for="photoURL" class="label">
           <span class="label-text"></span>
       </label>
       <input
-          on:change={mode === 'background' ? handleBgFileChange : handleLinkFileChange}
+          on:change={$event => uploadImage(mode, $event)}
           name="photoURL"
           type="file"
           class="file-input file-input-xs file-input-bordered w-[231px] max-w-xs"
@@ -246,9 +301,12 @@
             <p class="text-success">uploaded successfully</p>
         </button>
       {/if}
+      
   </div>
+    
 
-  {#if isUrl !== ''}
+  <!-- use these styles for everything except for the header -->
+  {#if isUrl !== '' && mode !== 'header'}
     <!-- image style options -->
     <div 
       in:slide={{duration: 2000, easing: cubicInOut}}

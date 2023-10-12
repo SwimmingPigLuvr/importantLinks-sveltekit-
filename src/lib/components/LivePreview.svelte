@@ -14,6 +14,7 @@
   export let bio: string = '';
   export let links: any[] = [];
   export let theme: string = '';
+  export let header: string = '';
   let previewMode: boolean = true;
 
   let background: {
@@ -59,6 +60,7 @@
       }
       isVisible: boolean,
       opacity: number;
+      fillStyle: string;
       style: string;
       width: string;
     }
@@ -168,7 +170,6 @@
 
   onMount(() => { 
       mounted = true;
-      console.log('mounted');
       function handleResize() {
         if (window.innerWidth >= 768) {
           showPreview = false
@@ -176,9 +177,74 @@
       }
       window.addEventListener('resize', handleResize);
       handleResize();
-      console.log('showPreview: ', showPreview)
     }
   );
+
+  let combinedStyle: string;
+  let backgroundImage: string[] = [];
+  let backgroundColor: string = '';
+  let backgroundRepeat: string[] = [];
+  let backgroundPosition: string[] = [];
+  let backgroundSize: string[] = []; // Changed this to an array for easier management
+  let color: string = '';
+
+  $: {
+      // Clear previous values
+      backgroundImage = [];
+      backgroundSize = [];
+
+      // If header exists
+      if (header && header !== '') {
+          backgroundImage.push(`url(${header})`);
+          backgroundSize.push('contain');
+          backgroundRepeat.push('no-repeat');
+          backgroundPosition.push('top');
+      }
+
+      // If background style exists
+      if (background) {
+          if (background?.style === 'image') {
+              backgroundImage.push(`url(${background.image.url})`);
+              backgroundRepeat.push(background.image.repeat || `no-repeat`);
+              backgroundPosition.push(background.image.position || `center`);
+              backgroundSize.push(background.image.size || `cover`);
+          } 
+
+          // Solid color background
+          if (background?.style === 'solid') {
+              backgroundColor = background.hex || `hsl(var(--s))`;
+          } 
+          
+          // Gradient background
+          if (background?.style === 'gradient') {
+              backgroundColor = `linear-gradient(${direction || `0deg`}, ${fromHex || `hsl(var(--p))`}, ${toHex || `hsl(var(--s))`})`;
+          } 
+
+          // Radial Gradient background
+          if (background?.style === 'radial-gradient') {
+              backgroundColor = `radial-gradient(${fromHex || `hsl(var(--p))`}, ${toHex || `hsl(var(--s))`})`;
+          }
+      }
+
+      // If font exists
+      if (font) {
+          color = font.hex || `hsl(var(--ac))`;
+      }
+
+      // Construct the final combined style using the individual properties
+      combinedStyle = `
+          color: ${color};
+          background-image: ${backgroundImage.join(", ")};
+          background-color: ${backgroundColor};
+          background-repeat: ${backgroundRepeat.join(', ')};
+          background-position: ${backgroundPosition.join(', ')};
+          background-size: ${backgroundSize.join(", ")};
+      `;
+  }
+
+
+  
+
 
 </script>
 
@@ -227,12 +293,8 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
     <div 
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
         data-theme={theme}
-        style={`
-          ${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} 
-          color: ${font?.hex? font?.hex : `hsl(var(--a))`}; 
-          ${background?.style === 'image' ? `background-image: url(${background.image.url}); background-size: ${background.image.size}; background-repeat: ${background.image.repeat}; background-position: ${background.image.position};` : ''} 
-          ${background?.style === 'solid' ? `background-color: ${background?.hex? background?.hex : `hsl(var(--s))`};` : (background?.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex? fromHex : 'hsl(var(--a))'}, ${toHex? toHex : 'hsl(var(--p))'});` : (background?.style === 'radial gradient' ? `background: radial-gradient(${fromHex? fromHex : 'hsl(var(--a))'}, ${toHex? toHex : 'hsl(var(--p))' })` : ''))}
-          
+        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} 
+        ${combinedStyle}
         `}
         class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} flex flex-col justify-start overflow-auto">
         <div style="padding-top: 205%; position: relative;">

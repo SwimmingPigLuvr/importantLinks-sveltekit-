@@ -15,13 +15,17 @@
   import colors from "tailwindcss/colors";
   import { onMount } from "svelte";
   import ImageUpload from "$lib/components/ImageUpload.svelte";
+  import ColorInput from "$lib/components/ColorInput.svelte";
 
+  let sizeNumber: number = 1;
+  let unit: string = 'rem';
 
   let openPosition: boolean;
   let openSize: boolean;
   let openRepeat: boolean;
   let customSize: string;
 
+  let header: string;
   let background: {
     gradient: {
       from: {
@@ -65,6 +69,7 @@
       }
       isVisible: boolean,
       opacity: number;
+      fillStyle: string;
       style: string;
       width: string;
     }
@@ -253,6 +258,45 @@
     saving = false;
   }
 
+  async function setBorderWidth(sizeNumber: number, unit: string) {
+    const batch = writeBatch(db);
+    saving = true;
+    const width = `${sizeNumber}${unit}`;
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        link: {
+          border: {
+            width: width
+          }
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+    saveSuccess = true;
+    saving = false;
+  }
+
+  async function setBorderFillStyle(fillStyle: string) {
+    const batch = writeBatch(db);
+    saving = true;
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        link: {
+          border: {
+            fillStyle: fillStyle
+          }
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+    saveSuccess = true;
+    saving = false;  
+  }
+
 
   let fill: boolean;
   let border: boolean;
@@ -261,6 +305,10 @@
   let solidLinkFill: boolean;
   let gradientLinkFill: boolean;
   let imageLinkFill: boolean;
+
+  let solidLinkBorder: boolean;
+  let gradientLinkBorder: boolean;
+  let imageLinkBorder: boolean;
 
   async function updateVisibility(mode: string, isVisible: boolean) {
     const batch = writeBatch(db);
@@ -446,8 +494,24 @@
 
   let onHover: boolean;
 
+  let currentBackgroundHex;
+  let currentBackgroundGradient;
+
+  let currentLinkHex;
+  let currentLinkGradient;
+
+  let currentBorderHex;
+  let currentBorderGradient;
+
+  let currentShadowHex;
+  let currentShadowGradient;
+  let currentLinkTitleHex;
+  let currentFontHex;
+
+  let headerImage;
   let backgroundImage;
   let linkImage;
+  let borderImage;
 
   $: if ($userData) {
     username = $userData.username;
@@ -457,22 +521,36 @@
     customTheme = $userData.customTheme;
     theme = $userData.theme;    
     userThemes = $userData.userThemes;
+    header = $userData.header;
 
     font = customTheme.font;
     background = customTheme.background;
     link = customTheme.link;
     onHover = link?.title?.onHover;
 
+    // objects for color input component
+    currentFontHex = {hex: font.hex, opacity: font.opacity}
+    currentLinkHex = {hex: link.fill.hex, opacity: link.fill.opacity};
+    currentBorderHex = {hex: link.border.hex, opacity: link.border.opacity};
+    currentShadowHex = {hex: link.shadow.hex, opacity: link.shadow.opacity};
+    currentLinkTitleHex = {hex: link.title.font.hex, opacity: link.title.opacity};
+
+    currentBackgroundHex = {hex: background.hex, opacity: background.opacity};
+    currentLinkGradient = {...link.fill.gradient, style: link.fill.style};
+    currentBorderGradient = {...link.border.gradient, style: link.border.style};
+    currentShadowGradient = {...link.shadow.gradient, style: link.shadow.style};
+    currentBackgroundGradient = {...background.gradient, style: background.style};
+
     // objects for the ImageUpload component
     backgroundImage = background.image;
     linkImage = link.fill.image;
+    borderImage = link.border.image;
   }
 
   
 
   $: if ($userData && $userData.userThemes && $userData.userThemes.length > 1) {
     const uniqueThemeName = Object.keys(userThemes[1])[0];
-    console.log('userthemes: ', userThemes);
   }
 
   $: if (data && data.customTheme) {
@@ -548,6 +626,24 @@
     imageLinkFill = true;
   } else {
     imageLinkFill = false;
+  }
+
+  $: if (link?.border?.fillStyle === 'solid') {
+    solidLinkBorder = true;
+  } else {
+    solidLinkBorder = false;
+  }
+
+  $: if (link?.border?.fillStyle === 'gradient') {
+    gradientLinkBorder = true;
+  } else {
+    gradientLinkBorder = false;
+  }
+
+  $: if (link?.border?.fillStyle === 'image') {
+    borderImageForm = true;
+  } else {
+    borderImageForm = false;
   }
 
 
@@ -717,35 +813,35 @@
   }
   
   const themes = [
+    "methyleneBlue",
+    "coffee",
+    "luxury",
+    "garden",
+    "retro",
     "business",
+    "autumn",
+    "emerald",
     "cmyk",
     "dracula",
+    "halloween",
     "fantasy",
     "wireframe",
     "cupcake",
     "bumblebee",
-    "emerald",
     "corporate",
     "synthwave",
     "valentine",
-    "halloween",
     "lofi",
     "winter",
-    "autumn",
     "pastel",
-    "retro",
-    "garden",
     "black",
-    "luxury",
     "aqua",
     "night",
-    "coffee",
     "acid",
     "forest",
     "cyberpunk",
     "lemonade",
     "red",
-    "methyleneBlue"
   ];
 
   let allThemes = userThemes.concat(themes);
@@ -754,6 +850,7 @@
   let files: FileList;
   let backgroundImageForm = false;
   let linkImageForm = false;
+  let borderImageForm = false; 
 
   let previewURL: string;
   let uploading: boolean = false;
@@ -1191,6 +1288,7 @@
   bio={bio} links={links} 
   theme={theme} 
   customTheme={customTheme}
+  header={header}
 />
 
 <main data-theme="{theme}" class="flex flex-col">
@@ -1263,6 +1361,11 @@
   <div class="my-4">
 
   </div>
+
+    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Header</h2>
+    <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
+      <ImageUpload currentImage={headerImage} mode={'header'}/>
+    </div>
     
     <!-- backgrounds -->
     <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Background</h2>
@@ -1272,322 +1375,43 @@
       
       <!-- bg styles -->
       <div class="flex space-x-2">
-
-
         <!-- solid color -->
         <div>
           <button 
             on:click={() => setStyle('background', 'solid')} 
-            class="btn bg-warning-content border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4"></button>
-          <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Solid Color</h3>
+            class="w-[120px] h-[200px] btn bg-accent border-none flex flex-col justify-start"></button>
+          <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">Solid Color</h3>
         </div>
       <!-- gradient -->
       <div>
         <button 
           on:click={() => setStyle('background', 'gradient')}
-          class="group btn bg-gradient-to-br from-green-400 to-blue-500 hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none min-w-[150px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4 gradient-transition"><span class="font-noka text-warning-content text-[0.6rem]">UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION</span><div class="overlay btn w-[100%] h-[100%]"></div></button>
+          class="w-[120px] h-[200px] btn bg-gradient-to-b from-accent to-primary hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none flex flex-col justify-start py-4"></button>
         <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
       </div>
     
 
 
-    <div>
-      <button 
-        on:click={() => setStyle('background', 'image')}
-        class="filter grayscale hover:grayscale-0 btn border-none w-[150px] min-h-[300px] flex flex-col justify-start py-4">
-        <img src="{$userData?.photoURL}" alt="pfp" class="w-[100%] h-[100%]">
-      </button>
-      <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Upload Image</h3>
-    </div>
-
-    </div>
-
-<!-- solid background color picker -->
-
-    {#if backgroundColorSelect}
-    <div 
-      in:slide={{ duration: 1000, easing: cubicInOut }}
-      out:slide={{ duration: 1000, easing: cubicInOut }}
-      class="flex justify-start space-x-10 mt-8 bg-rose-500">
-
-      <!-- background color -->
       <div>
-        <label for="Background Color" class="label">
-          <span class="label-text font-input-mono">Background Color</span>
-        </label>      
-        <div id="Background Color" class="flex flex-col">
-
-            <!-- show buttoncolor / clikc for color picker -->
-            <div class="flex relative">
-              <input 
-                type="color" 
-                id="colorInput"
-                style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.hex};" 
-                bind:value={background.hex} 
-                on:change={() => updateColor('background', background.hex, background.opacity)}
-                class="relative"
-              >
-              <input 
-                type="text" 
-                placeholder="#12345" 
-                bind:value={background.hex} 
-                on:change={() => updateColor('background', background.hex, background.opacity)} 
-                class="input text-center w-[13rem]">
-              {#if background?.hex !== ''}
-                <button
-                  in:fly={{y: 10, duration: 200, easing: backOut}} 
-                  out:blur={{amount: 10, duration: 1000}}
-                  on:mouseenter={() => showRemoveBackground = true}
-                  on:mouseleave={() => showRemoveBackground = false}
-                  on:click={() => {updateColor('background', '', 100)}} 
-                  class="absolute -top-1 -right-1 btn btn-xs font-input-mono">
-                    ❌
-                </button>
-                {#if showRemoveBackground}
-                  <p 
-                    in:slide={{duration: 500, easing: backOut}}
-                    out:blur={{amount: 10, duration: 1000}}
-                    class="absolute -top-10 -right-1/3 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove custom color?</p>
-                {/if}
-              {/if}
-            </div>
-              
-              
-
-            
-
-            
-        </div>
+        <button 
+          on:click={() => setStyle('background', 'image')}
+          class="w-[120px] h-[200px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
+          <img src="{$userData?.photoURL}" alt="pfp" class="h-[100%] btn p-0">
+        </button>
+        <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Image</h3>
       </div>
+
     </div>
+    {#if backgroundColorSelect}
+      <ColorInput mode={'background'} currentHex={currentBackgroundHex} />
     {/if}
-
-<!-- gradient background color pickers -->
-
     {#if backgroundGradientSelect}
-    <div 
-      in:slide={{ duration: 1000, easing: cubicInOut }}
-      out:slide={{ duration: 1000, easing: cubicInOut }}
-      class="flex-col flex space-y-4 my-4">
-      <div class="flex space-x-4">
-        <button class:bg-success={background?.style === 'gradient'} on:click={() => setStyle('background', 'gradient')} class="btn btn-outline">Linear</button>
-        <button class:bg-success={background?.style === 'radial gradient'} on:click={() => setStyle('background', 'radial gradient')} class="btn btn-outline">Radial</button>
-      </div>
-
-      <!-- colors -->
-      <div class="flex">
-        <!-- from color -->
-        <div class="flex justify-start space-x-4">
-          
-          <!-- from color -->
-          <div>
-            <label for="From" class="label">
-              <span class="label-text font-input-mono text-[1rem]">From</span>
-            </label>      
-            <div id="From" class="flex flex-col">
-              <div class="flex relative">
-                <!-- from input -->
-                <input 
-                  type="color" 
-                  id="colorInput"
-                  style={`width: 3.1rem; height: 3rem; background-color: ${background?.gradient?.to?.hex ?? `hsl(var(--a))`};`}
-                  bind:value={background.gradient.from.hex} 
-                  on:mouseenter={() => {if (background?.gradient?.from?.hex !== '') {showRemoveBackground = true}}}
-                  on:mouseleave={() => showRemoveBackground = false}
-                  on:change={() => updateColor('background gradient from', background?.gradient?.from?.hex, background?.gradient?.from?.opacity)}
-                  class="relative">
-                <input 
-                  type="text" 
-                  placeholder="#12345" 
-                  bind:value={background.gradient.from.hex} 
-                  on:change={() => updateColor('background gradient from', background?.gradient?.from?.hex, background?.gradient?.from?.opacity)} 
-                  class="input text-center w-1/2">
-                  <!-- remove color to revert back to theme color -->
-                {#if background?.gradient?.from?.hex !== ''}
-                  <button
-                    in:fly={{y: 10, duration: 200, easing: backOut}} out:blur={{amount: 100}}
-                    on:mouseenter={() => showRemoveFromColor = true}
-                    on:mouseleave={() => showRemoveFromColor = false}
-                    on:click={() => {updateColor('background gradient from', '', 100)}} 
-                    class="absolute -top-1 right-[4.69rem] btn btn-xs font-input-mono">
-                      ❌
-                  </button>
-                  {#if showRemoveFromColor}
-                    <p 
-                      in:fade
-                      out:fade
-                      class="absolute -top-10 -right-4 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove first color?</p>
-                  {/if}
-                {/if}
-                </div>
-
-              
-            </div>
-          </div>
-
-          <!-- no opacities for backgrounds until further notice -->
-          <!-- opacity -->
-          <!-- <div class="form-control">
-            <label for="opacity" class="label">
-              <span class="label-text font-input-mono">Opacity</span>
-            </label>
-            <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity might cause background to reflect diffently in preview than it will on your site"`}>
-            <label class="input-group">
-                <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.from.opacity} on:change={() => updateOpacity('background', background?.gradient?.from?.opacity)} class="input input-bordered w-[4rem]" />
-              <span>%</span>
-            </label>
-            </div>
-          </div> -->
-
-        </div>
-
-        <!-- to color -->
-        <div class="flex justify-start space-x-4">
-
-          <!-- to color -->
-          <div>
-            <label for="to Color" class="label">
-              <span class="label-text font-input-mono text-[1rem]">To</span>
-            </label>      
-            <div id="to Color" class="flex flex-col">
-              <div class="flex relative">
-                <!-- show buttoncolor / clikc for color picker -->
-                <input 
-                  type="color" 
-                  id="colorInput"
-                  style="width: 3.1rem; height: 3rem; border: 1px ridge {background?.gradient?.to?.hex ?? `hsl(var(--p))`};" 
-                  bind:value={background.gradient.to.hex} 
-                  on:mouseenter={() => {if (background?.gradient?.to?.hex !== '') {showRemoveBackground = true}}}
-                  on:mouseleave={() => showRemoveBackground = false}
-                  on:change={() => updateColor('background gradient to', background?.gradient?.to?.hex, background?.gradient?.to?.opacity)} 
-                  class="relative">
-                <input 
-                  type="text" 
-                  placeholder="#12345" 
-                  bind:value={background.gradient.to.hex} 
-                  on:change={() => updateColor('background gradient to', background?.gradient?.to?.hex, background?.gradient?.to?.opacity)} 
-                  class="input text-center w-1/2">
-                {#if background?.gradient?.to?.hex !== ''}
-                  <button
-                    in:fly={{y: 10, duration: 200, easing: backOut}} out:blur={{amount: 100}}
-                    on:mouseenter={() => showRemoveToColor = true}
-                    on:mouseleave={() => showRemoveToColor = false}
-                    on:click={() => {updateColor('background gradient to', '', '')}} 
-                    class="absolute -top-1 right-[4.69rem] btn btn-xs font-input-mono">
-                      ❌
-                  </button>
-                  {#if showRemoveToColor}
-                    <p 
-                      in:fade
-                      out:fade
-                      class="absolute -top-10 -right-4 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove second color?</p>
-                  {/if}
-                {/if}
-              </div>
-                
-            </div>
-          </div>
-
-          <!-- opacity -->
-          <!-- <div class="form-control">
-            <label for="opacity" class="label">
-              <span class="label-text font-input-mono">Opacity</span>
-            </label>
-            <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
-
-            <label class="input-group">
-                <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.to.opacity} on:change={() => updateOpacity('background', background?.gradient?.to?.opacity)} class="input input-bordered w-[4rem]" />
-              <span>%</span>
-            </label>
-            </div>
-          </div> -->
-        </div>
-      </div>
-      <!-- gradient direction -->
-      <div class="flex flex-col justify-start">
-
-        <!-- preview + selection container -->
-        <div class="flex justify-start space-x-4">
-
-          <!-- gradient preview -->
-          <div 
-            style={`background: linear-gradient(${backgroundDirection}, ${backgroundFromHex}, ${backgroundToHex});`}
-            class="w-full border-2 mt-10 border-primary rounded-xl h-40 ">
-          </div>
-          {#if background?.style === 'gradient'}
-          <!-- gradient direction -->
-          <div 
-            in:fade={{duration: 300}}
-            out:fade={{duration: 300}}
-            class="flex flex-col mt-4">
-            <label for="Gradient Direction" class="label">
-              <span class="label-text font-input-mono">Direction <span class="text-info">{backgroundDirection}°</span></span>
-            </label>
-            <div class="flex">
-
-            <div id="Gradient Direction" class="flex flex-col text-white  join">
-              <div class="join text-white flex justify-evenly">
-                <button class:bg-info={background?.gradient?.direction === '315deg'} on:click={() => setGradientDirection('background', 315)} class="btn-outline btn text-5xl">↖</button>
-                <button class:bg-info={background?.gradient?.direction === '0deg'} on:click={() => setGradientDirection('background', 0)} class="btn btn-outline text-5xl">↑</button>
-                <button class:bg-info={background?.gradient?.direction === '45deg'} on:click={() => setGradientDirection('background', 45)} class="btn btn-outline text-5xl">↗</button>
-              </div>
-              <div class="join flex justify-evenly">
-                <button class:bg-info={background?.gradient?.direction === '270deg'} on:click={() => setGradientDirection('background', 270)} class="btn btn-outline text-5xl">←</button>
-                <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
-                <button class:bg-info={background?.gradient?.direction === '90deg'} on:click={() => setGradientDirection('background', 90)} class="btn btn-outline text-5xl">→</button>
-              </div>
-              <div class="join flex justify-evenly">
-                <button class:bg-info={background?.gradient?.direction === '215deg'} on:click={() => setGradientDirection('background', 215)} class="btn btn-outline text-5xl">↙</button>
-                <button class:bg-info={background?.gradient?.direction === '180deg'} on:click={() => setGradientDirection('background', 180)} class="btn btn-outline text-5xl">↓</button>
-                <button class:bg-info={background?.gradient?.direction === '135deg'} on:click={() => setGradientDirection('background', 135)} class="btn btn-outline text-5xl">↘</button>
-              </div>
-            </div>
-            </div>
-          </div>
-          {/if}
-
-
-        </div>
-
-
-        <!-- input gradient values -->
-        
-        <div class="text-[1.5rem] font-input-mono mt-4 border-accent bg-primary bg-opacity-100 text-primary-content border-2 p-4 px-6 flex flex-col space-y-4">
-          {#if background?.style === 'gradient'}
-            <p>Linear Gradient</p>
-          {/if}
-          {#if background?.style === 'radial gradient'}
-            <p>Radial Gradient</p>
-          {/if}
-
-          <p>
-            from:
-            <input 
-              type="text" 
-              class="text-info inline-input w-[5.75rem]" 
-              bind:value={backgroundFromHex} 
-            />,
-          </p>
-          <p>
-            to: 
-            <input type="text" class="text-info inline-input w-[5.75rem]" bind:value={backgroundToHex} />, 
-          </p>
-          {#if background?.style === 'gradient'}
-            <input type="text" class="text-info inline-input w-[7rem]" bind:value={backgroundDirection} />
-          {/if}
-        </div>
-      </div>
-
-    <!-- end of entire gradient div -->
-    </div>
+      <ColorInput mode={'background'} isGradient={true} currentGradient={currentBackgroundGradient}/>
     {/if}
-
-
-
-    <!-- background image upload -->
     {#if backgroundImageForm}
-      <ImageUpload image={backgroundImage} mode={'background'}/>
+      <ImageUpload currentImage={backgroundImage} mode={'background'}/>
     {/if}
+
     <!-- end bg image upload here -->
   </div>
 
@@ -1624,19 +1448,22 @@
                   <!-- solid -->
                   <button 
                     on:click={() => setStyle('fill', 'solid')}
-                    class:grayscale-0={link?.fill?.style === ''}
+                    class:grayscale-0={link?.fill?.style === 'solid'}
                     class="filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent p-2 btn rounded-md btn-primary w-1/5 transform transition duration-300 ease-in-out">solid</button>
                   <!-- gradient -->
                   <button 
                     on:click={() => setStyle('fill', 'gradient')}
+                    class:grayscale-0={link?.fill?.style === 'gradient' || link?.fill?.style === 'radial gradient'}
                     class="filter grayscale hover:grayscale-0 p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
                   <!-- image -->
                   <button 
                     on:click={() => setStyle('fill', 'image')}
+                    class:grayscale-0={link?.fill?.style === 'image'}
                     class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
                   <!-- custom fill -->
                   <button 
-                    on:click={() => setStyle('fill', 'image')}
+                    on:click={() => setStyle('fill', 'gif')}
+                    class:grayscale-0={link?.fill?.style === 'gif'}
                     class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
                 </div>
               </div>
@@ -1644,253 +1471,17 @@
 
             <!-- solid color selection -->
             {#if solidLinkFill}
-            <div 
-              in:slide={{duration: 500, easing: cubicInOut}}
-              out:slide={{duration: 500, easing: cubicInOut}}
-              class="flex justify-start space-x-10">
-              
-              <!-- link color -->
-              <div class="">
-                <label for="Fill Color" class="label">
-                  <span class="label-text font-input-mono text-right">Fill Color</span>
-                </label>      
-                <div id="Fill Color" class="join">
-
-                  <input 
-                    type="color" 
-                    id="colorInput"
-                    style="width: 3.1rem; height: 3rem; border: 1px ridge {link?.fill?.hex};" 
-                    bind:value={link.fill.hex} 
-                    on:mouseenter={() => {if (link?.fill?.hex !== '') {showRemoveBackground = true}}}
-                    on:mouseleave={() => showRemoveBackground = false}
-                    on:change={() => updateColor('link fill', link.fill.hex, link.fill.opacity)}
-                    class="relative"
-                  >
-                  {#if showRemoveBackground}
-                  <button
-                    in:slide out:blur={{amount: 100}}
-                    on:click={() => {updateColor('link fill', '', 100)}} 
-                    class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
-                  {/if}
-                  <input 
-                    type="text" 
-                    placeholder="#12345" 
-                    bind:value={link.fill.hex} 
-                    on:change={() => updateColor('link fill', link.fill.hex, link.fill.opacity)} 
-                    class="input text-center w-[13rem]"
-                  >
-                    
-                </div>
-              </div>
-
-              <!-- opacity -->
-              <div class="form-control">
-                <label for="link fillopacity" class="label">
-                  <span class="label-text font-input-mono">Opacity</span>
-                </label>
-                <label class="input-group">
-                  <input type="text" min="0" max="100" id="opacity" bind:value={link.fill.opacity} on:change={() => updateOpacity('link fill')} class="input input-bordered w-1/2" />
-                  <span>%</span>
-                </label>
-              </div>
-            </div>
+              <ColorInput mode={'link fill'} isGradient={false} currentHex={currentLinkHex} currentGradient={currentLinkGradient}/>
             {/if}
-
             {#if gradientLinkFill}
-              <!-- entire gradient div -->
-              <!-- radial? or linear? -->
-            <div 
-              in:slide={{ duration: 1000, easing: cubicInOut }}
-              out:slide={{ duration: 1000, easing: cubicInOut }}
-              class="flex-col flex space-y-4">
-              <div class="flex space-x-4">
-                <button class:bg-success={link?.fill?.style === 'gradient'} on:click={() => setStyle('fill', 'gradient')} class="btn btn-sm btn-outline">Linear</button>
-                <button class:bg-success={link?.fill?.style === 'radial gradient'} on:click={() => setStyle('fill', 'radial gradient')} class="btn btn-sm btn-outline">Radial</button>
-              </div>
-
-              <!-- colors -->
-              <div class="flex">
-                <!-- from color -->
-                <div class="flex justify-start space-x-4">
-                  
-                  <!-- from color -->
-                  <div>
-                    <label for="From" class="label">
-                      <span class="label-text font-input-mono text-[1rem]">From</span>
-                    </label>      
-                    <div id="From" class="join">
-
-                        <!-- from input -->
-                        <input 
-                          type="color" 
-                          id="colorInput"
-                          style="width: 3.1rem; height: 3rem; border: 1px ridge {link?.fill?.gradient?.from?.hex};" 
-                          bind:value={link.fill.gradient.from.hex} 
-                          on:mouseenter={() => {if (link?.fill?.gradient?.from?.hex !== '') {showRemoveBackground = true}}}
-                          on:mouseleave={() => showRemoveBackground = false}
-                          on:change={() => updateColor('link gradient from', link?.fill?.gradient?.from?.hex, link?.fill?.gradient?.from?.opacity)}
-                          class="relative">
-
-                        <!-- remove color to revert back to theme color -->
-                        {#if showRemoveBackground}
-                        <button
-                          in:slide out:blur={{amount: 100}}
-                          on:click={() => {updateColor('link gradient from', '', 100)}} 
-                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
-                        {/if}
-
-                        <!-- hex input -->
-                        <input 
-                          type="text" 
-                          placeholder="#12345" 
-                          bind:value={link.fill.gradient.from.hex} 
-                          on:change={() => updateColor('link gradient from', link?.fill?.gradient?.from?.hex)} 
-                          class="input text-center w-1/2">
-                      </div>
-                    </div>
-
-                  <!-- no opacities for backgrounds until further notice -->
-                  <!-- opacity -->
-                  <!-- <div class="form-control">
-                    <label for="opacity" class="label">
-                      <span class="label-text font-input-mono">Opacity</span>
-                    </label>
-                    <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity might cause background to reflect diffently in preview than it will on your site"`}>
-                    <label class="input-group">
-                        <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.from.opacity} on:change={() => updateOpacity('background', background?.gradient?.from?.opacity)} class="input input-bordered w-[4rem]" />
-                      <span>%</span>
-                    </label>
-                    </div>
-                  </div> -->
-
-                </div>
-
-                <!-- to color -->
-                <div class="flex justify-start space-x-4">
-
-                  <!-- to color -->
-                  <div>
-                    <label for="to Color" class="label">
-                      <span class="label-text font-input-mono text-[1rem]">To</span>
-                    </label>      
-                    <div id="Background Color" class="join">
-
-                        <!-- show buttoncolor / clikc for color picker -->
-                          <input 
-                            type="color" 
-                            id="colorInput"
-                            style="width: 3.1rem; height: 3rem; border: 1px ridge {link?.fill?.gradient?.to?.hex};" 
-                            bind:value={link.fill.gradient.to.hex} 
-                            on:mouseenter={() => {if (link?.fill?.gradient?.to?.hex !== '') {showRemoveBackground = true}}}
-                            on:mouseleave={() => showRemoveBackground = false}
-                            on:change={() => updateColor('link gradient to', link?.fill?.gradient?.to?.hex, link?.fill?.gradient?.to?.opacity)} 
-                            class="relative"
-                          >
-                          {#if showRemoveBackground}
-                          <button
-                            in:slide out:blur={{amount: 100}}
-                            on:click={() => {updateColor('background gradient to', '', '')}} 
-                            class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</button>
-                          {/if}
-                      <input 
-                        type="text" 
-                        placeholder="#12345" 
-                        bind:value={link.fill.gradient.to.hex} 
-                        on:change={() => updateColor('link gradient to', link?.fill?.gradient?.to?.hex, link?.fill?.gradient?.to?.opacity)} 
-                        class="input text-center w-1/2"
-                      >
-
-                        
-
-                        
-                    </div>
-                  </div>
-
-                  <!-- opacity -->
-                  <!-- <div class="form-control">
-                    <label for="opacity" class="label">
-                      <span class="label-text font-input-mono">Opacity</span>
-                    </label>
-                    <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity will cause background to reflect diffently in preview than it will on your site"`}>
-
-                    <label class="input-group">
-                        <input type="text" min="0" max="100" id="opacity" bind:value={background.gradient.to.opacity} on:change={() => updateOpacity('background', background?.gradient?.to?.opacity)} class="input input-bordered w-[4rem]" />
-                      <span>%</span>
-                    </label>
-                    </div>
-                  </div> -->
-                </div>
-              </div>
-              <!-- gradient direction -->
-              <div class="flex flex-col justify-start">
-
-                <!-- preview + selection container -->
-                <div class="flex justify-start space-x-4">
-
-                  <!-- gradient preview -->
-                  <div 
-                    style={`background: linear-gradient(${backgroundDirection}, ${backgroundFromHex}, ${backgroundToHex});`}
-                    class="w-60 border-2 mt-10 border-primary rounded-xl max-w-md h-40 ">
-                  </div>
-                  <!-- gradient direction -->
-                  <div class="flex flex-col mt-4">
-                    <label for="Gradient Direction" class="label">
-                      <span class="label-text font-input-mono">Direction <span class="text-info">{backgroundDirection}°</span></span>
-                    </label>
-                  <div class="flex">
-
-                  <div id="Gradient Direction" class="flex flex-col text-white  join">
-                    <div class="join text-white flex justify-evenly">
-                      <button on:click={() => setGradientDirection('background', 315)} class="btn bg-opacity-0 text-5xl">↖</button>
-                      <button on:click={() => setGradientDirection('background', 0)} class="btn bg-opacity-0 text-5xl">↑</button>
-                      <button on:click={() => setGradientDirection('background', 4)} class="btn bg-opacity-0 text-5xl">↗</button>
-                    </div>
-                    <div class="join flex justify-evenly">
-                      <button on:click={() => setGradientDirection('background', 270)} class="btn bg-opacity-0 text-5xl">←</button>
-                      <button class="bg-opacity-0 text-5xl font-input-mono">☯︎</button>
-                      <button on:click={() => setGradientDirection('background', 90)} class="btn bg-opacity-0 text-5xl">→</button>
-                    </div>
-                    <div class="join flex justify-evenly">
-                      <button on:click={() => setGradientDirection('background', 215)} class="btn bg-opacity-0 text-5xl">↙</button>
-                      <button on:click={() => setGradientDirection('background', 180)} class="btn bg-opacity-0 text-5xl">↓</button>
-                      <button on:click={() => setGradientDirection('background', 135)} class="btn bg-opacity-0 text-5xl">↘</button>
-                    </div>
-                  </div>
-                  </div>
-
-                  
-                  </div>
-
-
-                </div>
-
-
-                <!-- input gradient values -->
-                
-                <div class="font-input-mono mt-4 bg-accent p-2 px-4">
-                  <p>
-                    from 
-                    <input 
-                      type="text" 
-                      class="text-info inline-input w-[5.75rem]" 
-                      bind:value={backgroundFromHex} 
-                    />, 
-                    to 
-                    <input type="text" class="text-info inline-input w-[5.75rem]" bind:value={backgroundToHex} />, 
-                    <input type="text" class="text-info inline-input w-[4rem]" bind:value={backgroundDirection} />
-                  </p>
-                </div>
-              </div>
-
-            </div>
-            <!-- end of entire gradient div -->
+            <ColorInput mode={'link fill'} isGradient={true} currentHex={currentLinkHex} currentGradient={currentLinkGradient}/>
             {/if}
 
           </div>
           {/if}
           {#if linkImageForm}
           <div class="">
-            <ImageUpload mode={'link'} image={linkImage} />
+            <ImageUpload mode={'link'} currentImage={linkImage} />
           </div>
           {/if}
         </div>
@@ -1904,11 +1495,41 @@
           </div>
           
           {#if border}
-          <!-- border style -->
           <div 
             in:slide={{duration: 300, easing: cubicInOut}}
             out:slide>
 
+            <!-- border size -->
+            <div>
+              <label for="size input" class="label">
+                <span class="label-text font-input-mono">Size</span>
+              </label>
+              <div id="size input" class="join font-input-mono">
+                <input on:change={() => setBorderWidth(sizeNumber, unit)} type="number" placeholder="1" class="input w-28" bind:value={sizeNumber}>
+                <div class="dropdown dropdown-hover">
+                  <!-- svelte-ignore a11y-label-has-associated-control -->
+                  <label tabindex="-1" class="btn">{unit}</label>
+                  <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 text-[1rem]">
+                    <button 
+                      on:click={() => {unit = 'rem'; setBorderWidth(sizeNumber, unit)}} 
+                      on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'rem'; setBorderWidth(sizeNumber, unit)}; }}
+                      tabindex="0">rem</button>
+                
+                    <button 
+                      on:click={() => {unit = 'em'; setBorderWidth(sizeNumber, unit)}} 
+                      on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'em'; setBorderWidth(sizeNumber, unit)}; }}
+                      tabindex="0">em</button>
+                
+                    <button 
+                      on:click={() => {unit = 'px'; setBorderWidth(sizeNumber, unit)}} 
+                      on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'px'; setBorderWidth(sizeNumber, unit)}; }}
+                      tabindex="0">px</button>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- border style -->
             <div 
               in:fly={{x: -20, duration: 400, easing: cubicInOut, delay: 200}}
               out:blur
@@ -1918,119 +1539,107 @@
               </label>
               <div id="Border Style">
                 <!-- styles -->
-                <div class="flex space-x-4 font-input-mono">
+                <div class="flex flex-wrap font-input-mono">
                   <!-- solid -->
                   <button 
                     on:click={() => setStyle('border', 'solid')}
-                    class="p-2 rounded-md border-success w-1/5 border-2 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
+                    style="border: 4px solid"
+                    class:bg-info={link?.border?.style === 'solid'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">solid</button>
                   <!-- dashed -->
                   <button 
                     on:click={() => setStyle('border', 'dashed')}
-                    class="p-2 rounded-md border-success w-1/5 border-dashed border-2 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
+                    style="border: 4px dashed"
+                    class:bg-info={link?.border?.style === 'dashed'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">dashed</button>
                   <!-- double -->
                   <button 
                     on:click={() => setStyle('border', 'double')}
-                    class="p-2 rounded-md border-success w-1/5 border-double border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
+                    style="border: 4px double"
+                    class:bg-info={link?.border?.style === 'double'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">double</button>
                   <!-- groove -->
                   <button 
                     on:click={() => setStyle('border', 'groove')}
                     style="border: 4px groove"
-                    class="p-2 rounded-md border-success w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">groove</button>
+                    class:bg-info={link?.border?.style === 'groove'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">groove</button>
                   <!-- ridge -->
                   <button 
                     on:click={() => setStyle('border', 'ridge')}
                     style="border: 4px ridge"
-                    class="p-2 rounded-md border-success w-1/5 border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">ridge</button>
-                  <!-- custom border -->
-                  <!-- <button 
-                    on:click={() => setStyle('border', 'custom')}
-                    class="p-2 rounded-md btn-accent w-1/5 border-t-primary border-r-primary border-b-info border-l-info border-4 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">custom</button> -->
+                    class:bg-info={link?.border?.style === 'ridge'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">ridge</button>
+                  <button 
+                    on:click={() => setStyle('border', 'inset')}
+                    style="border: 4px inset"
+                    class:bg-info={link?.border?.style === 'inset'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">inset</button>
+                  <button 
+                    on:click={() => setStyle('border', 'outset')}
+                    style="border: 4px outset"
+                    class:bg-info={link?.border?.style === 'outset'}
+                    class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">outset</button>
                 </div>
               </div>
             </div>
 
-            <!-- color selection -->
+            <!-- fill styles -->
             <div 
-              in:fly={{x: 20, duration: 400, easing: backOut, delay: 500}}
-              out:blur
-              class="flex flex-wrap justify-between">
-              <div class="flex justify-start space-x-10 ">
-                <!-- button border color -->
-                <div>
-                  <label for="Border Color" class="label">
-                    <span class="label-text font-input-mono">Border Color</span>
-                  </label>      
-                  <div id="Border Color" class="join">
-          
-                      <!-- link border color -->
-                      <button 
-                      style={`background-color: ${link.border.hex? link.border.hex : 'hsl(var(--s))'}`}
-                        on:mouseenter={() => {if (link.border.hex !== '') {showRemoveBorder = true}}}
-                        on:mouseleave={() => showRemoveBorder = false}
-                        on:click={() => {updateColor('link border', '', '')}} 
-                      class="btn w-1/4 rounded-md relative">
-                      {#if showRemoveBorder}
-                        <div
-                          in:slide out:blur={{amount: 100}}
-                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
-                      {/if}
-                    </button>
-          
-                      <!-- select value -->
-                      <select placeholder={bbValue} bind:value={bbValue} on:change={() => updateColor('link border', bbValue, bbShade)} class="select select-bordered">
-                        <option>slate</option>
-                        <option>gray</option>
-                        <option>zinc</option>
-                        <option>neutral</option>
-                        <option>stone</option>
-                        <option>red</option>
-                        <option>orange</option>
-                        <option>amber</option>
-                        <option>yellow</option>
-                        <option>lime</option>
-                        <option>green</option>
-                        <option>emerald</option>
-                        <option>teal</option>
-                        <option>cyan</option>
-                        <option>sky</option>
-                        <option>blue</option>
-                        <option>indigo</option>
-                        <option>violet</option>
-                        <option>purple</option>
-                        <option>fuchsia</option>
-                        <option>pink</option>
-                        <option>rose</option>
-                      </select>
-          
-                      <!-- select shade -->
-                      <select bind:value={bbShade} on:change={() => updateColor('link border', bbValue, bbShade)} class="select select-bordered">
-                        <option>50</option>
-                        <option>100</option>
-                        <option>200</option>
-                        <option>300</option>
-                        <option>400</option>
-                        <option>500</option>
-                        <option>600</option>
-                        <option>700</option>
-                        <option>800</option>
-                        <option>900</option>
-                        <option>950</option>
-                      </select>
-                  
+            in:slide={{duration: 300, easing: cubicInOut}}
+            out:slide>
+
+              <div 
+                in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
+                out:blur
+                class="mt-2 mb-6">
+                <label for="Fill Style" class="label">
+                  <span class="label-text font-input-mono">Style</span>
+                </label>
+                <div id="Fill Style">
+                  <!-- styles -->
+                  <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
+                    <!-- solid -->
+                    <button 
+                      on:click={() => setBorderFillStyle('solid')}
+                      class:grayscale-0={link?.border?.fillStyle === 'solid'}
+                      class="filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent p-2 btn rounded-md btn-primary w-1/5 transform transition duration-300 ease-in-out">solid</button>
+                    <!-- gradient -->
+                    <button 
+                      on:click={() => setBorderFillStyle('gradient')}
+                      class:grayscale-0={link?.border?.fillStyle === 'gradient' || link?.fill?.style === 'radial gradient'}
+                      class="filter grayscale hover:grayscale-0 p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
+                    <!-- image -->
+                    <button 
+                      on:click={() => setBorderFillStyle('image')}
+                      class:grayscale-0={link?.border?.fillStyle === 'image'}
+                      class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
+                    <!-- custom fill -->
+                    <button 
+                      on:click={() => setBorderFillStyle('gif')}
+                      class:grayscale-0={link?.border?.fillStyle === 'gif'}
+                      class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
                   </div>
                 </div>
-                <!-- opacity -->
-                <div class="form-control">
-                  <label for="opacity" class="label">
-                    <span class="label-text font-input-mono">Opacity</span>
-                  </label>
-                  <label class="input-group">
-                    <input type="text" min="0" max="100" id="opacity" bind:value={bbOpacity} on:change={() => updateOpacity('bb')} class="input input-bordered w-1/2" />
-                    <span>%</span>
-                  </label>
-                </div>
               </div>
-            </div>
+
+            <!-- solid color selection -->
+            {#if solidLinkBorder}
+            <ColorInput mode={'link border'} isGradient={false} currentHex={currentBorderHex} currentGradient={currentBorderGradient}/>
+            {/if}
+            {#if gradientLinkBorder}
+            <ColorInput mode={'link border'} isGradient={true} currentHex={currentBorderHex} currentGradient={currentBorderGradient}/>
+            {/if}
+            {#if borderImageForm}
+            <ImageUpload mode={'border'} currentImage={borderImage} />
+            {/if}
+            
+
+          </div>
+
+
+
+            
           </div>
           {/if}
 
@@ -2062,98 +1671,25 @@
                 <div class="flex space-x-4 font-input-mono">
                   <!-- soft shadow -->
                   <button 
-                    on:click={() => setStyle('shadow', 'soft')}
+                    on:click={() => setStyle('shadow', 'soft-shadow')}
                     class="btn soft-shadow p-2 rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">soft shadow</button>
                   <!-- hard shadow -->
                   <button 
-                    on:click={() => setStyle('shadow', 'hard')}
+                    on:click={() => setStyle('shadow', 'hard-shadow')}
                     class="hard-shadow p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">hard shadow</button>
+                  <!-- smooth steel shadow -->
+                  <button 
+                    on:click={() => setStyle('shadow', 'smooth-steel')}
+                    class="smooth-steel p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">smooth steel</button>
+                  <button
+                    on:click={() => setStyle('shadow', 'croc')}
+                    class="croc p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">croc</button>
                 </div>
               </div>
             </div>
 
-            <!-- color selection -->
-            <div 
-              in:fly={{y: 20, duration: 400, easing: backOut, delay: 500}}
-              out:blur
-              class="flex flex-wrap justify-between">
-              <div class="flex justify-start space-x-10 ">
-                <!-- shadow color -->
-                <div>
-                  <label for="Shadow Color" class="label">
-                    <span class="label-text font-input-mono">Shadow Color</span>
-                  </label>      
-                  <div id="Shadow Color" class="join">
-          
-                      <!-- link shadow color -->
-                      <button 
-                      style={`background-color: ${link.shadow.hex? link.shadow.hex : 'hsl(var(--s))'}`}
-                        on:mouseenter={() => {if (link.shadow.hex !== '') {showRemoveShadow = true}}}
-                        on:mouseleave={() => showRemoveShadow = false}
-                        on:click={() => {updateColor('link shadow', '', '')}} 
-                      class="btn w-1/4 rounded-md relative">
-                      {#if showRemoveShadow}
-                        <div
-                          in:slide out:blur={{amount: 100}}
-                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
-                      {/if}
-                    </button>
-          
-                      <!-- select value -->
-                      <select placeholder={bsValue} bind:value={bsValue} on:change={() => updateColor('link shadow', bsValue, bsShade)} class="select select-bordered">
-                        <option>slate</option>
-                        <option>gray</option>
-                        <option>zinc</option>
-                        <option>neutral</option>
-                        <option>stone</option>
-                        <option>red</option>
-                        <option>orange</option>
-                        <option>amber</option>
-                        <option>yellow</option>
-                        <option>lime</option>
-                        <option>green</option>
-                        <option>emerald</option>
-                        <option>teal</option>
-                        <option>cyan</option>
-                        <option>sky</option>
-                        <option>blue</option>
-                        <option>indigo</option>
-                        <option>violet</option>
-                        <option>purple</option>
-                        <option>fuchsia</option>
-                        <option>pink</option>
-                        <option>rose</option>
-                      </select>
-          
-                      <!-- select shade -->
-                      <select bind:value={bsShade} on:change={() => updateColor('link shadow', bsValue, bsShade)} class="select select-bordered">
-                        <option>50</option>
-                        <option>100</option>
-                        <option>200</option>
-                        <option>300</option>
-                        <option>400</option>
-                        <option>500</option>
-                        <option>600</option>
-                        <option>700</option>
-                        <option>800</option>
-                        <option>900</option>
-                        <option>950</option>
-                      </select>
-                  
-                  </div>
-                </div>
-                <!-- opacity -->
-                <div class="form-control">
-                  <label for="opacity" class="label">
-                    <span class="label-text font-input-mono">Opacity</span>
-                  </label>
-                  <label class="input-group">
-                    <input type="text" min="0" max="100" id="opacity" bind:value={bsOpacity} on:change={() => updateOpacity('bs')} class="input input-bordered w-1/2" />
-                    <span>%</span>
-                  </label>
-                </div>
-              </div>
-            </div>
+            <ColorInput mode={'link shadow'} currentHex={currentShadowHex} />
+            
           </div>
           {/if}
 
@@ -2175,20 +1711,10 @@
               out:blur
               class="mt-2 mb-6">
               
-              <div class="flex flex-col space-x-6 items-start mb-4">
+              <div class="flex flex-col space-x-6 items-start mb-2">
                 <label for="Text Effect" class="label">
                   <span class="label-text font-input-mono">Text Effect</span>
                 </label>
-                <div class="flex space-x-2">
-                  <input type="checkbox" class="toggle toggle-sm" bind:checked={onHover} on:change={() => updateOnHover()}>
-                  <h4 class="font-input-mono text-info text-[1rem]">
-                    {#if onHover}
-                    <span in:blur>On Hover</span>
-                    {:else}
-                    <span in:blur>Static</span>
-                    {/if}
-                  </h4>
-                </div>
               </div>
               <div id="Text Effect">
                 <!-- styles -->
@@ -2201,92 +1727,16 @@
                   <button 
                     on:click={() => handleTextEffectSelect('highlight', false)}
                     class="p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Highlight</button>
+                  <button 
+                    on:click={() => handleTextEffectSelect('tony', false)}
+                    class="tony p-2 btn btn-outline rounded-md w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Tony</button>
                 </div>
               </div>
             </div>
 
             <!-- color selection -->
-            <div 
-              in:fly={{y: 20, duration: 400, easing: backOut, delay: 500}}
-              out:blur
-              class="flex flex-wrap justify-between">
-              <div class="flex justify-start space-x-10 ">
-                <!-- title color -->
-                <div>
-                  <label for="Title Color" class="label">
-                    <span class="label-text font-input-mono">Title Color</span>
-                  </label>      
-                  <div id="Title Color" class="join">
-          
-                      <!-- link title color -->
-                      <button 
-                      style={`background-color: ${link?.title.hex? link?.title.hex : 'hsl(var(--pc))'}`}
-                        on:mouseenter={() => {if (link?.title.hex !== '') {showRemoveTitle = true}}}
-                        on:mouseleave={() => showRemoveTitle = false}
-                        on:click={() => {updateColor('link title', '', '')}} 
-                      class="btn w-1/4 rounded-md relative">
-                      {#if showRemoveTitle}
-                        <div
-                          in:slide out:blur={{amount: 100}}
-                          class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
-                      {/if}
-                    </button>
-          
-                      <!-- select value -->
-                      <select placeholder={bfValue} bind:value={bfValue} on:change={() => updateColor('link title', bfValue, bfShade)} class="select select-bordered">
-                        <option>slate</option>
-                        <option>gray</option>
-                        <option>zinc</option>
-                        <option>neutral</option>
-                        <option>stone</option>
-                        <option>red</option>
-                        <option>orange</option>
-                        <option>amber</option>
-                        <option>yellow</option>
-                        <option>lime</option>
-                        <option>green</option>
-                        <option>emerald</option>
-                        <option>teal</option>
-                        <option>cyan</option>
-                        <option>sky</option>
-                        <option>blue</option>
-                        <option>indigo</option>
-                        <option>violet</option>
-                        <option>purple</option>
-                        <option>fuchsia</option>
-                        <option>pink</option>
-                        <option>rose</option>
-                      </select>
-          
-                      <!-- select shade -->
-                      <select bind:value={bfShade} on:change={() => updateColor('link title', bfValue, bfShade)} class="select select-bordered">
-                        <option>50</option>
-                        <option>100</option>
-                        <option>200</option>
-                        <option>300</option>
-                        <option>400</option>
-                        <option>500</option>
-                        <option>600</option>
-                        <option>700</option>
-                        <option>800</option>
-                        <option>900</option>
-                        <option>950</option>
-                      </select>
-                  
-                  </div>
-                </div>
-                <!-- opacity -->
-                <div class="form-control">
-                  <label for="opacity" class="label">
-                    <span class="label-text font-input-mono">Opacity</span>
-                  </label>
-                  <label class="input-group">
-                    <input type="text" min="0" max="100" id="opacity" bind:value={bfOpacity} on:change={() => updateOpacity('link title')} class="input input-bordered w-1/2" />
-                    <span>%</span>
-                  </label>
-                </div>
-              </div>
-            </div>
+            <ColorInput mode={'link title'} currentHex={currentLinkTitleHex} />
+            
           </div>
 
         </div> 
@@ -2423,11 +1873,6 @@
     <div>
 
     </div> 
-    {#if showFontColorPicker}
-      <ColorPicker mode={mode} customTheme={customTheme}/>
-    {/if}
-
-
 </div>
     
 <!-- fonts -->
@@ -2462,30 +1907,6 @@
 
 <style>
   
-
-  .gradient-transition {
-    background: linear-gradient(180deg, #f0f9ff, #0c4a6e);
-    position: relative;
-    transition: background 1s ease-in-out;
-}
-
-.gradient-transition:hover .overlay {
-    opacity: 1;
-}
-
-.overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('/photos/disclaimer.jpeg');
-    background-size: contain;  /* This will make the image cover the entire div */
-    background-position: center;  /* This will center the image */
-    background-repeat: repeat;  /* This will prevent the image from repeating if it's too small for the container */
-    opacity: 0;
-    transition: opacity 1s ease-out;
-}
 
 .my-theme {
   position: relative;
