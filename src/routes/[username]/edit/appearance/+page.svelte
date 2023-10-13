@@ -744,7 +744,9 @@
       customTheme: {
         link: { 
           title: {
-            effect: effect
+            effect: {
+              effect: effect
+            }
           }
         }
       }
@@ -753,10 +755,7 @@
     await batch.commit();
   }
 
-  const handleTextEffectSelect = (effect) => {
-    console.log('handling text effect selection');
-    saveTextEffect(effect);
-  }
+  
 
 
 
@@ -1721,14 +1720,14 @@
                 <div class="flex space-x-4 font-input-mono">
                   <!-- glow -->
                   <button 
-                  on:click|preventDefault={() => handleTextEffectSelect('glow', false)} 
+                  on:click|preventDefault={() => saveTextEffect('glow')} 
                   class="glow btn p-2 rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Glow</button>
                   <!-- hard shadow -->
                   <button 
-                    on:click={() => handleTextEffectSelect('highlight', false)}
+                    on:click={() => saveTextEffect('highlight')}
                     class="p-2 btn rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Highlight</button>
                   <button 
-                    on:click={() => handleTextEffectSelect('tony', false)}
+                    on:click={() => saveTextEffect('tony')}
                     class="tony p-2 btn btn-outline rounded-md w-1/5 transform transition duration-300 ease-in-out font-black -tracking-widest">Tony</button>
                 </div>
               </div>

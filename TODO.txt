@@ -2976,5 +2976,62 @@ cant make a var with the name class:
 change this: let class: string[] = []; to this: let customClass: string[] = string[];
 
 
+i fixed the link title hex
 
+let's see if i can get the styles to be compatible
+
+for example: tony sets the text to black but glow keeps the custom text hex
+so let's see what magic i did in the glow style and apply that to tony
+
+
+
+
+old pattern:
+
+[localhost/username]
+style={`
+    {background.style === 'solid' ? `background: ${link.title.hex}` : ''}
+`}
+
+new pattern
+
+[app.css]
                     
+:root {
+    --background-hex: #fffffff;
+}
+.solid {
+    background: var(--background-hex)
+}
+
+[localhost/username]
+
+let element: HTMLElement;
+
+let customClass: string[] = [];
+let combinedClass: string;
+
+$: if (background) {
+    let newClasses = [];
+
+    if (background?.style) {
+        newClasses.push(background.style)
+    }
+
+    if (background?.hex) {
+      const rootStyle = document.documentElement.style;
+      rootStyle.setProperty('--background-hex', background.hex);
+    }
+
+    customClass = newClasses;
+    combinedClass = customClass.join(' ');
+    
+}
+
+<main
+    bind:this={element}
+    class="{combinedClass}">
+
+    ...html
+
+</main>

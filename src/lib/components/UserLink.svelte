@@ -181,6 +181,11 @@
 $: if (link) {
     let newStyles = [];
     let newClasses = [];
+
+    if (link?.title?.font?.hex) {
+      const rootStyle = document.documentElement.style;
+      rootStyle.setProperty('--title-color', link.title.font.hex);
+    }
     
     if (link?.fill?.isVisible) {
         switch (link?.fill?.style) {
@@ -269,7 +274,7 @@ $: if (link) {
     style={`
       color: ${link.title.font.hex || `hsl(var(--pc))`} 
     `}
-    class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect} {previewMode ? 'text-[1.23rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
+    class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect?.effect} {previewMode ? 'text-[1.23rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
     </p>
 </a>
 

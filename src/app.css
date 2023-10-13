@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  --title-color: #ffffff;
   transition:
     background-color 1s ease-out,
     color 1.5s ease-out,
@@ -86,7 +87,7 @@ html {
     to right,
     hsl(var(--a)),
     hsl(var(--a)) 50%,
-    #000 50%
+    var(--title-color) 50%
   );
   background-size: 200% 100%;
   background-position: -100%;
