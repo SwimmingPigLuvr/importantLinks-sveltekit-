@@ -5,7 +5,7 @@
 :root {
   --title-color: #ffffff;
   --fill-color: #ffffff;
-  --shadow-color: #ffffff;
+  --shadow-color: hsl(var(--a));
 
   --border-color: #ffffff;
   --border-style: solid;
@@ -28,15 +28,6 @@
     color 0.5s ease-out,
     border-color 1.5s ease-out;
   border-radius: 2s ease-out;
-}
-
-.hard-shadow {
-  box-shadow: 10px 10px 0px hsl(var(--pc));
-  border: 2px solid hsl(var(--pc));
-}
-
-.soft-shadow {
-  box-shadow: 0 10px 20px -12px hsl(var(--p));
 }
 
 html {
@@ -75,19 +66,19 @@ html {
 }
 
 .input::placeholder {
-  color: #97a6ce;
+  color: hsl(var(--a));
 }
 
 .soft-shadow {
-  box-shadow: 0 10px 20px -10px hsl(var(--a));
+  box-shadow: 0 10px 20px -10px var(--shadow-color);
 }
 
 .hard-shadow {
-  box-shadow: 10px 10px 0px hsl(var(--a));
+  box-shadow: 10px 10px 0px var(--shadow-color);
 }
 
 .hard-shadow:hover {
-  box-shadow: 15px 10px 0px hsl(var(--a));
+  box-shadow: 15px 10px 0px var(--shadow-color);
 }
 
 .smooth-steel {

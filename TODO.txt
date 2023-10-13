@@ -3098,3 +3098,12 @@ link shadow needs to have the hex value applied
 i think that i should go back to updating the patterns for setting the styles
 
 then i can nitpick all of the ui errors
+
+background isn't being applied. even in the livepreview
+
+uploading a background shows the backgroundDefault but it doens't show a preview of what the user uploaded
+
+removing the shadow color doesn't update unless i refresh
+    so let's add that to the list of things i have to refactor as reactive statements
+
+on refresh certain elements are falling back to the red data theme
