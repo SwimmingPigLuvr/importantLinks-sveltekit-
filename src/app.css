@@ -4,6 +4,18 @@
 
 :root {
   --title-color: #ffffff;
+  --fill-color: #ffffff;
+  --shadow-color: #ffffff;
+
+  --border-color: #ffffff;
+  --border-style: solid;
+  --border-width: 0.1rem;
+  --border-image: url('/borderDefault.png');
+  --border-repeat: no-repeat;
+  --border-gradient-direction: 0deg;
+  --border-gradient-from: #ffffff;
+  --border-gradient-to: #ffffff;
+
   transition:
     background-color 1s ease-out,
     color 1.5s ease-out,
@@ -122,4 +134,18 @@ html {
 
 .croc:hover {
   box-shadow: rgba(240, 46, 170, 0.4) -5px -5px, rgba(240, 46, 170, 0.3) -10px -10px, rgba(240, 46, 170, 0.2) -15px -15px, rgba(240, 46, 170, 0.1) -20px -20px, rgba(240, 46, 170, 0.05) -25px -25px;
+}
+
+.border-solid {
+  border: var(--border-width) var(--border-style) var(--border-color) 
+}
+
+.border-gradient {
+  border: var(--border-width) solid transparent;
+  border-image: linear-gradient(var(--border-gradient-direction), var(--border-gradient-from), var(--border-gradient-to));
+  border-image-slice: 1;
+}
+
+.border-image {
+  border: var(--border-width) solid; border-image: var(--border-image) var(--border-repeat);
 }

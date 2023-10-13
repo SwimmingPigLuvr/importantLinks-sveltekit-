@@ -17,8 +17,8 @@
   import ImageUpload from "$lib/components/ImageUpload.svelte";
   import ColorInput from "$lib/components/ColorInput.svelte";
 
-  let sizeNumber: number = 1;
-  let unit: string = 'rem';
+  let sizeNumber: number = 4;
+  let unit: string = 'px';
 
   let openPosition: boolean;
   let openSize: boolean;
@@ -628,19 +628,19 @@
     imageLinkFill = false;
   }
 
-  $: if (link?.border?.fillStyle === 'solid') {
+  $: if (link?.border?.fillStyle === 'border-solid') {
     solidLinkBorder = true;
   } else {
     solidLinkBorder = false;
   }
 
-  $: if (link?.border?.fillStyle === 'gradient') {
+  $: if (link?.border?.fillStyle === 'border-gradient') {
     gradientLinkBorder = true;
   } else {
     gradientLinkBorder = false;
   }
 
-  $: if (link?.border?.fillStyle === 'image') {
+  $: if (link?.border?.fillStyle === 'border-image') {
     borderImageForm = true;
   } else {
     borderImageForm = false;
@@ -1495,20 +1495,65 @@
           
           {#if border}
           <div 
-            in:slide={{duration: 300, easing: cubicInOut}}
-            out:slide>
+            in:slide={{duration: 500, easing: cubicInOut}}
+            out:slide={{duration: 500, easing: cubicInOut}}
+            class="py-4">
 
+            
+            
+            <!-- fill styles -->
+            <div>
+
+              <div 
+                in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
+                out:blur
+                class="mt-2 mb-6">
+                <label for="Fill Style" class="label">
+                  <span class="label-text font-input-mono">Style</span>
+                </label>
+                <div id="Fill Style">
+                  <!-- styles -->
+                  <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
+                    <!-- solid -->
+                    <button 
+                      on:click={() => setBorderFillStyle('border-solid')}
+                      class:grayscale-0={link?.border?.fillStyle === 'border-solid'}
+                      class="filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent p-2 btn rounded-md btn-primary w-1/5 transform transition duration-300 ease-in-out">solid</button>
+                    <!-- gradient -->
+                    <button 
+                      on:click={() => setBorderFillStyle('border-gradient')}
+                      class:grayscale-0={link?.border?.fillStyle === 'border-gradient' || link?.fill?.style === 'border-radial-gradient'}
+                      class="filter grayscale hover:grayscale-0 p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
+                    <!-- image -->
+                    <button 
+                      on:click={() => setBorderFillStyle('border-image')}
+                      class:grayscale-0={link?.border?.fillStyle === 'border-image'}
+                      class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
+                    <!-- custom fill -->
+                    <button 
+                      on:click={() => setBorderFillStyle('border-gif')}
+                      class:grayscale-0={link?.border?.fillStyle === 'border-gif'}
+                      class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
+                  </div>
+              </div>
+            </div>
+            
             <!-- border size -->
             <div>
               <label for="size input" class="label">
                 <span class="label-text font-input-mono">Size</span>
               </label>
               <div id="size input" class="join font-input-mono">
-                <input on:change={() => setBorderWidth(sizeNumber, unit)} type="number" placeholder="1" class="input w-28" bind:value={sizeNumber}>
+                <input on:change={() => setBorderWidth(sizeNumber, unit)} type="number" placeholder="4" class="input w-28" bind:value={sizeNumber}>
                 <div class="dropdown dropdown-hover">
                   <!-- svelte-ignore a11y-label-has-associated-control -->
                   <label tabindex="-1" class="btn">{unit}</label>
                   <ul tabindex="-1" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 text-[1rem]">
+                    <button 
+                      on:click={() => {unit = 'px'; setBorderWidth(sizeNumber, unit)}} 
+                      on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'px'; setBorderWidth(sizeNumber, unit)}; }}
+                      tabindex="0">px</button>
+
                     <button 
                       on:click={() => {unit = 'rem'; setBorderWidth(sizeNumber, unit)}} 
                       on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'rem'; setBorderWidth(sizeNumber, unit)}; }}
@@ -1519,19 +1564,16 @@
                       on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'em'; setBorderWidth(sizeNumber, unit)}; }}
                       tabindex="0">em</button>
                 
-                    <button 
-                      on:click={() => {unit = 'px'; setBorderWidth(sizeNumber, unit)}} 
-                      on:keydown={(e) => { if (e.key === 'Enter' || e.key === 'Space') {unit = 'px'; setBorderWidth(sizeNumber, unit)}; }}
-                      tabindex="0">px</button>
                   </ul>
                 </div>
               </div>
             </div>
 
             <!-- border style -->
+            {#if solidLinkBorder}
             <div 
-              in:fly={{x: -20, duration: 400, easing: cubicInOut, delay: 200}}
-              out:blur
+              in:slide={{duration: 1000, easing: cubicInOut}}
+              out:slide={{duration: 1000, easing: cubicInOut}}
               class="mt-2 mb-6">
               <label for="Border Style" class="label">
                 <span class="label-text font-input-mono">Style</span>
@@ -1581,56 +1623,23 @@
                     class="p-2 hover:bg-info rounded-md w-1/5 transform transition duration-300 ease-in-out font-black text-sm -tracking-widest">outset</button>
                 </div>
               </div>
+
+              <ColorInput mode={'link border'} currentHex={currentBorderHex} />
+
             </div>
-
-            <!-- fill styles -->
-            <div 
-            in:slide={{duration: 300, easing: cubicInOut}}
-            out:slide>
-
-              <div 
-                in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
-                out:blur
-                class="mt-2 mb-6">
-                <label for="Fill Style" class="label">
-                  <span class="label-text font-input-mono">Style</span>
-                </label>
-                <div id="Fill Style">
-                  <!-- styles -->
-                  <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
-                    <!-- solid -->
-                    <button 
-                      on:click={() => setBorderFillStyle('solid')}
-                      class:grayscale-0={link?.border?.fillStyle === 'solid'}
-                      class="filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent p-2 btn rounded-md btn-primary w-1/5 transform transition duration-300 ease-in-out">solid</button>
-                    <!-- gradient -->
-                    <button 
-                      on:click={() => setBorderFillStyle('gradient')}
-                      class:grayscale-0={link?.border?.fillStyle === 'gradient' || link?.fill?.style === 'radial gradient'}
-                      class="filter grayscale hover:grayscale-0 p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
-                    <!-- image -->
-                    <button 
-                      on:click={() => setBorderFillStyle('image')}
-                      class:grayscale-0={link?.border?.fillStyle === 'image'}
-                      class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
-                    <!-- custom fill -->
-                    <button 
-                      on:click={() => setBorderFillStyle('gif')}
-                      class:grayscale-0={link?.border?.fillStyle === 'gif'}
-                      class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
-                  </div>
-                </div>
-              </div>
-
-            <!-- solid color selection -->
-            {#if solidLinkBorder}
-            <ColorInput mode={'link border'} isGradient={false} currentHex={currentBorderHex} currentGradient={currentBorderGradient}/>
             {/if}
+
             {#if gradientLinkBorder}
-            <ColorInput mode={'link border'} isGradient={true} currentHex={currentBorderHex} currentGradient={currentBorderGradient}/>
+            <div 
+              in:slide={{duration: 1000, easing: cubicInOut}}
+              out:slide={{duration: 1000, easing: cubicInOut}}
+              class="py-4">
+              <ColorInput mode={'link border'} isGradient={true} currentGradient={currentBorderGradient}/>
+            </div>
             {/if}
+
             {#if borderImageForm}
-            <ImageUpload mode={'border'} currentImage={borderImage} />
+              <ImageUpload mode={'border'} currentImage={borderImage} />
             {/if}
             
 
@@ -1704,6 +1713,10 @@
           <div 
             in:slide={{duration: 300, easing: cubicInOut}}
             out:slide>
+
+            <!-- color selection -->
+            <ColorInput mode={'link title'} currentHex={currentLinkTitleHex} />
+
             <!-- style/texteffects div -->
             <div 
               in:fly={{y: -20, duration: 400, easing: backOut, delay: 200}}
@@ -1733,8 +1746,6 @@
               </div>
             </div>
 
-            <!-- color selection -->
-            <ColorInput mode={'link title'} currentHex={currentLinkTitleHex} />
             
           </div>
 

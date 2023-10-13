@@ -3035,3 +3035,66 @@ $: if (background) {
     ...html
 
 </main>
+
+
+
+to do:
+
+make sure there are custom classes set for every border fillStyle
+
+border will be different because we have styles and we have fillStyles
+
+fillStyles:
+    solid
+    gradient
+    image
+
+styles:
+    all of the generic css border styles
+        solid
+        double
+        ...etc
+
+also need to be more specific with my fillStyles because in the css file i don't want to be generic
+
+border-solid
+border-gradient
+border-image
+
+
+need to fix how the styles are applied because it's kinda all over the place 
+
+border gradient styles aren't applying correctly
+
+✅default border size needs to be in px unless we want to 
+change the dropdown to be in decimal increments 0.1rem
+
+border gradient just sets a gradient background behind the link fill
+border image just sets a solid black border
+
+
+i can probably come back to this but i need to update the style for backgrounds 
+in other pages besides the livepreview
+
+border styles need to only appear if link.border.fillStyle === 'solid'
+because that's the only time they are appliccable
+
+
+editing the animations when switching styles even tho this wasn't on my todo list
+
+link title color should come before the link title effect page
+
+fix the colorinput component
+
+removing the custom color doesn't always remove it from the input.
+
+it works instantly to remove it from the db and the user's page
+but just in the edit/appearance page it doesn't show in the relevant inputs
+
+when border isVisible = false. there is still a pesky border that shows up
+
+link shadow needs to have the hex value applied
+
+i think that i should go back to updating the patterns for setting the styles
+
+then i can nitpick all of the ui errors
