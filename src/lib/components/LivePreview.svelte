@@ -4,7 +4,13 @@
     import { fly, blur, fade, slide } from "svelte/transition";
     import { backOut } from "svelte/easing";
   import type { CustomTheme } from "$lib/theme";
+  import { doc } from "firebase/firestore";
+  import { browser } from "$app/environment";
 
+  if (browser) {
+    const headingElement = document.querySelector('h1');
+    console.log(headingElement);
+  }
   // user's customTheme settings 
   export let customTheme: CustomTheme;
 
@@ -14,7 +20,9 @@
   export let bio: string = '';
   export let links: any[] = [];
   export let theme: string = '';
-  export let header: string = '';
+
+  let element: HTMLElement;
+
   let previewMode: boolean = true;
 
   let background: {
@@ -32,8 +40,8 @@
     hex: string | undefined;
     image: {
       position: string,
-      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover",
+      repeat: string,
+      size: string,
       url: string,
     };
     opacity: number;
@@ -131,6 +139,9 @@
     background = customTheme.background;
     font = customTheme.font;
     link = customTheme.link;
+    console.log('background: ', background);
+    console.log('font: ', font);
+    console.log('link: ', link);
   }
 
   // gradient constructors
@@ -142,7 +153,7 @@
   let toOpacity: number;
   let direction: string;
 
-  $: if (background?.style === 'gradient') {
+  $: if (background?.style === 'background-gradient') {
     gradient = background?.gradient;
     fromHex = gradient?.from?.hex;
     fromOpacity = gradient?.from?.opacity;
@@ -167,80 +178,63 @@
     showData = !showData;
   }
 
+  let newClasses: string[] = [];
+  let combinedClass: string;
+  let combinedStyle: string;
+  let rootStyle;
+
+  // $: if (background?.style === 'solid-background') {
+  //   // newClasses.push
+  // }
+
+  $: if (background) {
+    rootStyle = document.documentElement.style;
+    newClasses = [];
+    newClasses.push(background?.style ?? 'no background style?');
+    combinedClass = newClasses.join(' ');
+    console.log('newClasses: ', newClasses);
+    console.log('combined class: ', combinedClass);
+
+    // background-solid
+    rootStyle.setProperty('--background-color', background?.hex || 'hsl(var(--s))');
+    // background-gradient
+    rootStyle.setProperty('--background-gradient-direction', direction || '0deg');
+    rootStyle.setProperty('--background-gradient-from', fromHex || 'hsl(var(--a))');
+    rootStyle.setProperty('--background-gradient-to', toHex || 'hsl(var(--s))');
+    // background-image
+    rootStyle.setProperty('--background-url', `url(${background.image.url})` || `url('linkDefault.png')`);
+    rootStyle.setProperty('--background-position', background?.image?.position || 'center');
+    rootStyle.setProperty('--background-size', background?.image?.size || 'cover');
+    rootStyle.setProperty('--background-repeat', background?.image?.repeat || 'no-repeat');
+  }
+
 
   onMount(() => { 
       mounted = true;
+      
+
       function handleResize() {
         if (window.innerWidth >= 768) {
           showPreview = false
         }
       }
       window.addEventListener('resize', handleResize);
-      handleResize();
+      handleResize(); 
+      
+
+      
     }
+
+   
   );
 
-  let combinedStyle: string;
-  let backgroundImage: string[] = [];
-  let backgroundColor: string = '';
-  let backgroundRepeat: string[] = [];
-  let backgroundPosition: string[] = [];
-  let backgroundSize: string[] = []; // Changed this to an array for easier management
-  let color: string = '';
 
-  $: {
-      // Clear previous values
-      backgroundImage = [];
-      backgroundSize = [];
+  
+  
 
-      // If header exists
-      if (header && header !== '') {
-          backgroundImage.push(`url(${header})`);
-          backgroundSize.push('contain');
-          backgroundRepeat.push('no-repeat');
-          backgroundPosition.push('top');
-      }
+  
 
-      // If background style exists
-      if (background) {
-          if (background?.style === 'image') {
-              backgroundImage.push(`url(${background.image.url})`);
-              backgroundRepeat.push(background.image.repeat || `no-repeat`);
-              backgroundPosition.push(background.image.position || `center`);
-              backgroundSize.push(background.image.size || `cover`);
-          } 
-
-          // Solid color background
-          if (background?.style === 'solid') {
-              backgroundColor = background.hex || `hsl(var(--s))`;
-          } 
-          
-          // Gradient background
-          if (background?.style === 'gradient') {
-              backgroundColor = `linear-gradient(${direction || `0deg`}, ${fromHex || `hsl(var(--p))`}, ${toHex || `hsl(var(--s))`})`;
-          } 
-
-          // Radial Gradient background
-          if (background?.style === 'radial-gradient') {
-              backgroundColor = `radial-gradient(${fromHex || `hsl(var(--p))`}, ${toHex || `hsl(var(--s))`})`;
-          }
-      }
-
-      // If font exists
-      if (font) {
-          color = font.hex || `hsl(var(--ac))`;
-      }
-
-      // Construct the final combined style using the individual properties
-      combinedStyle = `
-          color: ${color};
-          background-image: ${backgroundImage.join(", ")};
-          background-color: ${backgroundColor};
-          background-repeat: ${backgroundRepeat.join(', ')};
-          background-position: ${backgroundPosition.join(', ')};
-          background-size: ${backgroundSize.join(", ")};
-      `;
-  }
+      
 
 
   
@@ -292,11 +286,10 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
     <!-- phone div -->
     <div 
         in:fly={{ x: -50, duration: 1000, easing: backOut }}
-        data-theme={theme}
-        style={`${showPreview? 'width: 100vw; height: 100vh' : 'width: 30vw; min-width: 190px; min-height: 380px; max-height: 600px; max-width: 300px;'} 
-        ${combinedStyle}
-        `}
-        class="{showPreview? 'border-none rounded-none w-screen' : 'border-black border-[0.75rem] rounded-[33px]'} flex flex-col justify-start overflow-auto">
+        bind:this={element}
+        class={`
+          ${showPreview ? 'full-preview' : 'small-preview'} common-preview ${combinedClass}
+        `}>
         <div style="padding-top: 205%; position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
 
@@ -308,9 +301,9 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
 
       <div 
       style={`color: ${font?.hex? font?.hex : 'hsl(var(--p))'}`}
-      class="flex flex-col items-center mt-8 mb-4 font-{font?.family}">
+      class="flex flex-col space-y-1 items-center mt-8 mb-4 font-{font?.family}">
         <!-- pfp -->
-        <img class="min-w-[38px] min-h-[38px] max-h-[88px] max-w-[88px]"  src="{photoURL}" alt="pfp">
+        <img class="min-w-[30px] min-h-[30px] max-h-[72px] max-w-[72px]"  src="{photoURL}" alt="pfp">
         <!-- Username -->
         <p class="text-[1rem]">@{username? username : 'error fetching username'}</p>
         <!-- bio -->

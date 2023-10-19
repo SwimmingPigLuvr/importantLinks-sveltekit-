@@ -3107,3 +3107,54 @@ removing the shadow color doesn't update unless i refresh
     so let's add that to the list of things i have to refactor as reactive statements
 
 on refresh certain elements are falling back to the red data theme
+
+
+
+october 18
+
+fixing the gradient style in the livepreview
+
+gradient hexes are saving correctly
+when deleted the change doesn't reflect right away
+that means it's not reflecting in the edit/appearance page? or the color picker?
+    in the color picker the bound styles were not based on reacitve conditions. make everything that needs to be reactive, reactive
+    while i was in they i fixed the linear and radial styles so that way they show up as selected
+
+
+i need to organize everything.
+
+alt/edit/appearance let's milady edit milady's page?
+
+background image works now!
+make sure to fix the preview from the imageUpload component
+
+
+use authcheck to check if user is logged in.
+make a custom log in page that takes them back to the front
+
+homepage idea
+
+blinktr.ee
+
+circular slider of existing accounts
+    each users as user
+        
+        if user.isPublished (only show public accounts)
+            <LivePreview data={...userData} />
+        if
+    each
+
+
+october 19
+
+first todos checking out my site from the top down
+    ✅make sure that clicking a prebuilt theme will have a solid background that doesn't hide the hard shadow
+        solutions:
+            change the bg
+            change the link style
+
+    livepreview ui:
+        pfp & bio: a little smaller, more space between
+        userlink: a little wider, title a little smaller
+        customTheme dissapears after refresh
+            solution: designate the custom theme for just the preview.

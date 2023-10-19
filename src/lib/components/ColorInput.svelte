@@ -16,12 +16,12 @@
     export let isGradient: boolean = false;
 
     export let currentHex = {
-        hex: '#FFFFFF',
+        hex: '#ffffff',
         opacity: 100,
     };
 
     export let currentGradient = {
-        from: { hex: '#FFFFFF', opacity: 100 },
+        from: { hex: '#ffffff', opacity: 100 },
         to: { hex: '#000000', opacity: 100 },
         direction: '0deg',
         style: 'linear',
@@ -30,7 +30,7 @@
     let hex: string;
     let opacity: number;
 
-    if (currentHex) {
+    $: if (currentHex) {
         hex = currentHex.hex;
         opacity = currentHex.opacity;
     }
@@ -41,7 +41,7 @@
     let direction: string;
     let style: string;
 
-    if (currentGradient) {
+    $: if (currentGradient) {
         from = currentGradient.from;
         to = currentGradient.to;
         direction = currentGradient.direction;
@@ -381,6 +381,7 @@
 </script>
     {#if !isGradient}
 
+    <!-- non gradients -->
     <container 
         in:slide={{ duration: 1000, easing: cubicInOut }}
         out:slide={{ duration: 1000, easing: cubicInOut }}
@@ -445,13 +446,14 @@
 
     {:else}
 
+    <!-- gradients -->
     <container 
         in:slide={{ duration: 1000, easing: cubicInOut }}
         out:slide={{ duration: 1000, easing: cubicInOut }}
         class="flex-col flex space-y-4 my-4">
       <div class="flex space-x-4">
-        <button class:bg-success={style === 'gradient'} on:click={() => setStyle(mode, 'gradient')} class="btn btn-outline">Linear</button>
-        <button class:bg-success={style === 'radial gradient'} on:click={() => setStyle(mode, 'radial gradient')} class="btn btn-outline">Radial</button>
+        <button class:bg-success={style === 'background-gradient'} on:click={() => setStyle(mode, 'background-gradient')} class="btn btn-outline">Linear</button>
+        <button class:bg-success={style === 'background-radial-gradient'} on:click={() => setStyle(mode, 'background-radial-gradient')} class="btn btn-outline">Radial</button>
       </div>
 
       <!-- colors -->

@@ -61,12 +61,12 @@
     hex: string | undefined;
     image: {
       position: string,
-      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover",
+      repeat: string,
+      size: string,
       url: string,
     };
     opacity: number;
-    style: "image" | "gradient" | "solid";
+    style: string;
   };
 
   let link: {
@@ -326,7 +326,7 @@ data-theme={theme}
 style={`
   color: ${font?.hex};
   ${background?.style === 'solid' ? `background-color: ${background?.hex}` : ''}
-  ${background?.style === 'image' ? `background-image: url(${background.value}): background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''}
+  ${background?.style === 'image' ? `background-image: url(${background.image.url}): background-size: 100% 100%; background-repeat: no-repeat; background-position: top;` : ''}
 `}
 
 class={`bg-secondary font-${font?.family ? font?.family : 'input-mono'} -z-20 h-screen fixed top-0 left-0 overflow-auto w-[100vw] text-center`}>
@@ -435,6 +435,7 @@ class={`bg-secondary font-${font?.family ? font?.family : 'input-mono'} -z-20 h-
         title={item.title} 
         url={item.url} 
         customTheme={customTheme}
+        previewMode={false}
       />      
   
 
@@ -449,7 +450,7 @@ class={`bg-secondary font-${font?.family ? font?.family : 'input-mono'} -z-20 h-
         in:slide={{ duration: 700, easing: cubicInOut}}
         out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-{font?.value} text-{background?.value} font-{font?.family} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
+        class="bg-{font?.value} text-{background?.hex} font-{font?.family} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->

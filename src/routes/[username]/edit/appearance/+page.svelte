@@ -1,29 +1,22 @@
 <script lang="ts">
   import Fonts from "$lib/components/Fonts.svelte";
+  import AuthCheck from "$lib/components/AuthCheck.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
-  import UserLink from "$lib/components/UserLink.svelte";
-  import { db, user, userData, storage, userTheme } from "$lib/firebase";
-  import { setTheme, type CustomTheme, defaultTheme, emptyTheme, type GradientValue } from "$lib/theme";
-  import { doc, getDoc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
+  import { db, user, userData, storage } from "$lib/firebase";
+  import type { LinkData } from "$lib/firebase";
+  import { setTheme, type CustomTheme, emptyTheme } from "$lib/theme";
+  import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-  import { flip } from "svelte/animate";
-  import { backIn, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
-  import { fade, slide, blur, fly } from "svelte/transition";
+  import { backOut, cubicInOut } from "svelte/easing";
+  import { slide, blur, fly } from "svelte/transition";
   import { updateTheme } from "$lib/themeStore";
   import type { PageData } from "./$types";
   import Nav from "$lib/components/Nav.svelte";
-  import colors from "tailwindcss/colors";
-  import { onMount } from "svelte";
   import ImageUpload from "$lib/components/ImageUpload.svelte";
   import ColorInput from "$lib/components/ColorInput.svelte";
 
   let sizeNumber: number = 4;
   let unit: string = 'px';
-
-  let openPosition: boolean;
-  let openSize: boolean;
-  let openRepeat: boolean;
-  let customSize: string;
 
   let header: string;
   let background: {
@@ -41,8 +34,8 @@
     hex: string | undefined;
     image: {
       position: string,
-      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover" | "100% 100%",
+      repeat: string,
+      size: string,
       url: string,
     };
     opacity: number;
@@ -136,128 +129,6 @@
     opacity: number;
   };
 
-  async function setBackgroundPosition(position: string) {
-    const batch = writeBatch(db);
-    saving = true;
-
-    batch.set(doc(db, `users/${$user!.uid}`), {
-      customTheme: {
-        background: {
-          image: {
-            position: position
-          }
-        }
-      }
-    }, { merge: true });
-    
-    await batch.commit();
-    saveSuccess = true;
-    saving = false;
-  }
-
-  async function setBackgroundSize(size: string) {
-    const batch = writeBatch(db);
-    saving = true;
-
-    batch.set(doc(db, `users/${$user!.uid}`), {
-      customTheme: {
-        background: {
-          image: {
-            size: size
-          }
-        }
-      }
-    }, { merge: true });
-    
-    await batch.commit();
-    saveSuccess = true;
-    saving = false;
-  }
-
-  async function setBackgroundRepeat(repeat: string) {
-    const batch = writeBatch(db);
-    saving = true;
-    batch.set(doc(db, `users/${$user!.uid}`), {
-      customTheme: {
-        background: {
-          image: {
-            repeat: repeat
-          }
-        }
-      }
-    }, { merge: true });
-    
-    await batch.commit();
-    saveSuccess = true;
-    saving = false;
-  }
-
-
-  async function setGradientDirection(mode: string, degree: number) {
-    const batch = writeBatch(db);
-    saving = true;
-    const degreeValue = `${degree}deg`;
-
-    switch (mode) {
-      case 'background':
-        batch.set(doc(db, `users/${$user!.uid}`), {
-          customTheme: {
-            background: {
-              gradient: {
-                direction: degreeValue
-              }
-            }
-          }
-        }, { merge: true });
-        break;
-      case 'link border':
-        batch.set(doc(db, `users/${$user!.uid}`), {
-          customTheme: {
-            link: {
-              border: {
-                gradient: {
-                  direction: degreeValue
-                }
-              }
-            }
-          }
-        }, { merge: true });
-        break;
-      case 'link fill':
-        batch.set(doc(db, `users/${$user!.uid}`), {
-          customTheme: {
-            link: {
-              fill: {
-                gradient: {
-                  direction: degreeValue
-                }
-              }
-            }
-          }
-        }, { merge: true });
-        break;
-      case 'link shadow':
-        batch.set(doc(db, `users/${$user!.uid}`), {
-          customTheme: {
-            link: {
-              shadow: {
-                gradient: {
-                  direction: degreeValue
-                }
-              }
-            }
-          }
-        }, { merge: true });
-        break;
-
-      default:
-        break;
-    }
-    await batch.commit();
-    saveSuccess = true;
-    saving = false;
-  }
-
   async function setBorderWidth(sizeNumber: number, unit: string) {
     const batch = writeBatch(db);
     saving = true;
@@ -296,7 +167,6 @@
     saveSuccess = true;
     saving = false;  
   }
-
 
   let fill: boolean;
   let border: boolean;
@@ -369,38 +239,7 @@
     await batch.commit();
   }
 
-  let from: GradientValue = {
-    value: 'lime',
-    shade: '400',
-    opacity: 100 
-  };
-
-  let to: GradientValue = {
-    value: 'cyan',
-    shade: '200',
-    opacity: 100
-  };
-
-  let direction: string = '45deg';
-
-  // tailwind class based on user color choices
-  let fromColor: string;
-  let toColor: string;
-
-  // hex codes
-  let fromHex: string | undefined = '#A0A0A0FF';
-  let toHex: string | undefined = '#4A4A4AFF';
-
   let showBackUp: boolean = false;
-
-  let showRemoveBackground: boolean = false;
-  let showRemoveFromColor: boolean = false;
-  let showRemoveToColor: boolean = false;
-  let showRemoveFill: boolean = false;
-  let showRemoveBorder: boolean = false;
-  let showRemoveShadow: boolean = false;
-  let showRemoveTitle: boolean = false;
-  let showRemoveFont: boolean = false;
 
   export let data: PageData;
 
@@ -413,105 +252,28 @@
   let theme: string | undefined;
   
 
-
-  // new color flow
-  let shade: string = 'lime';
-  let value: number;
-  let opacity: number = 100;
-
-
-  // background
-  let bgValue: string = 'sky';
-  let bgShade: string = '600';
-  let bgOpacity: number = 100;
-
-  // button color
-  let bcValue: string = 'lime';
-  let bcShade: string = '400';
-  let bcOpacity: number = 100;
-
-  // button font
-  let bfValue: string = 'slate';
-  let bfShade: string = '50';
-  let bfOpacity: number = 100;
-
-  // button border
-  let buttonBorder: string;
-  let bbValue: string = 'lime';
-  let bbShade: string = '50';
-  let bbOpacity: number = 100;
-
-  // button shadow
-  let buttonShadow: string;
-  let bsValue: string = 'slate';
-  let bsShade: string = '950';
-  let bsOpacity: number = 100;
-
-  // font
-  let fcValue: string = 'zinc';
-  let fcShade: string = '50';
-  let fcOpacity: number = 100;
-
-  let temp: string;
-
-  let tempBackgroundColor: string;
-
-  let tempButtonColor: string;
-  let tempButtonFontColor: string;
-  let tempButtonBorderColor: string = 'zinc-950';
-  let tempButtonShadowColor: string = 'zinc-950';
-
-  let tempFontColor: string;
-
   let userThemes: CustomTheme[] = [];
   
-  // hex vars
-  let fontColorHex: string | undefined;
-  let backgroundHex: string | undefined;
-  let buttonColorHex: string | undefined;
-  let buttonFontColorHex: string | undefined;
-  let buttonBorderHex: string | undefined;
-  let buttonShadowHex: string | undefined;
-
-  // complicated vars lol
-  // bg color hex w opacity
-  let bgchwo: string;
-
-  // button color hex w opacity
-  let bchwo: string;
-
-  // button font color hex w opacity
-  let bfchwo: string;
-
-  // button border
-  let buttonBorderHexWithOpacity: string;
-
-  // button shadow color with opacity
-  let buttonShadowHexWithOpacity: string;
-
-  // font color hex w opacity
-  let fchwo: string;
-
   let onHover: boolean;
 
-  let currentBackgroundHex;
-  let currentBackgroundGradient;
+  let currentBackgroundHex: any;
+  let currentBackgroundGradient: any;
 
-  let currentLinkHex;
-  let currentLinkGradient;
+  let currentLinkHex: any;
+  let currentLinkGradient: any;
 
-  let currentBorderHex;
-  let currentBorderGradient;
+  let currentBorderHex: any;
+  let currentBorderGradient: any;
 
-  let currentShadowHex;
-  let currentShadowGradient;
-  let currentLinkTitleHex;
-  let currentFontHex;
+  let currentShadowHex: any;
+  let currentShadowGradient: any;
+  let currentLinkTitleHex: any;
+  let currentFontHex: any;
 
-  let headerImage;
-  let backgroundImage;
-  let linkImage;
-  let borderImage;
+  let headerImage: any;
+  let backgroundImage: any;
+  let linkImage: any;
+  let borderImage: any;
 
   $: if ($userData) {
     username = $userData.username;
@@ -526,7 +288,7 @@
     font = customTheme.font;
     background = customTheme.background;
     link = customTheme.link;
-    onHover = link?.title?.onHover;
+    onHover = link?.title?.effect?.onHover;
 
     // objects for color input component
     currentFontHex = {hex: font.hex, opacity: font.opacity}
@@ -539,7 +301,18 @@
     currentLinkGradient = {...link.fill.gradient, style: link.fill.style};
     currentBorderGradient = {...link.border.gradient, style: link.border.style};
     currentShadowGradient = {...link.shadow.gradient, style: link.shadow.style};
-    currentBackgroundGradient = {...background.gradient, style: background.style};
+    currentBackgroundGradient = {
+      from: {
+        hex: background.gradient.from.hex,
+        opacity: background.gradient.from.opacity
+      },
+      to: {
+        hex: background.gradient.to.hex,
+        opacity: background.gradient.to.opacity
+      },
+      direction: background.gradient.direction,
+      style: background.style,
+    };
 
     // objects for the ImageUpload component
     backgroundImage = background.image;
@@ -557,30 +330,20 @@
     updateTheme(customTheme);
   }
 
-  let backgroundDirection;
-  let backgroundFromHex;
-  let backgroundToHex;
-  let backgroundFromOpacity;
-  let backgroundToOpacity;
 
-  $: if (background?.style === 'gradient' || background?.style === 'radial gradient') {
-    backgroundDirection = background?.gradient?.direction;
-    backgroundFromHex = background?.gradient?.from?.hex;
-    backgroundToHex = background?.gradient?.to?.hex;
-    backgroundFromOpacity = background?.gradient?.from?.opacity;
-    backgroundToOpacity = background?.gradient?.to?.opacity;
+  $: if (background?.style === 'background-gradient' || background?.style === 'background-radial-gradient') {
     backgroundGradientSelect = true;
   } else {
     backgroundGradientSelect = false;
   }
 
-  $: if (background?.style === 'solid') {
+  $: if (background?.style === 'background-solid') {
     backgroundColorSelect = true;
   } else {
     backgroundColorSelect = false;
   }
 
-  $: if (background?.style === 'image') {
+  $: if (background?.style === 'background-image') {
     backgroundImageForm = true;
   } else {
     backgroundImageForm = false;
@@ -646,9 +409,6 @@
     borderImageForm = false;
   }
 
-
-  let mode = '';
-
   // save theme
   let chosenTheme = '';
 
@@ -662,13 +422,13 @@
 
 
     const batch = writeBatch(db);
-    batch.set(doc(db, "users", $user!.uid), {
+    batch.set(doc(db, `users/${$user!.uid}`), {
       theme: chosenTheme
     }, { merge: true });
 
     for (const theme of userThemes) {
       if (chosenTheme === theme.name) {
-        batch.set(doc(db, "users", $user!.uid), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: theme
         }, { merge: true });
       }
@@ -678,7 +438,7 @@
       if (chosenTheme === theme) {
         console.log('theme: ', theme);
         console.log('setting emptyTheme');
-        batch.set(doc(db, "users", $user!.uid), {
+        batch.set(doc(db, `users/${$user!.uid}`), {
           customTheme: emptyTheme
         }, { merge: true });
       }
@@ -689,31 +449,12 @@
     chosenTheme = '';
   }
 
-  async function changeFontSize() {
-    console.log('changing font size to: ', fontSize);
-
-    const batch = writeBatch(db);
-    batch.set(doc(db, "users", $user!.uid), {
-      customTheme: {
-        ...customTheme,
-        font: {
-          ...font,
-          family: font,
-          size: fontSize,
-        }
-      }
-    }, {merge: true});
-
-    await batch.commit();
-  }
-
   const handleThemeSelect = (selectedTheme: string) => {
     chosenTheme = selectedTheme;
     saveTheme();
     setTheme(selectedTheme);
   }
-  // save theme
-
+  
   let name: string;
 
   async function saveCustomTheme(name: string, customTheme: CustomTheme) {
@@ -740,7 +481,7 @@
     const batch = writeBatch(db);
 
     // update textEffect
-    batch.set(doc(db, "users", $user!.uid), {
+    batch.set(doc(db, `users/${$user!.uid}`), {
       customTheme: {
         link: { 
           title: {
@@ -755,10 +496,6 @@
     await batch.commit();
   }
 
-  
-
-
-
   let fontDropdown = false;
 
   function toggleFontDropdown() {
@@ -766,11 +503,6 @@
     console.log('font drop down: ', fontDropdown);
   };
 
-  let bgColor = '';
-  let currentColorSelection = null;
-
-
-  let colorPickerHover = false;
   let showColorPicker = false;
   let showGradientPicker = false;
   let showButtonColorPicker = false;
@@ -842,8 +574,6 @@
     "lemonade",
     "red",
   ];
-
-  let allThemes = userThemes.concat(themes);
 
   // img upload
   let files: FileList;
@@ -1268,18 +998,7 @@
 
 </script>
 
-<div class="fixed z-50 bottom-2 right-2">
-  {#if saving}
-    <div in:slide class="flex w-full bg-success-content p-1 px-2">
-      <p class="text-lg text-success font-input-mono tracking-widest">saving</p>
-    </div> 
-  {/if}
-  {#if saveSuccess}
-    <button on:click={() => saveSuccess = false} in:slide class="flex w-full bg-success-content p-2 px-4">
-      <p class="text-lg text-success font-input-mono tracking-widest">change saved</p>
-    </button>  
-  {/if}
-</div>
+<AuthCheck>
 
 <LivePreview 
   username={username} 
@@ -1287,9 +1006,9 @@
   bio={bio} links={links} 
   theme={theme} 
   customTheme={customTheme}
-  header={header}
 />
 
+<!-- main html -->
 <main data-theme="{theme}" class="flex flex-col">
 
   <h1 id="custom" class="font-input-mono text-[1.5rem] lg:text-[2.5rem] -tracking-widest">👁️‍🗨️🌴 Customize your profile.</h1>
@@ -1310,21 +1029,22 @@
         {#each userThemes as userTheme, index}
           <div class="">
             <button 
+              data-theme={$userData?.theme}
               on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
-              style={`color: ${fontColorHex}; ${userTheme?.background?.style === 'image' ? `background-image: url(${userTheme?.background?.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : (userTheme?.background?.style === 'solid' ? `background-color: ${userTheme?.background?.hex}` : '')}`}
-              class={`btn bg-${background} border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
+              style={`color: ${userTheme.font?.hex}; ${userTheme.background?.style === 'image' ? `background-image: url(${userTheme.background?.image?.url}); background-size: ${userTheme.background.image.size}; background-repeat: ${userTheme.background.image.repeat}; background-position: ${userTheme.background.image.position};` : (userTheme.background?.style === 'solid' ? `background-color: ${userTheme.background?.hex}` : '')}`}
+              class={`btn border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
                 <div class={`font-${userTheme.font? userTheme.font?.family : ''} flex flex-col items-center font`}>
                   <!-- pfp -->
-                  <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+                  <img class="w-[45px] h-[45px]"  src="{photoURL}" alt="pfp">
                   <!-- Username -->
-                  <p class="text-[0.5rem]">@{$userData?.username}</p>
+                  <p class="text-[0.5rem]">@{username}</p>
                   <!-- bio -->
-                  <p class="text-[0.33rem]">{$userData?.bio}</p>
+                  <p class="text-[0.33rem]">{bio}</p>
                 </div>
                 <!-- links -->
-                <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
-                <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
-                <div class={`bg-${userTheme.button? userTheme.button.color : ''} w-full h-4`}></div>
+                <div class={`w-full h-2`}></div>
+                <div class={`bg-${userTheme.link? userTheme.link.fill.hex : ''} w-full h-4`}></div>
+                <div class={`bg-${userTheme.link? userTheme.link.fill.hex : ''} w-full h-4`}></div>
             </button>
             <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{userTheme.name}</h3>
           </div> 
@@ -1377,14 +1097,14 @@
         <!-- solid color -->
         <div>
           <button 
-            on:click={() => setStyle('background', 'solid')} 
+            on:click={() => setStyle('background', 'background-solid')} 
             class="w-[120px] h-[200px] btn bg-accent border-none flex flex-col justify-start"></button>
           <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">Solid Color</h3>
         </div>
       <!-- gradient -->
       <div>
         <button 
-          on:click={() => setStyle('background', 'gradient')}
+          on:click={() => setStyle('background', 'background-gradient')}
           class="w-[120px] h-[200px] btn bg-gradient-to-b from-accent to-primary hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none flex flex-col justify-start py-4"></button>
         <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
       </div>
@@ -1393,7 +1113,7 @@
 
       <div>
         <button 
-          on:click={() => setStyle('background', 'image')}
+          on:click={() => setStyle('background', 'background-image')}
           class="w-[120px] h-[200px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
           <img src="{$userData?.photoURL}" alt="pfp" class="h-[100%] btn p-0">
         </button>
@@ -1470,10 +1190,10 @@
 
             <!-- solid color selection -->
             {#if solidLinkFill}
-              <ColorInput mode={'link fill'} isGradient={false} currentHex={currentLinkHex} currentGradient={currentLinkGradient}/>
+              <ColorInput mode={'link fill'} currentHex={currentLinkHex} />
             {/if}
             {#if gradientLinkFill}
-            <ColorInput mode={'link fill'} isGradient={true} currentHex={currentLinkHex} currentGradient={currentLinkGradient}/>
+            <ColorInput mode={'link fill'} isGradient={true} currentGradient={currentLinkGradient}/>
             {/if}
 
           </div>
@@ -1534,6 +1254,10 @@
                       on:click={() => setBorderFillStyle('border-gif')}
                       class:grayscale-0={link?.border?.fillStyle === 'border-gif'}
                       class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
+                    <!-- <button 
+                      on:click={() => setBorderFillStyle('hover-2')}
+                      class:grayscale-0={link?.border?.fillStyle === 'hover-2'}
+                      class="hover-2 filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">hover</button> -->
                   </div>
               </div>
             </div>
@@ -1787,91 +1511,9 @@
           <Fonts />
         </div>
       {/if}
-      <div class="flex space-x-8 mt-4">
-
-        <!-- font color selection -->
-        <div 
-          in:slide={{duration: 1000, easing: backOut}}
-          out:slide={{duration: 400, easing: backIn}}
-          class="flex justify-start space-x-10 mt-8 ">
-
-        <!-- font color -->
-        <div>
-          <label for="Font Color" class="label">
-            <span class="label-text font-input-mono">Font Color</span>
-          </label>      
-          <div id="Font Color" class="join">
-
-              <!-- show fontColor / clikc for color picker -->
-              <button 
-                style={`background-color: ${font?.hex? font?.hex : 'white'}`}
-                on:mouseenter={() => {if (font?.hex !== '') {showRemoveFont = true}}}
-                on:mouseleave={() => showRemoveFont = false}
-                on:click={() => {updateColor('font', '', '')}} 
-                class="btn w-1/4 rounded-md">
-                {#if showRemoveFont}
-                <div
-                  in:slide out:blur={{amount: 100}}
-                  class="text-[0.5rem] absolute -top-2 left-1/2 -translate-x-1/2 w-[8rem] bg-warning-content border-accent border-[0.1rem] font-input-mono text-warning">Remove Custom Color</div>
-                {/if}
-              </button>
-
-              <!-- select value -->
-              <select placeholder={fcValue} bind:value={fcValue} on:change={() => updateColor('font', fcValue, fcShade)} class="select select-bordered">
-                <option>slate</option>
-                <option>gray</option>
-                <option>zinc</option>
-                <option>neutral</option>
-                <option>stone</option>
-                <option>red</option>
-                <option>orange</option>
-                <option>amber</option>
-                <option>yellow</option>
-                <option>lime</option>
-                <option>green</option>
-                <option>emerald</option>
-                <option>teal</option>
-                <option>cyan</option>
-                <option>sky</option>
-                <option>blue</option>
-                <option>indigo</option>
-                <option>violet</option>
-                <option>purple</option>
-                <option>fuchsia</option>
-                <option>pink</option>
-                <option>rose</option>
-              </select>
-
-              <!-- select shade -->
-              <select bind:value={fcShade} on:change={() => updateColor('font', fcValue, fcShade)} class="select select-bordered">
-                <option>50</option>
-                <option>100</option>
-                <option>200</option>
-                <option>300</option>
-                <option>400</option>
-                <option>500</option>
-                <option>600</option>
-                <option>700</option>
-                <option>800</option>
-                <option>900</option>
-                <option>950</option>
-              </select>
-          </div>
-        </div>
-
-        <!-- font opacity -->
-        <div class="form-control">
-          <label for="opacity" class="label">
-            <span class="label-text font-input-mono">Opacity</span>
-          </label>
-
-          <label class="input-group">
-              <input type="text" min="0" max="100" id="opacity" bind:value={fcOpacity} on:change={() => updateOpacity(fcOpacity)} class="input input-bordered w-1/2" />
-            <span>%</span>
-          </label>
-        </div>
+      <div class="flex space-x-8 mt-4 bg-white">
+        <ColorInput mode={'font'} currentHex={currentFontHex}/>
       </div>
-        <!-- font color selection -->
 
         
 
@@ -1883,37 +1525,57 @@
     <div>
 
     </div> 
-</div>
+  </div>
+      
+  <!-- fonts -->
+  <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Save Custom Theme</h2>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="bg-secondary space-y-4 font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
+
     
-<!-- fonts -->
-<h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Save Custom Theme</h2>
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="bg-secondary space-y-4 font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
-
-  
-  <label for="Custom Theme Name">Theme Name</label>
-  <input type="text" bind:value={name} class="p-4 rounded-md" placeholder="Enter Theme Name">
-  <button 
-    on:click={() => saveCustomTheme(name, customTheme)}
-    class="btn">Save Theme</button>
+    <label for="Custom Theme Name">Theme Name</label>
+    <input type="text" bind:value={name} class="p-4 rounded-md" placeholder="Enter Theme Name">
+    <button 
+      on:click={() => saveCustomTheme(name, customTheme)}
+      class="btn">Save Theme</button>
 
 
-</div> 
+  </div> 
+
+  <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Milady</h2>
+  <div class="bg-secondary space-y-4 font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
+    <img src="/icons/custom.png" alt="custom" width="200">
+  </div> 
 
 
-{#if showBackUp}
-  <a 
-    in:blur
-    out:blur
-    href="#top" 
-    class="fixed bottom-3 z-50 right-3 text-[3rem]">
-    👆
-  </a>
-{/if}
+  {#if showBackUp}
+    <a 
+      in:blur
+      out:blur
+      href="#top" 
+      class="fixed bottom-3 z-50 right-3 text-[3rem]">
+      👆
+    </a>
+  {/if}
 
-<Nav username={username} />
+  <Nav username={username} />
 
 </main>
+
+<!-- saving message -->
+<div class="fixed z-50 bottom-2 right-2">
+  {#if saving}
+    <div in:slide class="flex w-full bg-success-content p-1 px-2">
+      <p class="text-lg text-success font-input-mono tracking-widest">saving</p>
+    </div> 
+  {/if}
+  {#if saveSuccess}
+    <button on:click={() => saveSuccess = false} in:slide class="flex w-full bg-success-content p-2 px-4">
+      <p class="text-lg text-success font-input-mono tracking-widest">change saved</p>
+    </button>  
+  {/if}
+</div>
+</AuthCheck>
 
 <style>
   
@@ -1931,7 +1593,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('your-image-url.jpg'); /* Set your image URL here */
+  background-image: url('linkDefault.png'); /* Set your image URL here */
   opacity: 0.5;  /* Initial opacity set to 50% */
   z-index: -1;  /* Place it behind the content */
 }
@@ -1940,16 +1602,14 @@
   opacity: 1;  /* Opacity set to 100% on hover */
 }
 
-.custom-gradient {
-  background: linear-gradient(var(--direction, to right), var(--fromHex), var(--toHex));
-}
-
 .inline-input {
   background: none;
   border: none;
   outline: none;
   /* More styles here as needed */
 }
+
+
 
   
   </style>

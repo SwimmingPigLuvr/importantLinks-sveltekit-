@@ -1,8 +1,4 @@
 import { writable } from "svelte/store";
-import { db, storage, user, userData, userTheme } from "$lib/firebase";
-import { collection, doc, onSnapshot, writeBatch, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import colors from "tailwindcss/colors";
 
 
 
@@ -29,8 +25,8 @@ export interface CustomTheme {
     hex: string | undefined;
     image: {
       position: string,
-      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover",
+      repeat: string,
+      size: string,
       url: string,
     };
     opacity: number;
@@ -230,7 +226,7 @@ export const emptyTheme: CustomTheme = {
     style: 'solid',
   },
   link: {
-    radius: 'half',
+    radius: 'full',
     fill: {
       gradient: {
         from: { hex: '', opacity: 100 },
@@ -275,7 +271,7 @@ export const emptyTheme: CustomTheme = {
       hex: '',
       isVisible: true,
       opacity: 100,
-      style: 'hard-shadow',
+      style: 'solid',
     },
     title: {
       effect: {
@@ -479,4 +475,12 @@ export function setTheme(theme: string) {
   if (typeof window !== "undefined") {
     document.documentElement.setAttribute("data-theme", theme);
   }
+}
+
+export function hexToRgb(hex: string) {
+  let bigint = parseInt(hex.slice(1), 16);
+  let r = (bigint >> 16) & 255;
+  let g = (bigint >> 8) & 255;
+  let b = bigint & 255;
+  return r + ',' + g + ',' + b;
 }

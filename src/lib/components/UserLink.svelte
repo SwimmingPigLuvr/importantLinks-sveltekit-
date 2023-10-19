@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import type { CustomTheme } from "$lib/theme";
-  import Page from "../../routes/+page.svelte";
-  import { browserLocalPersistence } from "firebase/auth";
+  import { hexToRgb, type CustomTheme } from "$lib/theme";
 
   export let customTheme: CustomTheme;
   export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
@@ -185,6 +182,8 @@ $: if (link) {
     // set user's hex values
     const rootStyle = document.documentElement.style;
 
+    let shadowRgb = hexToRgb(link.shadow.hex || '#ffffff');
+
     if (link?.title?.font?.hex) {
       rootStyle.setProperty('--title-color', link.title.font.hex);
     }
@@ -197,8 +196,12 @@ $: if (link) {
       rootStyle.setProperty('--fill-color', link.fill.hex);
     }
 
-    if (link?.shadow?.hex) {
-      rootStyle.setProperty('--shadow-color', link.shadow.hex);
+    if (link?.shadow) {
+      rootStyle.setProperty('--shadow-color', link?.shadow?.hex || 'hsl(var(--a))');
+    }
+
+    if (link?.shadow?.style === 'smooth-steel') {
+      rootStyle.setProperty('--shadow-rgb', shadowRgb);
     }
 
     // set border styles
@@ -207,9 +210,9 @@ $: if (link) {
       rootStyle.setProperty('--border-width', link?.border?.width || '0.1rem');
       rootStyle.setProperty('--border-image', link?.border?.image?.url || '/borderDefault.png');
       rootStyle.setProperty('--border-repeat', link?.border?.image?.repeat || 'no-repeat');
-      rootStyle.setProperty('--border-gradient-direction', link?.border?.gradient?.direction || '0deg');
-      rootStyle.setProperty('--border-gradient-from', link?.border?.gradient?.from?.hex || '#ffffff');
-      rootStyle.setProperty('--border-gradient-to', link?.border?.gradient?.to?.hex || '#000000');
+      rootStyle.setProperty('--border-gradient-direction', link?.border?.gradient?.direction || '90deg');
+      rootStyle.setProperty('--border-gradient-from', link?.border?.gradient?.from?.hex || 'hsl(var(--p))');
+      rootStyle.setProperty('--border-gradient-to', link?.border?.gradient?.to?.hex || 'hsl(var(--s))');
     }
 
 
@@ -294,7 +297,7 @@ $: if (link) {
   href="{url}" 
     bind:this={element}
     style={`${combinedStyle}`} 
-    class="{combinedClass} {previewMode ? 'h-[40px]  p-[0.2rem] lg:max-w-[100%]' : 'md:max-w-2xl p-[0.4rem]'} max-w-[94%] 
+    class="{combinedClass} {previewMode ? 'h-[40px]  p-[0.2rem] ' : 'md:max-w-3xl p-[0.4rem]'}  
      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
     
      flex justify-between m-auto items-center no-underline">
@@ -309,7 +312,7 @@ $: if (link) {
     style={`
       color: ${link.title.font.hex || `hsl(var(--pc))`} 
     `}
-    class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect?.effect} {previewMode ? 'text-[1.23rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
+    class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect?.effect} {previewMode ? 'text-[0.88rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
     </p>
 </a>
 

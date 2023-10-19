@@ -6,7 +6,6 @@ export const load = (async ({ params }) => {
   const { username } = params;
   try {
     const data = await fetchUserData(username);
-    console.log("Fetched data:", data); // Logging the fetched data
     return data;
   } catch (error) {
     console.error("An error occurred:", error); // Logging any errors

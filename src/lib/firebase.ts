@@ -96,6 +96,7 @@ export interface UserData {
   customTheme: CustomTheme;
   theme: string;
   header: string;
+  userThemes: CustomTheme[];
 }
 
 export interface DataToSave {

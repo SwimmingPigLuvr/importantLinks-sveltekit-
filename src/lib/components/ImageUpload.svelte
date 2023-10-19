@@ -4,10 +4,6 @@
     import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
     import { backInOut, cubicInOut } from "svelte/easing";
     import { slide, blur, fly } from "svelte/transition";
-    import Cropper from 'svelte-easy-crop';
-
-    let crop = { x: 0, y: 0 };
-    let zoom = 1;
 
     export let mode: string;
     export let currentImage: {
@@ -183,7 +179,7 @@
                 batch.set(doc(db, `users/${$user!.uid}`), {
                     customTheme: {
                         background: {
-                            style: 'image',
+                            style: 'background-image',
                             image: {
                                 url: url
                             },
@@ -251,15 +247,6 @@
   <div class="form-control lg:w-[256px] max-w-xs text-center">
     <!-- image preview -->
       <div class="relative">
-        {#if mode === 'header'}
-            <Cropper 
-                {image}
-                aspect={3}
-                bind:crop
-                bind:zoom
-                on:cropcomplete={e => console.log(e.detail)}
-            />
-        {/if}
 
       <img 
           src="{getImageUrl(mode)}" 
@@ -306,7 +293,7 @@
     
 
   <!-- use these styles for everything except for the header -->
-  {#if isUrl !== '' && mode !== 'header'}
+  {#if mode !== 'header'}
     <!-- image style options -->
     <div 
       in:slide={{duration: 2000, easing: cubicInOut}}

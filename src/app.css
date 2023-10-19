@@ -2,16 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --title-color: #ffffff;
-  --fill-color: #ffffff;
-  --shadow-color: hsl(var(--a));
+@font-face {
+  font-family: 'elven';
+  src: url('/static/fonts/elven.otf') format('opentype');
+}
 
+:root {
+/* BACKGROUNDS */
+  /* solid */
+  --background-color: #ffffff;
+
+  /* gradient */
+  --background-gradient-direction: 0deg;
+  --background-gradient-from: #ffffff;
+  --background-gradient-to: #ffffff;
+  
+  /* image */
+  --background-url: url('linkDefault.png');
+  --background-size: cover;
+  --background-repeat: no-repeat;
+  --background-position: center;
+
+/* LINKS */
+  /* title */
+  --title-color: #ffffff;
+
+  /* fill */
+  --fill-color: #ffffff;
+
+  /* shadow */
+  --shadow-color: hsl(var(--a));
+  --r: calc(var(--shadow-red, 0) * 255);
+  --g: calc(var(--shadow-greed, 0) * 255);
+  --b: calc(var(--shadow-blue, 0) * 255);
+
+/* BORDERS */
+  /* solid */
   --border-color: #ffffff;
   --border-style: solid;
   --border-width: 0.1rem;
+
+  /* image */
   --border-image: url('/borderDefault.png');
   --border-repeat: no-repeat;
+
+  /* gradient */
   --border-gradient-direction: 0deg;
   --border-gradient-from: #ffffff;
   --border-gradient-to: #ffffff;
@@ -20,6 +55,25 @@
     background-color 1s ease-out,
     color 1.5s ease-out,
     border-color 1.5s ease-out;
+}
+
+.background-solid {
+  background: var(--background-color);
+}
+
+.background-gradient {
+  background: linear-gradient(var(--border-gradient-direction), var(--border-gradient-from), var(--border-gradient-to));
+}
+
+.background-image {
+  background: var(--background-position) / var(--background-size) var(--background-repeat) var(--background-url);
+}
+
+.dummy {
+  background-color: rgba(var(--shadow-color));
+  --shadow-red: red;
+  --shadow-green: green;
+  --shadow-blue: blue;
 }
 
 .btn {
@@ -34,14 +88,7 @@ html {
   scroll-behavior: smooth;
 }
 
-.border-custom {
-  border: 10px solid;
-  border-image: url('/blueborder.png') 30 round
-}
 
-.custom-gradient {
-  background: linear-gradient(var(--direction, to right), var(--fromHexWithOpacity), var(--toHexWithOpacity));
-}
 
 .glow {
   color: #fff;
@@ -82,7 +129,7 @@ html {
 }
 
 .smooth-steel {
-  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+  box-shadow: rgba(var(--shadow-rgb), 0.17) 0px -23px 25px 0px inset, rgba(var(--shadow-rgb), 0.15) 0px -36px 30px 0px inset, rgba(var(--shadow-rgb), 0.1) 0px -79px 40px 0px inset, rgba(var(--shadow-rgb), 0.06) 0px 2px 1px, rgba(var(--shadow-rgb), 0.09) 0px 4px 2px, rgba(var(--shadow-rgb), 0.09) 0px 8px 4px, rgba(var(--shadow-rgb), 0.09) 0px 16px 8px, rgba(var(--shadow-rgb), 0.09) 0px 32px 16px;
 }
 
 .tony {
@@ -138,5 +185,68 @@ html {
 }
 
 .border-image {
-  border: var(--border-width) solid; border-image: var(--border-image) var(--border-repeat);
+  border: var(--border-width) solid; 
+  border-image: var(--border-image) var(--border-repeat);
+}
+
+.hover-2 {
+  --c: var(--border-color); /* the color */
+  --b: var(--border-width);    /* border length*/
+  --d: 10px;    /* the cube depth */
+  
+  --_s: calc(var(--d) + var(--b));
+  
+  border-width: var(--b) var(--b) var(--_s) var(--_s);
+  background:
+    conic-gradient(at left var(--d)  bottom var(--d),
+      #0000 90deg, rgb(255 255 255 /0.3) 0 225deg,rgb(255 255 255 /0.6) 0) border-box,
+    conic-gradient(at left var(--_s) bottom var(--_s),
+      #0000 90deg,var(--c) 0) 0 100%/calc(100% - var(--b)) calc(100% - var(--b))  border-box;
+  transform: translate(calc(var(--d)/-1),var(--d));
+  clip-path: 
+    polygon(
+     var(--d) 0%, 
+     var(--d) 0%, 
+     100% 0%, 
+     100% calc(100% - var(--d)),
+     100% calc(100% - var(--d)),
+     var(--d) calc(100% - var(--d))
+    );
+  transition: 0.5s;
+}
+.hover-2:hover {
+  transform: translate(0,0);
+  clip-path: 
+    polygon(
+     0% var(--d), 
+     var(--d) 0%, 
+     100% 0%, 
+     100% calc(100% - var(--d)), 
+     calc(100% - var(--d)) 100%, 
+     0% 100%
+   );
+}
+
+.full-preview {
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  border-radius: 0;
+}
+
+.small-preview {
+  width: 30vw;
+  min-width: 190px;
+  min-height: 380px;
+  max-height: 600px;
+  max-width: 300px;
+  border: 0.75rem solid black;
+  border-radius: 33px;
+}
+
+.common-preview { 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: auto;
 }
