@@ -4,7 +4,8 @@
   import LivePreview from "$lib/components/LivePreview.svelte";
   import { db, user, userData, storage } from "$lib/firebase";
   import type { LinkData } from "$lib/firebase";
-  import { setTheme, type CustomTheme, emptyTheme } from "$lib/theme";
+  import { setTheme, dataTheme } from "$lib/theme";
+  import type { CustomTheme, Gradient, Color, Image, RepeatValue, PositionValue, Border, BorderImage, Fill, Shadow, Title, Effect, TitleFont, Font } from "$lib/theme";
   import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { backOut, cubicInOut } from "svelte/easing";
@@ -20,114 +21,22 @@
 
   let header: string;
   let background: {
-    gradient: {
-      from: {
-        hex: string,
-        opacity: number,
-      },
-      to: {
-        hex: string,
-        opacity: number,
-      },
-      direction: string
-    };
+    gradient: Gradient;
     hex: string | undefined;
-    image: {
-      position: string,
-      repeat: string,
-      size: string,
-      url: string,
-    };
+    image: Image;
     opacity: number;
     style: string;
-  };
+  }
 
   let link: {
-    border: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      image: {
-        url: string,
-        repeat: "stretch" | "repeat" | "round" | "space",
-      }
-      isVisible: boolean,
-      opacity: number;
-      fillStyle: string;
-      style: string;
-      width: string;
-    }
-    fill: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-      image: {
-        position: string,
-        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-        size: "auto" | "contain" | "cover" | "100% 100%",
-        url: string,
-      };
-    }
+    border: Border;
+    fill: Fill;
     radius: string;
-    shadow: {
-      direction: string;
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-    }
-    title: {
-      effect: {
-        effect: string;
-        hex: string;
-        onHover: boolean;
-      }
-      font: {
-        size: string;
-        tracking: string;
-        hex: string | undefined;
-      }
-      opacity: number;
-    }
+    shadow: Shadow;
+    title: Title;
   };
 
-  let font: {
-    family: string;
-    hex: string | undefined;
-    opacity: number;
-  };
+  let font: Font;
 
   async function setBorderWidth(sizeNumber: number, unit: string) {
     const batch = writeBatch(db);
@@ -182,9 +91,9 @@
 
   async function updateVisibility(mode: string, isVisible: boolean) {
     const batch = writeBatch(db);
+    console.log('updating visibility for ', mode);
 
     if (mode === 'fill') {
-      console.log('updating visibility for fill -> ', mode);
       batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
           link: {
@@ -196,7 +105,6 @@
       }, { merge: true });
 
     } else if (mode === 'border') {
-      console.log('updating visibility for border -> ', mode);
       batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
           link: {
@@ -208,7 +116,6 @@
       }, { merge: true });
       
     } else if (mode === 'shadow') {
-      console.log('updating visibility for shadow -> ', mode);
       batch.set(doc(db, `users/${$user!.uid}`), {
         customTheme: {
           link: {
@@ -436,10 +343,8 @@
 
     for (const theme of themes) {
       if (chosenTheme === theme) {
-        console.log('theme: ', theme);
-        console.log('setting emptyTheme');
         batch.set(doc(db, `users/${$user!.uid}`), {
-          customTheme: emptyTheme
+          customTheme: dataTheme
         }, { merge: true });
       }
     }
@@ -500,7 +405,6 @@
 
   function toggleFontDropdown() {
     fontDropdown = !fontDropdown;
-    console.log('font drop down: ', fontDropdown);
   };
 
   let showColorPicker = false;
@@ -587,44 +491,6 @@
 
   let saving: boolean = false;
   let saveSuccess: boolean = false;
-
-  async function uploadBackground(e: any) {
-    uploadSuccess = false;
-    uploading = true;
-
-    console.log('uploading bg image');
-
-    const batch = writeBatch(db);
-
-    try {
-      // get user uploaded file into a URL
-      const file = e.target.files[0];
-      previewURL = URL.createObjectURL(file);
-      const storageRef = ref(storage, `users/${$user!.uid}/background.png`);
-      const result = await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(result.ref);
-
-      batch.set(doc(db, `users/${$user!.uid}`), {
-        customTheme: {
-          background: {
-            image: {
-              url: url
-            },
-            style: 'image',
-          }
-        }
-      }, { merge: true });
-
-      await batch.commit();
-
-      uploadSuccess = true;
-    } catch (error) {
-      console.error('background upload error: something went wrong: ', error);
-    } finally {
-      uploading = false;
-    }
-
-  }
 
   async function setStyle(mode: string, style: string) {
     const batch = writeBatch(db);
@@ -1011,16 +877,40 @@
 <!-- main html -->
 <main data-theme="{theme}" class="flex flex-col">
 
-  <h1 id="custom" class="font-input-mono text-[1.5rem] lg:text-[2.5rem] -tracking-widest">👁️‍🗨️🌴 Customize your profile.</h1>
-  <div id="top" class="flex flex-col my-8  md:max-w-[62%]">
-    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Themes</h2>
+  <!-- logo -->
+  <h1 id="custom" class="px-2 z-10 font-blix text-[2rem] ">Magic<span class="font-oblique">Hat</span> 🎩🪄</h1>
+
+  <!-- hidden fonts -->
+  <h1 id="custom" class="hidden px-2 z-10 font-spooky text-[2rem] ">Magic<span class="font-lithotype">Hat</span> 🎩🪄</h1>
+  <h1 id="custom" class="hidden px-2 z-10 font-fit text-[2rem] ">Magic<span class="font-fit -tracking-[1em]">Hat</span> 🎩🪄</h1>
+  <p class="font-balboa hidden">hehe</p>
+  <p class="font-balboa-black hidden">hehe</p>
+  <p class="font-haunted hidden">hehe</p>
+  <p class="font-herb-bold hidden">hehe</p>
+  <p class="font-herb-condensed hidden">hehe</p>
+  <p class="font-herb-condensed-bold hidden">hehe</p>
+  <p class="font-playwright hidden">hehe</p>
+  <p class="font-tech hidden">hehe</p>
+  <p class="font-ink hidden">hehe</p>
+  <p class="font-tech-thin hidden">hehe</p>
+  <p class="font-gerald hidden">hehe</p>
+  <p class="font-gerald-italic hidden">hehe</p>
+  <p class="font-gerald-black hidden">hehe</p>
+  <p class="font-gerald-black-italic hidden">hehe</p>
+  <p class="font-gerald-thin hidden">hehe</p>
+  <p class="font-gerald-thin-italic hidden">hehe</p>
+  <p class="font-input-mono hidden">hehe</p>
+  <p class="font-typewriter hidden">hehe</p>
+  <p class="font-totally-gothic hidden">hehe</p>
+  <div id="top" class="flex flex-col my-8 mt-20  md:max-w-[62%]">
+    <h2 class="mx-2 font-legal-heading -tracking-widest text-[3rem] ">Themes</h2>
     <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
     <!-- themes -->
       <div class="flex overflow-auto space-x-2">
         <!-- custom -->
         <div>
           <a href="#custom" class="btn bg-white border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
-            <p class="max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="font-gin">Create </span><span class="font-totally-gothic">Custom </span><span class="font-typewriter">Theme </span></p>
+            <p class="max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="font-elven">Create </span><span class="font-totally-gothic">Custom </span><span class="font-typewriter">Theme </span></p>
           </a>
           <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
         </div>
@@ -1081,7 +971,7 @@
 
   </div>
 
-    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Header</h2>
+    <h2 class="mx-2 p-2 font-gin text-[3rem] ">Header</h2>
     <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
       <ImageUpload currentImage={headerImage} mode={'header'}/>
     </div>
@@ -1166,23 +1056,23 @@
                 <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
                   <!-- solid -->
                   <button 
-                    on:click={() => setStyle('fill', 'solid')}
-                    class:grayscale-0={link?.fill?.style === 'solid'}
+                    on:click={() => setStyle('fill', 'link-solid')}
+                    class:grayscale-0={link?.fill?.style === 'link-solid'}
                     class="filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent p-2 btn rounded-md btn-primary w-1/5 transform transition duration-300 ease-in-out">solid</button>
                   <!-- gradient -->
                   <button 
-                    on:click={() => setStyle('fill', 'gradient')}
-                    class:grayscale-0={link?.fill?.style === 'gradient' || link?.fill?.style === 'radial gradient'}
+                    on:click={() => setStyle('fill', 'link-gradient')}
+                    class:grayscale-0={link?.fill?.style === 'link-gradient' || link?.fill?.style === 'radial gradient'}
                     class="filter grayscale hover:grayscale-0 p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
                   <!-- image -->
                   <button 
-                    on:click={() => setStyle('fill', 'image')}
-                    class:grayscale-0={link?.fill?.style === 'image'}
+                    on:click={() => setStyle('fill', 'link-image')}
+                    class:grayscale-0={link?.fill?.style === 'link-image'}
                     class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
                   <!-- custom fill -->
                   <button 
-                    on:click={() => setStyle('fill', 'gif')}
-                    class:grayscale-0={link?.fill?.style === 'gif'}
+                    on:click={() => setStyle('fill', 'link-gif')}
+                    class:grayscale-0={link?.fill?.style === 'link-gif'}
                     class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
                 </div>
               </div>
@@ -1593,7 +1483,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('linkDefault.png'); /* Set your image URL here */
+  background-image: url('/static/linkDefault.png'); /* Set your image URL here */
   opacity: 0.5;  /* Initial opacity set to 50% */
   z-index: -1;  /* Place it behind the content */
 }

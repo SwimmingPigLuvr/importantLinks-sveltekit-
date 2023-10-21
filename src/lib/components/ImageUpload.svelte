@@ -16,7 +16,7 @@
 
     let headerDefault: string = '/headerDefault.png';
     let backgroundDefault: string = '/backgroundDefault.png';
-    let linkDefault: string = '/linkDefault.png';
+    let linkDefault: string = '/static/linkDefault.png';
     let borderDefault: string = '/borderDefault.png';
 
     let deleteBanner: boolean;

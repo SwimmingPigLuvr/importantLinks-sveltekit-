@@ -1,5 +1,6 @@
 <script lang="ts">
   import { hexToRgb, type CustomTheme } from "$lib/theme";
+  import { backInOut } from "svelte/easing";
 
   export let customTheme: CustomTheme;
   export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
@@ -176,115 +177,69 @@
   let combinedClass: string;
 
 $: if (link) {
-    let newStyles = [];
-    let newClasses = [];
+    let newStyles: string[] = [];
+    let newClasses: string[] = [];
 
     // set user's hex values
     const rootStyle = document.documentElement.style;
 
     let shadowRgb = hexToRgb(link.shadow.hex || '#ffffff');
 
-    if (link?.title?.font?.hex) {
-      rootStyle.setProperty('--title-color', link.title.font.hex);
-    }
+    // set css vars
+    rootStyle.setProperty('--title-color', link?.title?.font?.hex || 'hsl(var(--a))');
+    rootStyle.setProperty('--border-color', link?.border?.hex || 'hsl(var(--a))');
+  // links
+    
+    // link background
+    rootStyle.setProperty('--link-color', link?.fill?.hex || 'hsl(var(--p))');
+    rootStyle.setProperty('--link-gradient-direction', link?.fill?.gradient?.direction || '90deg');
+    rootStyle.setProperty('--link-gradient-from', link?.fill?.gradient?.from?.hex || 'hsl(var(--p))');
+    rootStyle.setProperty('--link-gradient-to', link?.fill?.gradient?.to?.hex || 'hsl(var(--s))');
+    rootStyle.setProperty('--link-image-position', link?.fill?.image?.position || 'center');
+    rootStyle.setProperty('--link-image-repeat', link?.fill?.image?.repeat || 'repeat');
+    rootStyle.setProperty('--link-image-size', link?.fill?.image?.size || 'contain');
+    rootStyle.setProperty('--link-image-url', link?.fill?.image?.url || '/static/linkDefault.png');
 
-    if (link?.border?.hex) {
-      rootStyle.setProperty('--border-color', link.border.hex);
-    }
+    // link shadow
+    rootStyle.setProperty('--shadow-color', link?.shadow?.hex || 'hsl(var(--a))');
+    rootStyle.setProperty('--shadow-rgb', shadowRgb);
 
-    if (link?.fill?.hex) {
-      rootStyle.setProperty('--fill-color', link.fill.hex);
-    }
-
-    if (link?.shadow) {
-      rootStyle.setProperty('--shadow-color', link?.shadow?.hex || 'hsl(var(--a))');
-    }
-
-    if (link?.shadow?.style === 'smooth-steel') {
-      rootStyle.setProperty('--shadow-rgb', shadowRgb);
-    }
-
-    // set border styles
-    if (link?.border) {
-      rootStyle.setProperty('--border-style', link?.border?.style || 'solid');
-      rootStyle.setProperty('--border-width', link?.border?.width || '0.1rem');
-      rootStyle.setProperty('--border-image', link?.border?.image?.url || '/borderDefault.png');
-      rootStyle.setProperty('--border-repeat', link?.border?.image?.repeat || 'no-repeat');
-      rootStyle.setProperty('--border-gradient-direction', link?.border?.gradient?.direction || '90deg');
-      rootStyle.setProperty('--border-gradient-from', link?.border?.gradient?.from?.hex || 'hsl(var(--p))');
-      rootStyle.setProperty('--border-gradient-to', link?.border?.gradient?.to?.hex || 'hsl(var(--s))');
-    }
+    // link border
+    rootStyle.setProperty('--border-style', link?.border?.style || 'solid');
+    rootStyle.setProperty('--border-width', link?.border?.width || '0.1rem');
+    rootStyle.setProperty('--border-image', link?.border?.image?.url || '/borderDefault.png');
+    rootStyle.setProperty('--border-repeat', link?.border?.image?.repeat || 'no-repeat');
+    rootStyle.setProperty('--border-gradient-direction', link?.border?.gradient?.direction || '90deg');
+    rootStyle.setProperty('--border-gradient-from', link?.border?.gradient?.from?.hex || 'hsl(var(--p))');
+    rootStyle.setProperty('--border-gradient-to', link?.border?.gradient?.to?.hex || 'hsl(var(--s))');
 
 
 
     // push styles into newClasses array
+
+    // fill
+    if (link?.fill?.isVisible) {
+      newClasses.push(link.fill.style);
+    }
+
+    // border
     if (link?.shadow?.isVisible) {
       newClasses.push(link.shadow.style);
     }
 
+    // shadow
     if (link?.border?.isVisible) {
       newClasses.push(link.border.fillStyle);
     }
-
     
-    if (link?.fill?.isVisible) {
-        switch (link?.fill?.style) {
-            case 'solid':
-                newStyles.push(`background-color: ${link.fill.hex || `hsl(var(--p))`};`);
-                break;
-            case 'gradient':
-                newStyles.push(`background: linear-gradient(${fillDirection || '0deg'}, ${fillFromHex || `hsl(var(--p))`}, ${fillToHex || `hsl(var(--a))`});`);
-                break;
-            case 'image':
-                newStyles.push(`background-image: url(${link.fill.image.url}); background-size: ${link.fill.image.size || `auto`}; background-repeat: ${link.fill.image.repeat || `round`}; background-position: ${link.fill.image.position || `center`};`);
-                break;
-            default:
-                break;
-        }
-    }
-
-    if (link?.border?.isVisible) {
-      if (link?.border?.fillStyle === 'border-solid') {
-        switch (link?.border?.style) {
-          case 'image':
-            newStyles.push(`border: ${link.border.width} solid; border-image: url(${link.border.image.url}) ${link.border.image.repeat};`);
-            break;
-          case 'solid':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'dashed':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'double':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'groove':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'ridge':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'inset':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'outset':
-            newStyles.push(`border: ${link.border.width} ${link.border.style} ${link.border.hex || `hsl(var(--a))`};`);
-            break;
-          case 'gradient':
-            newStyles.push(`border: ${link.border.width} solid; border-image: linear-gradient(${borderDirection || `0deg`}, ${borderFromHex || `hsl(var(--s))`}, ${borderToHex || `hsl(var(--in))`});`);
-            break;
-          default: 
-            break;
-        }
-      }
-    }
+    
 
     
 
-    style = newStyles;
-    combinedStyle = style.join('; ');
-    customClass = newClasses;
-    combinedClass = customClass.join(' ');
+    combinedStyle = newStyles.join('; ');
+    combinedClass = newClasses.join(' ');
+    console.log('USERLINK_ combinedClass: ', combinedClass);
+    console.log('USERLINK_ combinedStyle: ', combinedStyle);
 }
 
 
@@ -297,10 +252,13 @@ $: if (link) {
   href="{url}" 
     bind:this={element}
     style={`${combinedStyle}`} 
-    class="{combinedClass} {previewMode ? 'h-[40px]  p-[0.2rem] ' : 'md:max-w-3xl p-[0.4rem]'}  
-     {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : 'rounded-none'}  
-    
-     flex justify-between m-auto items-center no-underline">
+    class="
+      {combinedClass} 
+      {previewMode ? 'blinktree-preview' : 'blinktree'} ease-[backInOut]
+      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'}  
+      flex justify-between m-auto items-stretch no-underline
+    ">
+     
      <!-- link icon -->
     <img 
       src={iconURL} 
@@ -315,9 +273,5 @@ $: if (link) {
     class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect?.effect} {previewMode ? 'text-[0.88rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
     </p>
 </a>
-
-<style>
-  
-</style>
 
 

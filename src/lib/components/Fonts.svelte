@@ -10,19 +10,34 @@
     let chosenFont = '';
 
     let fonts = [
+        'lithotype',
+        'spooky',
+        'fit',
+        'blix',
+        'oblique',
+        'balboa',
+        'balboa-black',
         'gin',
         'elven',
-        'input-mono',
-        'totally-gothic',
-        'typewriter',
-        'elizeth-condensed',
+        'haunted',
         'herb',
-        'lapture-display',
-        'josefine',
-        'ellograph',
-        'titilium',
-        'new-spirit',
-        'noka',
+        'herb-bold',
+        'herb-condensed',
+        'herb-condensed-bold',
+        'ink',
+        'legal-heading',
+        'playwright',
+        'tech',
+        'tech-thin',
+        'gerald',
+        'gerald-italic',
+        'gerald-black',
+        'gerald-black-italic',
+        'gerald-thin',
+        'gerald-thin-italic',
+        'input-mono',
+        'typewriter',
+        'totally-gothic',
     ]
     let sample = '';
 
@@ -59,7 +74,7 @@
         class="w-full flex flex-col justify-center items-center md:max-w-xl bg-primary p-10 rounded-full">
         <input bind:value={sample} placeholder="type here 4 preview" type="text" name="sample" id="sample" class="p-2 text-center">
             {#each fonts as font (font)}
-                <button on:click={() => handleFontSelect(font)} class="bg-black p-2 w-full rounded-none hover:text-primary text-[1.5rem]  font-{font}" value={font}>
+                <button on:click={() => handleFontSelect(font)} class={`bg-black p-2 w-full rounded-none hover:text-primary text-[1.5rem]  font-${font}`} value={font}>
                     {#if sample !== ''}
                         {sample}
                     {:else}

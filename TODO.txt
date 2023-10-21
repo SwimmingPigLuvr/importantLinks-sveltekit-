@@ -3158,3 +3158,106 @@ first todos checking out my site from the top down
         userlink: a little wider, title a little smaller
         customTheme dissapears after refresh
             solution: designate the custom theme for just the preview.
+
+    deploying downloaded fonts
+        steps:
+            delete adobe typekit import
+            make sure the tailwind.config.js is set up perfectly
+
+
+
+driving ideas
+
+names:
+    magicHAT 🎩🪄
+
+    why?
+        can contain anything and everything
+        anything in the hat can be transformed in the blink of an eye
+
+
+october 20
+
+    features
+        create extremely different styles for displaying links + other content
+            well defined css classes in the UserLinks.svelte component
+                style ideas:
+                    linktree, hoobee,
+            works with all of the user's data
+        accent color based on link icon
+
+    content categories
+        links
+        pinned tweets
+        media: videos, memecoin charts, soundcloud, 
+        portfolios / galleries: art, animation, ...etc
+        nft showcase
+        social icons
+
+simple fixes checklist
+    ✅link width: currently too wide
+    default link image breaks in the livepreview
+        fix later. don't really care all too much
+    default + emptyThemes are broken!
+        fix the empytheme first.
+        that's one i'll be using a lot more that the defaul theme
+
+moderately simple fixes really
+    make sure taht the colorpicker component works across my app
+    livepreview border size needs to be proportional
+        possibole solutions
+            calculate borderWidth / 30
+    my downloaded fonts don't render until they are used as a tailwind class
+        solutions
+            1. figure out why?
+            2. secretly use them all in hidden places?
+
+
+new patterns todo list
+    create css class that encapsulates the entire current ui style
+        .blinktree {
+            blah: blah blah;
+        }
+    transition from adding the customstyle in a template literal
+        into adding the customClasses in a template literal
+            that way it just needs to know which css class to use and the css file handles the rest
+
+    need to create new css styles first
+        link background solid
+        link background gradient
+        link background image
+
+    now that i am pushing in the link fill style into the newClasses
+        i need to make sure that the names are matching the css classes
+
+    now that the styles are created i need to set the css vars based on the users db
+        and and and i need to update the names of the link background styles
+
+    all of the css vars exist within different classes so they should be always set 
+
+    when creating new css class names remember to change the values in the emptyTheme
+
+    use these new types and import into relevant areas
+
+
+
+
+
+    create a new section in the edit/appearance
+        hover
+            color
+            scale
+            translate
+            content preview
+                preview box?
+                    screen goes dim except for preview
+                background color change
+                background image change
+
+question?
+    should i create these new style patterns then fix the edit page?
+        yes because if i fix it now i'm going to have to change it to the new pattern anyways
+
+random todo
+    emulate the svelte backInOut function? to add to the css? 
+        no actually i think reguardless of the style we can use the backInOut

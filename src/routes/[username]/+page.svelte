@@ -8,8 +8,8 @@
   import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { updateTheme } from "$lib/themeStore";
   import type { LinkData } from "$lib/firebase";
-  import { page } from "$app/stores";
-  import type { CustomTheme } from "$lib/theme";
+  import type { CustomTheme, Gradient, Color, Image, RepeatValue, PositionValue, Border, BorderImage, Fill, Shadow, Title, Effect, TitleFont, Font } from "$lib/theme";
+
 
   // states
   let mounted = false;
@@ -26,114 +26,22 @@
 
 
   let background: {
-    gradient: {
-      from: {
-        hex: string,
-        opacity: number,
-      },
-      to: {
-        hex: string,
-        opacity: number,
-      },
-      direction: string
-    };
+    gradient: Gradient;
     hex: string | undefined;
-    image: {
-      position: string,
-      repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-      size: "auto" | "contain" | "cover",
-      url: string,
-    };
+    image: Image;
     opacity: number;
-    style: "image" | "gradient" | "solid";
-  };
+    style: string;
+  }
 
   let link: {
-    border: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      image: {
-        url: string,
-        repeat: "stretch" | "repeat" | "round" | "space",
-      }
-      isVisible: boolean,
-      opacity: number;
-      fillStyle: string;
-      style: string;
-      width: string;
-    }
-    fill: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-      image: {
-        position: string,
-        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-        size: "auto" | "contain" | "cover",
-        url: string,
-      };
-    }
+    border: Border;
+    fill: Fill;
     radius: string;
-    shadow: {
-      direction: string;
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-    }
-    title: {
-      effect: {
-        effect: string;
-        hex: string;
-        onHover: boolean;
-      }
-      font: {
-        size: string;
-        tracking: string;
-        hex: string | undefined;
-      }
-      opacity: number;
-    }
+    shadow: Shadow;
+    title: Title;
   };
 
-  let font: {
-    family: string;
-    hex: string | undefined;
-    opacity: number;
-  };
+  let font: Font;
 
   $: if (data) {
     bio = data.bio;
@@ -208,7 +116,7 @@
 data-theme={theme}
 style={`
   color: ${font.hex? font.hex : 'hsl(var(--p))'}; 
-  ${background.style === 'image' ? `background-image: url(${background.value}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : 
+  ${background.style === 'image' ? `background-image: url(${background?.image?.url}); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;` : 
   (background.style === 'solid' ? `background-color: ${background.hex};` : 
   (background.style === 'gradient' ? `background: linear-gradient(${direction}, ${fromHex}, ${toHex})` : ''))}
 `}
@@ -246,6 +154,7 @@ class={`font-${font? font : 'input-mono'} -z-20 h-screen fixed top-0 left-0 w-[1
           title={item.title} 
           url={item.url} 
           customTheme={customTheme} 
+          previewMode={false}
         />
       </li>
     {/each}

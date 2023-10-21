@@ -3,21 +3,19 @@
   import SortableList from "$lib/components/SortableList.svelte";
   import UserLink from "$lib/components/UserLink.svelte";
   import { db, user, userData, storage } from "$lib/firebase";
-  import { arrayRemove, arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
+  import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
   import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import AuthCheck from "$lib/components/AuthCheck.svelte";
-  import { fade, fly, slide, blur } from "svelte/transition";
-  import { backIn, backInOut, backOut, cubicIn, cubicInOut, cubicOut } from "svelte/easing";
+  import { fade, slide, blur } from "svelte/transition";
+  import { backOut, cubicInOut, cubicOut } from "svelte/easing";
   import { themeStore } from "$lib/theme";
   import Footer from "$lib/components/Footer.svelte";
-  import colors from "tailwindcss/colors";
   import { updateTheme } from "$lib/themeStore";
-  import type { PageData } from "./$types";
-  import type { CustomTheme } from "$lib/theme";
   import type { LinkData } from "$lib/firebase";
   import Nav from "$lib/components/Nav.svelte";
+  import type { CustomTheme, Gradient, Color, Image, RepeatValue, PositionValue, Border, BorderImage, Fill, Shadow, Title, Effect, TitleFont, Font } from "$lib/theme";
 
   
 
@@ -47,114 +45,22 @@
   let theme: string | undefined;
 
   let background: {
-    gradient: {
-      from: {
-        hex: string,
-        opacity: number,
-      },
-      to: {
-        hex: string,
-        opacity: number,
-      },
-      direction: string
-    };
+    gradient: Gradient;
     hex: string | undefined;
-    image: {
-      position: string,
-      repeat: string,
-      size: string,
-      url: string,
-    };
+    image: Image;
     opacity: number;
     style: string;
-  };
+  }
 
   let link: {
-    border: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      image: {
-        url: string,
-        repeat: "stretch" | "repeat" | "round" | "space",
-      }
-      isVisible: boolean,
-      opacity: number;
-      fillStyle: string;
-      style: string;
-      width: string;
-    }
-    fill: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-      image: {
-        position: string,
-        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-        size: "auto" | "contain" | "cover",
-        url: string,
-      };
-    }
+    border: Border;
+    fill: Fill;
     radius: string;
-    shadow: {
-      direction: string;
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-    }
-    title: {
-      effect: {
-        effect: string;
-        hex: string;
-        onHover: boolean;
-      }
-      font: {
-        size: string;
-        tracking: string;
-        hex: string | undefined;
-      }
-      opacity: number;
-    }
+    shadow: Shadow;
+    title: Title;
   };
 
-  let font: {
-    family: string;
-    hex: string | undefined;
-    opacity: number;
-  };
+  let font: Font;
 
   $: if ($userData) {
     username = $userData.username;
@@ -450,7 +356,7 @@ class={`bg-secondary font-${font?.family ? font?.family : 'input-mono'} -z-20 h-
         in:slide={{ duration: 700, easing: cubicInOut}}
         out:slide={{ duration: 500, easing: cubicInOut}}
         on:submit|preventDefault={addLink}
-        class="bg-{font?.value} text-{background?.hex} font-{font?.family} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
+        class="bg-{font?.hex} text-{background?.hex} font-{font?.family} p-6 max-w-[94%] mx-auto rounded-xl space-y-6 flex flex-col mb-40"
       >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->

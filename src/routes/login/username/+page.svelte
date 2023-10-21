@@ -1,7 +1,7 @@
 <script lang="ts">
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import { db, user, userData } from "$lib/firebase";
-  import { dark, defaultTheme, light } from "$lib/theme";
+  import { defaultTheme } from "$lib/theme";
   import { doc, getDoc, writeBatch } from "firebase/firestore";
 
   let username = "";
@@ -57,7 +57,7 @@
             }
         ],
         customTheme: defaultTheme,
-        userThemes: [ light, dark ],
+        userThemes: [],
     });
 
     await batch.commit();

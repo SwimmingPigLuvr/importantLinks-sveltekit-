@@ -1,16 +1,11 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import UserLink from "./UserLink.svelte";
-    import { fly, blur, fade, slide } from "svelte/transition";
-    import { backOut } from "svelte/easing";
-  import type { CustomTheme } from "$lib/theme";
-  import { doc } from "firebase/firestore";
-  import { browser } from "$app/environment";
+  import { onMount } from "svelte";
+  import UserLink from "./UserLink.svelte";
+  import { fly, blur, fade, slide } from "svelte/transition";
+  import { backOut } from "svelte/easing";
+  import type { CustomTheme, Gradient, Color, Image, RepeatValue, PositionValue, Border, BorderImage, Fill, Shadow, Title, Effect, TitleFont, Font } from "$lib/theme";
 
-  if (browser) {
-    const headingElement = document.querySelector('h1');
-    console.log(headingElement);
-  }
+
   // user's customTheme settings 
   export let customTheme: CustomTheme;
 
@@ -26,122 +21,27 @@
   let previewMode: boolean = true;
 
   let background: {
-    gradient: {
-      from: {
-        hex: string,
-        opacity: number,
-      },
-      to: {
-        hex: string,
-        opacity: number,
-      },
-      direction: string
-    };
+    gradient: Gradient;
     hex: string | undefined;
-    image: {
-      position: string,
-      repeat: string,
-      size: string,
-      url: string,
-    };
+    image: Image;
     opacity: number;
     style: string;
-  };
+  }
 
   let link: {
-    border: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      image: {
-        url: string,
-        repeat: "stretch" | "repeat" | "round" | "space",
-      }
-      isVisible: boolean,
-      opacity: number;
-      fillStyle: string;
-      style: string;
-      width: string;
-    }
-    fill: {
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-      image: {
-        position: string,
-        repeat: "repeat" | "repeat-x" | "repeat-y" | "no-repeat" | "space" | "round",
-        size: "auto" | "contain" | "cover",
-        url: string,
-      };
-    }
+    border: Border;
+    fill: Fill;
     radius: string;
-    shadow: {
-      direction: string;
-      gradient: {
-        from: {
-          hex: string,
-          opacity: number,
-        },
-        to: {
-          hex: string,
-          opacity: number,
-        },
-        direction: string,
-      };
-      hex: string | undefined;
-      isVisible: boolean,
-      opacity: number;
-      style: string;
-    }
-    title: {
-      effect: {
-        effect: string;
-        hex: string;
-        onHover: boolean;
-      }
-      font: {
-        size: string;
-        tracking: string;
-        hex: string | undefined;
-      }
-      opacity: number;
-    }
+    shadow: Shadow;
+    title: Title;
   };
 
-  let font: {
-    family: string;
-    hex: string | undefined;
-    opacity: number;
-  };
+  let font: Font;
 
   $: if (customTheme) {
     background = customTheme.background;
     font = customTheme.font;
     link = customTheme.link;
-    console.log('background: ', background);
-    console.log('font: ', font);
-    console.log('link: ', link);
   }
 
   // gradient constructors
@@ -160,8 +60,6 @@
     toHex = gradient?.to?.hex;
     toOpacity = gradient?.to?.opacity;
     direction = gradient?.direction;
-
-    console.log('🐉' + fromHex, toHex, direction);
   }
 
 
@@ -192,8 +90,8 @@
     newClasses = [];
     newClasses.push(background?.style ?? 'no background style?');
     combinedClass = newClasses.join(' ');
-    console.log('newClasses: ', newClasses);
-    console.log('combined class: ', combinedClass);
+    console.log('LIVEPREVIEW_ newClasses: ', newClasses);
+    console.log('LIVEPREVIEW_ combined class: ', combinedClass);
 
     // background-solid
     rootStyle.setProperty('--background-color', background?.hex || 'hsl(var(--s))');
@@ -202,7 +100,7 @@
     rootStyle.setProperty('--background-gradient-from', fromHex || 'hsl(var(--a))');
     rootStyle.setProperty('--background-gradient-to', toHex || 'hsl(var(--s))');
     // background-image
-    rootStyle.setProperty('--background-url', `url(${background.image.url})` || `url('linkDefault.png')`);
+    rootStyle.setProperty('--background-url', `url(${background.image.url})` || `url('/static/linkDefault.png')`);
     rootStyle.setProperty('--background-position', background?.image?.position || 'center');
     rootStyle.setProperty('--background-size', background?.image?.size || 'cover');
     rootStyle.setProperty('--background-repeat', background?.image?.repeat || 'no-repeat');
@@ -360,6 +258,8 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
 
       </div>
       {/if}
+  
+  <h1 id="custom" class="hover:text-accent text-secondary-content absolute bottom-6 left-1/2 -translate-x-[40%] px-2 z-10 font-blix text-[1rem]">Magic<span class="font-oblique">Hat</span> 🎩🪄</h1>
 
 
 

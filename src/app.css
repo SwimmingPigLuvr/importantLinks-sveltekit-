@@ -4,8 +4,131 @@
 
 @font-face {
   font-family: 'elven';
-  src: url('/static/fonts/elven.otf') format('opentype');
+  src: url('/fonts/elven.otf') format('opentype');
 }
+
+@font-face {
+  font-family: 'gin';
+  src: url('/fonts/gin.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'balboa';
+  src: url('/fonts/balboa.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'balboa-black';
+  src: url('/fonts/balboaBlack.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'haunted';
+  src: url('/fonts/haunted.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'herb';
+  src: url('/fonts/herb.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'herb-bold';
+  src: url('/fonts/herbBold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'herb-condensed';
+  src: url('/fonts/herbCondensed.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'herb-condensed-bold';
+  src: url('/fonts/herbCondensedBold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'ink';
+  src: url('/fonts/ink.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'legal-heading';
+  src: url('/fonts/legalHeading.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'playwright';
+  src: url('/fonts/playwright.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'tech';
+  src: url('/fonts/tech.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'tech-thin';
+  src: url('/fonts/techThin.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'gerald';
+  src: url('/fonts/modernRegular.otf') format('opentype');
+}
+
+
+@font-face {
+  font-family: 'gerald-black';
+  src: url('/fonts/modernBlack.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'gerald-thin';
+  src: url('/fonts/modernThin.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'gerald-italic';
+  src: url('/fonts/modernItalicRegular.otf') format('opentype');
+}
+
+
+@font-face {
+  font-family: 'gerald-black-italic';
+  src: url('/fonts/modernItalicBlack.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'gerald-thin-italic';
+  src: url('/fonts/modernItalicThin.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'spooky';
+  src: url('/fonts/spooky.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'lithotype';
+  src: url('/fonts/lithotype.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'fit';
+  src: url('/fonts/fit.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'blix';
+  src: url('/fonts/blix.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'oblique';
+  src: url('/fonts/oblique.otf') format('opentype');
+}
+
 
 :root {
 /* BACKGROUNDS */
@@ -18,7 +141,7 @@
   --background-gradient-to: #ffffff;
   
   /* image */
-  --background-url: url('linkDefault.png');
+  --background-url: url('/static/linkDefault.png');
   --background-size: cover;
   --background-repeat: no-repeat;
   --background-position: center;
@@ -27,8 +150,19 @@
   /* title */
   --title-color: #ffffff;
 
-  /* fill */
-  --fill-color: #ffffff;
+  /* solid */
+  --link-color: #ffffff;
+
+  /* gradient */
+  --link-gradient-direction: 0deg;
+  --link-gradient-from: #ffffff;
+  --link-gradient-to: #ffffff;
+  
+  /* image */
+  --link-image-url: url('/static/linkDefault.png');
+  --link-image-size: cover;
+  --link-image-repeat: no-repeat;
+  --link-image-position: center;
 
   /* shadow */
   --shadow-color: hsl(var(--a));
@@ -57,6 +191,12 @@
     border-color 1.5s ease-out;
 }
 
+
+main {
+  transition: background-color 0.6s, color 3s;
+}
+
+/* BACKGROUND CLASSES */
 .background-solid {
   background: var(--background-color);
 }
@@ -68,6 +208,20 @@
 .background-image {
   background: var(--background-position) / var(--background-size) var(--background-repeat) var(--background-url);
 }
+
+/* LINK BACKGROUND CLASSES */
+.link-solid {
+  background: var(--link-color);
+}
+
+.link-gradient {
+  background: linear-gradient(var(--link-gradient-direction), var(--link-gradient-from), var(--link-gradient-to));
+}
+
+.link-image {
+  background: var(--link-image-position) / var(--link-image-size) var(--link-image-repeat) var(--link-image-url);
+}
+
 
 .dummy {
   background-color: rgba(var(--shadow-color));
@@ -249,4 +403,41 @@ html {
   flex-direction: column;
   justify-content: flex-start;
   overflow: auto;
+}
+
+.blinktree {
+  max-width: 95%;
+  padding: 0.4rem;
+  transform: 
+    translate(var(--tw-translate-x), 
+    var(--tw-translate-y)) 
+    rotate(var(--tw-rotate)) 
+    skewX(var(--tw-skew-x)) 
+    skewY(var(--tw-skew-y)) 
+    scaleX(var(--tw-scale-x)) 
+    scaleY(var(--tw-scale-y));
+  transition-duration: 1000ms;
+}
+
+@media (min-width: 640px) {
+  .blinktree {
+    max-width: 80%;
+  }
+}
+
+@media (min-width: 768px) {
+  .blinktree {
+      max-width: 65%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .blinktree {
+      max-width: 50%;
+  }
+}
+
+.blinktree-preview {
+  height: 40px;
+  padding: 0.2rem;
 }
