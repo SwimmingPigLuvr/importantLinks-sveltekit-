@@ -3261,3 +3261,30 @@ question?
 random todo
     emulate the svelte backInOut function? to add to the css? 
         no actually i think reguardless of the style we can use the backInOut
+
+
+october 23 2023
+
+todo
+
+✅css
+
+    .gradient-overlay
+    use two theme colors end to end
+    
+✅imageUpload
+
+    change the default images
+    
+    previewUrl = getImageUrl(mode);
+
+    then in the save function:
+    update the previewUrl to the user's uploaded image
+
+✅shake the first link link link tree does
+    should be easy to apply a basic css class to the first element in the userlink array
+
+link specific fonts to each theme
+    or find a font that is as as good as input mono to use as the default font
+
+blur in animation for the livepreview is ugly as shit

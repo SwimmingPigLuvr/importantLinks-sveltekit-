@@ -280,19 +280,19 @@
     shadow = false;
   }
 
-  $: if (link?.fill?.style === 'solid') {
+  $: if (link?.fill?.style === 'link-solid') {
     solidLinkFill = true;
   } else {
     solidLinkFill = false;
   }
 
-  $: if (link?.fill?.style === 'gradient') {
+  $: if (link?.fill?.style === 'link-gradient') {
     gradientLinkFill = true;
   } else {
     gradientLinkFill = false;
   }
 
-  $: if (link?.fill?.style === 'image') {
+  $: if (link?.fill?.style === 'link-image' || link?.fill?.style === 'link-gif') {
     imageLinkFill = true;
   } else {
     imageLinkFill = false;
@@ -875,10 +875,10 @@
 />
 
 <!-- main html -->
-<main data-theme="{theme}" class="flex flex-col">
+<main data-theme="autumn" class="flex flex-col">
 
   <!-- logo -->
-  <h1 id="custom" class="px-2 z-10 font-blix text-[2rem] ">Magic<span class="font-oblique">Hat</span> 🎩🪄</h1>
+  <h1 id="custom" class="px-2 z-10 font-blix text-accent text-[2rem] ">Magic<span class="font-oblique">Hat</span> 🎩🪄</h1>
 
   <!-- hidden fonts -->
   <h1 id="custom" class="hidden px-2 z-10 font-spooky text-[2rem] ">Magic<span class="font-lithotype">Hat</span> 🎩🪄</h1>
@@ -903,16 +903,16 @@
   <p class="font-typewriter hidden">hehe</p>
   <p class="font-totally-gothic hidden">hehe</p>
   <div id="top" class="flex flex-col my-8 mt-20  md:max-w-[62%]">
-    <h2 class="mx-2 font-legal-heading -tracking-widest text-[3rem] ">Themes</h2>
-    <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-wrap rounded-2xl">
+    <div class="gradient-overlay relative bg-secondary m-auto  max-w-[95%] py-2 mb-6 flex flex-wrap rounded-tl-[4] w-full">
+    <h2 class="absolute -top-8 -left-4 mx-2 font-legal-heading -tracking-widest text-[1.5rem]">Themes</h2>
     <!-- themes -->
-      <div class="flex overflow-auto space-x-2">
+      <div class="flex overflow-auto space-x-2 bg-gradient-to-r from-primary to-secondary pt-4 px-4">
         <!-- custom -->
-        <div>
-          <a href="#custom" class="btn bg-white border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
-            <p class="max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="font-elven">Create </span><span class="font-totally-gothic">Custom </span><span class="font-typewriter">Theme </span></p>
+        <div class="">
+          <a href="#custom" class="btn bg-opacity-50 hover:bg-opacity-70 rounded-none bg-primary border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
+            <p class="font-blix max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="">Create </span><span class="font-herb">Custom </span><span class="">Theme </span></p>
           </a>
-          <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
+          <h3 class="text-white font-blix bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
         </div>
 
         <!-- user made themes -->
@@ -936,7 +936,7 @@
                 <div class={`bg-${userTheme.link? userTheme.link.fill.hex : ''} w-full h-4`}></div>
                 <div class={`bg-${userTheme.link? userTheme.link.fill.hex : ''} w-full h-4`}></div>
             </button>
-            <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">{userTheme.name}</h3>
+            <h3 class="text-white font-blix my-2 text-center">{userTheme.name}</h3>
           </div> 
         {/each}
 
@@ -961,7 +961,7 @@
                 <div class="bg-secondary w-full h-4"></div>
                 <div class="bg-secondary w-full h-4"></div>
             </button>
-            <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2 bg-opacity-0" data-theme={theme}>{theme}</h3>
+            <h3 class="text-white font-blix my-2 text-center bg-opacity-0" data-theme={theme}>{theme}</h3>
           </div>
         {/each}
       </div>
@@ -971,7 +971,7 @@
 
   </div>
 
-    <h2 class="mx-2 p-2 font-gin text-[3rem] ">Header</h2>
+    <h2 class="mx-2 font-legal-heading -tracking-widest text-[1.5rem]">Header</h2>
     <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
       <ImageUpload currentImage={headerImage} mode={'header'}/>
     </div>
@@ -1499,8 +1499,17 @@
   /* More styles here as needed */
 }
 
-
-
+.gradient-overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: linear-gradient(to right, hsl(var(--a)), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), hsl(var(--p))); /* Adjust this gradient as needed */
+  pointer-events: none; /* Ensures the gradient doesn't interfere with interactions */
+  z-index: 2; /* Optional, if you have other positioned elements and need layering */
+}
   
   </style>
 

@@ -15,7 +15,7 @@
     let image: string;
 
     let headerDefault: string = '/headerDefault.png';
-    let backgroundDefault: string = '/backgroundDefault.png';
+    let backgroundDefault: string = '/backgroundDefault.webp';
     let linkDefault: string = '/static/linkDefault.png';
     let borderDefault: string = '/borderDefault.png';
 
@@ -234,6 +234,10 @@
         return ''; // default fallback
     }
 
+    previewURL = getImageUrl(mode);
+
+
+
 
     
 </script>
@@ -242,18 +246,19 @@
   in:slide={{ duration: 1000, easing: cubicInOut }}
   out:slide={{ duration: 1000, easing: cubicInOut }}
   class:justify-center={mode === 'header'}
-  class="flex space-x-4 my-12 justify-start">
+  class="flex space-x-4 my-6 justify-start">
 
-  <div class="form-control lg:w-[256px] max-w-xs text-center">
+  <div class="form-control text-center">
     <!-- image preview -->
       <div class="relative">
 
       <img 
-          src="{getImageUrl(mode)}" 
+          src="{previewURL}" 
           alt="preview"
-          width="432"
-          height="432"
-          class={`${uploading? 'filter grayscale' : 'grayscale-0'}`}
+          class={`
+            ${uploading? 'filter grayscale' : 'grayscale-0'}
+            w-80
+        `}
       />
       {#if mode === 'header' && $userData?.header !== ''}
         <button 

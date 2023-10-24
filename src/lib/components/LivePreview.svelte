@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import UserLink from "./UserLink.svelte";
   import { fly, blur, fade, slide } from "svelte/transition";
-  import { backOut } from "svelte/easing";
+  import { backInOut, backOut, cubicInOut } from "svelte/easing";
   import type { CustomTheme, Gradient, Color, Image, RepeatValue, PositionValue, Border, BorderImage, Fill, Shadow, Title, Effect, TitleFont, Font } from "$lib/theme";
 
 
@@ -183,9 +183,10 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
     >
     <!-- phone div -->
     <div 
-        in:fly={{ x: -50, duration: 1000, easing: backOut }}
+        in:blur={{opacity: 100, amount: 100, delay: 300, duration: 2000, easing: cubicInOut}}
         bind:this={element}
         class={`
+          transform duration-300 ease-in-out
           ${showPreview ? 'full-preview' : 'small-preview'} common-preview ${combinedClass}
         `}>
         <div style="padding-top: 205%; position: relative;">
@@ -209,8 +210,10 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
       </div>
         <!-- links -->
         <ul>
-          {#each links as link}
-            <li class="m-auto py-[0.5rem]">
+          {#each links as link, index}
+            <li 
+              class:shake-link={index === 0}
+              class="m-auto py-[0.5rem]">
               <UserLink 
                 iconURL={link.iconURL} 
                 title={link.title}

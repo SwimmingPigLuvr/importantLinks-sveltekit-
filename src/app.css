@@ -441,3 +441,46 @@ html {
   height: 40px;
   padding: 0.2rem;
 }
+
+/* link shake animation */
+@keyframes shake {
+  0% {
+    transform: translate(3px) rotate(1deg);
+  }
+  2.5% {
+    transform: translate(-3px) rotate(-1deg);
+  }
+  5% {
+    transform: translate(3px) rotate(1deg);
+  }
+  7.5% {
+    transform: translate(-3px) rotate(-1deg);
+  }
+  10% {
+    transform: translate(2px) rotate(1deg);
+  }
+  12.5% {
+    transform: translate(-2px) rotate(-1deg);
+  }
+  15% {
+    transform: translate(2px) rotate(1deg);
+  }
+  17.5% {
+    transform: translate(-2px) rotate(-1deg);
+  }
+  20% {
+    transform: translate(1px) rotate(1deg);
+  }
+  22.5% {
+    transform: translate(-1px) rotate(-1deg);
+  }
+  25% {
+    transform: translate(0px) rotate(0deg);
+  }
+}
+
+.shake-link {
+  /* display: inline-block; Required for transform to work on inline elements like links */
+  animation: shake 2s infinite;
+  animation-delay: 0s;
+}
