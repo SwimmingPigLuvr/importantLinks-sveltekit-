@@ -71,10 +71,10 @@
     <div 
         in:slide={{duration: 500, easing: backOut}}
         out:slide={{duration: 500, easing: backIn}}
-        class="w-full flex flex-col justify-center items-center md:max-w-xl bg-primary p-10 rounded-full">
+        class="w-full flex flex-col justify-center items-center bg-primary rounded-lg">
         <input bind:value={sample} placeholder="type here 4 preview" type="text" name="sample" id="sample" class="p-2 text-center">
             {#each fonts as font (font)}
-                <button on:click={() => handleFontSelect(font)} class={`bg-black p-2 w-full rounded-none hover:text-primary text-[1.5rem]  font-${font}`} value={font}>
+                <button on:click={() => handleFontSelect(font)} class={`bg-slate-200 hover:bg-slate-400 text-black px-2 py-1 w-full rounded-none text-[1rem] text-left font-${font}`} value={font}>
                     {#if sample !== ''}
                         {sample}
                     {:else}

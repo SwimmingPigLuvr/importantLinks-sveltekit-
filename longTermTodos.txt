@@ -1,0 +1,17 @@
+running list of features to eventually add to my project in the distant not so near futture, eventually.
+
+find out how to use variable adobe fonts in css / tailwind
+group fonts by family
+
+fix ui
+
+delpoy
+ship it
+
+get more personalized with the custom themes. 
+they should come with pre selected styles for
+    font
+    button style
+    button radius
+    background style
+    

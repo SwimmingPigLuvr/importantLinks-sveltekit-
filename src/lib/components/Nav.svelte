@@ -1,8 +1,9 @@
 <script lang="ts">
     import AuthCheck from "$lib/components/AuthCheck.svelte";
-    import { blur } from "svelte/transition";
+    import { blur, slide } from "svelte/transition";
     import { cubicInOut } from "svelte/easing";
     import { page } from '$app/stores';
+
 
     function isActive(path: string) {
         // Check if the current page path matches the given path
@@ -24,47 +25,43 @@
     
 
     <!-- nav -->
-    <div class="fixed top-0 right-2 flex z-50">
+    <div data-theme={'black'} class="bg-opacity-0 font-mono text-accent fixed top-0 right-2 flex z-50">
 
 
     {#if !openNav}
       <button 
         on:mouseenter={() => toggleNav()}
         in:blur={{ amount: 100, delay: 200, duration: 500, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
-        class="m-auto text-5xl">☯︎</button>
+        class=" m-auto text-5xl relative text-accent-focus">☯︎</button>
     {:else}
     <button 
+      in:slide
+      out:slide
       on:mouseleave={() => toggleNav()}
-      class="fixed top-0 right-2 flex flex-col items-end justify-center p-2 space-y-1 text-sm">
+      class="fixed bg-lime-500 top-0 right-4 flex flex-col items-end justify-end space-y-1 ">
+      
       <a 
-        in:blur={{ amount: 100, delay: 0, duration: 500, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
-        href="/{username}" 
-        class:active={isActive(`/${username}`)}
-        class="flex filter hover:invert">
-        <p class="m-auto">
-          Home
-        </p>
-      </a>
-      <a 
-        in:blur={{ amount: 100, delay: 100, duration: 700, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
         href="/{username}/edit" 
         class:active={isActive(`/${username}/edit`)}
-        class="flex filter hover:invert">
-        <p class="m-auto">
+        class="flex filter hover:text-primary text-sm">
+        <p class="">
           Edit Profile
         </p>
       </a>
       <a 
-        in:blur={{ amount: 100, delay: 200, duration: 900, easing: cubicInOut }}
-        out:blur={{ amount: 100, duration: 500, easing: cubicInOut }}
         href="/{username}/edit/appearance" 
         class:active={isActive(`/${username}/edit/appearance`)}
-        class="flex filter hover:invert">
-        <p class="m-auto">
+        class="flex filter hover:text-primary text-sm">
+        <p class="">
           Appearance
+        </p>
+      </a>
+      <a 
+        href="/{username}" 
+        class:active={isActive(`/${username}`)}
+        class="flex w-full filter hover:text-primary text-sm border-2 border-black">
+        <p class="">
+          magic.hat/{username}
         </p>
       </a>
     </button>
@@ -76,6 +73,6 @@
 
   <style>
     .active {
-        opacity: 50%;
+        text-decoration-style: double;
     }
   </style>

@@ -142,7 +142,7 @@
 
 <!-- toggle button -->
 <div 
-class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-1/3 bg-info hover:bg-accent duration-300 ease-in-out transition-all transform font-totally-gothic text-5xl p-6 px-8 rounded-full">
+class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-1/3 bg-black hover:bg-accent duration-300 ease-in-out transition-all transform font-totally-gothic text-xl p-2 rounded-full">
   <button 
     on:click={() => {
       togglePreview();
@@ -178,28 +178,32 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
 
 {#if mounted}
 <!-- preview -->
+<!-- <div class="bg-white w-screen h-screen"></div> -->
+        
 <div 
-    class={`${showPreview? 'visible' : 'hidden'} md:flex md:w-[38%] bg-accent fixed right-0 justify-center items-center h-screen z-40`}
+    style="--photo-url: url({photoURL});"
+    class={`${showPreview? 'visible' : 'hidden'} background-container sm:flex justify-center items-center h-screen z-40 transition-all transform duration-1000 ease-in-out`}
     >
     <!-- phone div -->
     <div 
-        in:blur={{opacity: 100, amount: 100, delay: 300, duration: 2000, easing: cubicInOut}}
-        bind:this={element}
-        class={`
-          transform duration-300 ease-in-out
-          ${showPreview ? 'full-preview' : 'small-preview'} common-preview ${combinedClass}
-        `}>
-        <div style="padding-top: 205%; position: relative;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
+      in:fade={{duration: 1000, delay: 500,}}
+      bind:this={element}
+      class={`
+        transform duration-300 ease-in-out
+        ${showPreview ? 'full-preview' : 'small-preview'} common-preview ${combinedClass}
+      `}>
+      <div style="padding-top: 205%; position: relative;">
+      <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;" class="p-4">
 
     <!-- preview container -->
     {#if !showData}
     <div
-      in:blur={{ delay: 300, amount: 100, duration: 1000, easing: backOut }}
+      in:fly={{ y: 20, x: 20, duration: 200, easing: backOut}}
     >
 
       <div 
       style={`color: ${font?.hex? font?.hex : 'hsl(var(--p))'}`}
+      in:fade={{duration: 1000, easing: cubicInOut, delay: 1000}}
       class="flex flex-col space-y-1 items-center mt-8 mb-4 font-{font?.family}">
         <!-- pfp -->
         <img class="min-w-[30px] min-h-[30px] max-h-[72px] max-w-[72px]"  src="{photoURL}" alt="pfp">
@@ -275,6 +279,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
   {/if}
 
 <style>
+
 
 
 

@@ -3287,4 +3287,94 @@ todo
 link specific fonts to each theme
     or find a font that is as as good as input mono to use as the default font
 
-blur in animation for the livepreview is ugly as shit
+o
+
+
+
+todo:
+
+let user select their own link shake attention grabbing first link style.
+
+the link tree one is probably effective but i don't really like it too much
+
+steps to implement link animation:
+
+    update the link objectin the customtheme type
+    link: {
+        animation: {
+            style: string,
+            active: boolean,
+        }
+    }
+
+    create 3 link animation styles
+    and a blurb about how animated links convert way higher. 
+
+    ux:
+
+        toggle link animation -> styles appear -> choose style -> trigger save function -> reflect change in the ui
+
+
+october 26
+
+tips for fixing these theme divs
+
+    make sure the links fit each screen change as well
+    chat gpt is screwing me over so i'll come back to that with my own research
+
+font.svelte easier ui
+
+    make the font open up like a modal then the user can scroll through
+    the goal should be to replicate the linktree font modal then adjust it to my liking
+    let user scroll through all the fonts without having to scroll down the page
+    fonts can be smaller as well
+
+    future: 
+        text styles:
+            size 
+            tracking
+            anything else?
+
+should user have to start with a blank slate every time they change their theme?
+
+should i have an option to only change the data-theme?
+
+changing the data theme will change your default color colors,
+all appearance settings will be the same,
+
+tip: too see what the theme colors are just delete any custom colors you have chosen.
+
+try to get rid of that weird margin effect when i scroll to the bottom. i want the background to be perfectly fixed to the bg
+
+
+
+wait wait wait wait wait i know know know know wait wait i know wait i know an an an an easy eays easy easy easy solution solution solution
+
+wait i know an es
+wait i know an easy solution
+wait i know an easy solution
+
+let's get rid of the empty theme?
+
+let's just trigger a set theme function that changes the theme name that is saved in the user's db
+then let's delete every color setting
+that way all of their styles are set
+
+we can have color themes.
+and prebuilt all inclusive themes.
+
+todo.
+delete empty theme
+
+
+figure out how to make the userlinks proportional inside of the livepreview
+
+
+todo 10.29
+create dataTheme function that sets new theme and deletes every color setting in the user's db
+
+async function changeDataTheme
+
+
+
+wow that was a lot of good shit. my website looks so nice and yummy

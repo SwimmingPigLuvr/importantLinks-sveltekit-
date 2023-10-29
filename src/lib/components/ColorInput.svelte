@@ -385,13 +385,13 @@
     <container 
         in:slide={{ duration: 1000, easing: cubicInOut }}
         out:slide={{ duration: 1000, easing: cubicInOut }}
-        class="flex justify-start space-x-10 mt-8">
+        class="flex justify-start space-x-1 mt-8 ">
       <div>
         <label for="{mode} color" class="label">
-          <span class="label-text font-input-mono">{mode} color</span>
+          <span class="label-text font-mono text-xs">Color</span>
         </label>      
         <!-- inputs -->
-        <div id="{mode} color" class="flex flex-col">
+        <div id="{mode} color" class="flex flex-col justify-fontent">
             <div 
                 style={`border: 2px solid ${hex}`}
                 class="flex relative">
@@ -400,7 +400,7 @@
               <input 
                 type="color" 
                 id="colorInput"
-                style="width: 3.1rem; height: 3rem; " 
+                style="width: 2.3rem; height: 2.3rem; " 
                 bind:value={hex} 
                 on:change={() => updateColor(mode, hex)}
                 class="relative"
@@ -411,7 +411,7 @@
                 placeholder="#12345" 
                 bind:value={hex} 
                 on:change={() => updateColor(mode, hex)} 
-                class="input text-center w-[13rem] rounded-none font-input-mono tracking-widest">
+                class="input text-left w-[8rem] h-[2.3rem] rounded-none font-mono tracking-widest">
             
               <!-- revert back to theme color -->
               {#if hex !== ''}

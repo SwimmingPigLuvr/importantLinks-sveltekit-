@@ -14,7 +14,7 @@
     };
     let image: string;
 
-    let headerDefault: string = '/headerDefault.png';
+    let headerDefault: string = '/headerDefault.avif';
     let backgroundDefault: string = '/backgroundDefault.webp';
     let linkDefault: string = '/static/linkDefault.png';
     let borderDefault: string = '/borderDefault.png';
@@ -246,9 +246,9 @@
   in:slide={{ duration: 1000, easing: cubicInOut }}
   out:slide={{ duration: 1000, easing: cubicInOut }}
   class:justify-center={mode === 'header'}
-  class="flex space-x-4 my-6 justify-start">
+  class="flex flex-col sm:flex-row space-y-4 space-x-4 my-6 justify-start ">
 
-  <div class="form-control text-center">
+  <div class="w-full sm:w-1/2 form-control flex items-center text-center transform transition-all duration-1000 ease-in-out">
     <!-- image preview -->
       <div class="relative">
 
@@ -257,7 +257,7 @@
           alt="preview"
           class={`
             ${uploading? 'filter grayscale' : 'grayscale-0'}
-            w-80
+            w-full transform transition-all duration-1000 ease-in-out
         `}
       />
       {#if mode === 'header' && $userData?.header !== ''}
@@ -302,35 +302,35 @@
     <!-- image style options -->
     <div 
       in:slide={{duration: 2000, easing: cubicInOut}}
-      class="flex flex-col text-accent font-input-mono text-[1rem] space-y-4 justify-start">
+      class="w-full sm:w-1/3  flex flex-col text-accent font-change text-[1rem] space-y-4 justify-start transform transition duration-1000 ease-in-out">
 
       <!-- background-position -->
-      <div class="flex flex-col space-y-2 justify-start rounded-none ">
-        <button class="font-input-mono text-white text-[1.5rem] text-left border-b-8 border-accent w-28 hover:w-36 transform transition-all duration-500 ease-[backOut]" on:click={() => {showPosition = !showPosition; showSize = false; showRepeat = false}}>Position</button>
+      <div class="flex flex-col space-y-2 justify-start rounded-none font-change w-full transform transition-all duration-1000 ease-in-out">
+        <button class=" text-white text-[1.5rem] text-left border-b-8 border-accent w-0 hover:w-full transform transition-all duration-500 ease-[backOut]" on:click={() => {showPosition = !showPosition; showSize = false; showRepeat = false}}>Position</button>
         {#if showPosition}
-          <div in:slide out:slide class=" flex-col space-y-2 justify-start ">
-            <div class="flex space-x-2 ">
-              <button class:bg-info={isPosition === 'left top'} on:click={() => setPosition(mode, 'left top')} class="btn btn-outline text-[2rem]">↖</button>
-              <button class:bg-info={isPosition === 'center top'} on:click={() => setPosition(mode, 'center top')} class="btn btn-outline text-[2rem]">↑</button>
-              <button class:bg-info={isPosition === 'right top'} on:click={() => setPosition(mode, 'right top')} class="btn btn-outline text-[2rem]">↗</button>
+          <div in:slide out:slide class=" flex-col space-y-2 ">
+            <div class="flex space-x-2 justify-center">
+              <button class="{isPosition === 'left top' ? `bg-info text-info-content glow` : ``} btn btn-outline text-accent text-[2rem]" on:click={() => setPosition(mode, 'left top')} >↖</button>
+              <button class="{isPosition === 'center top' ? `bg-info text-info-content glow` : ``} btn btn-outline text-[2rem]" on:click={() => setPosition(mode, 'center top')} >↑</button>
+              <button class="{isPosition === 'right top' ? `bg-info text-info-content glow` : ``} btn btn-outline text-accent text-[2rem]" on:click={() => setPosition(mode, 'right top')} >↗</button>
             </div>
-            <div class="flex space-x-2">
-              <button class:bg-info={isPosition === 'left'} on:click={() => setPosition(mode, 'left')} class="btn btn-outline text-[2rem]">←</button>
-              <button class:bg-info={isPosition === 'center'} on:click={() => setPosition(mode, 'center')} class="btn btn-outline text-[2rem]">☯︎</button>
-              <button class:bg-info={isPosition === 'right'} on:click={() => setPosition(mode, 'right')} class="btn btn-outline text-[2rem]">→</button>
+            <div class="flex space-x-2 justify-evenly">
+              <button class="{isPosition === 'left' ? `bg-info text-info-content glow` : ``} btn btn-outline text-[2rem]" on:click={() => setPosition(mode, 'left')} >←</button>
+              <button class="{isPosition === 'center' ? ` text-info-content glow` : ``} text-[2rem]" on:click={() => setPosition(mode, 'center')} >☯︎</button>
+              <button class="{isPosition === 'right' ? `bg-info text-info-content glow` : ``} btn btn-outline text-[2rem]" on:click={() => setPosition(mode, 'right')} >→</button>
             </div>
-            <div class="flex space-x-2">
-              <button class:bg-info={isPosition === 'left bottom'} on:click={() => setPosition(mode, 'left bottom')} class="btn btn-outline text-[2rem]">↙</button>
-              <button class:bg-info={isPosition === 'center bottom'} on:click={() => setPosition(mode, 'center bottom')} class="btn btn-outline text-[2rem]">↓</button>
-              <button class:bg-info={isPosition === 'right bottom'} on:click={() => setPosition(mode, 'right bottom')} class="btn btn-outline text-[2rem]">↘</button>
+            <div class="flex space-x-2 justify-center">
+              <button class="{isPosition === 'left bottom' ? `bg-info text-info-content glow` : ``} btn btn-outline text-accent text-[2rem]" on:click={() => setPosition(mode, 'left bottom')} >↙</button>
+              <button class="{isPosition === 'center bottom' ? `bg-info text-info-content glow` : ``} btn btn-outline text-[2rem]" on:click={() => setPosition(mode, 'center bottom')} >↓</button>
+              <button class="{isPosition === 'right bottom' ? `bg-info text-info-content glow` : ``} btn btn-outline text-accent text-[2rem]" on:click={() => setPosition(mode, 'right bottom')} >↘</button>
             </div>
           </div>
         {/if}
       </div>  
 
       <!-- background-size -->
-      <div class="flex flex-col space-y-2 justify-start rounded-none ">
-        <button class=" text-white text-[1.5rem] text-left border-b-8 border-accent w-12 hover:w-20 transform transition-all duration-500 ease-[backOut]" on:click={() => {showSize = !showSize; showPosition = false; showRepeat = false}}>Size</button>
+      <div class="flex flex-col space-y-2 justify-start rounded-none w-full ">
+        <button class=" text-white text-[1.5rem] text-left border-b-8 border-accent w-0 hover:w-full transform transition-all duration-500 ease-[backOut]" on:click={() => {showSize = !showSize; showPosition = false; showRepeat = false}}>Size</button>
         {#if showSize}
           <div in:slide out:slide class="flex flex-wrap gap-2">
             <button class:bg-info={isSize === "auto"} on:click={() => setSize(mode, 'auto')} class="btn btn-sm btn-outline">auto</button>
@@ -340,18 +340,18 @@
             <input 
               type="text" 
               bind:value={customSize} 
-              placeholder="custom" 
+              placeholder="custom css" 
               on:change={() => setSize(mode, customSize)} 
               on:keypress={(e) => {if (e.key === 'Enter') setSize(mode, customSize);}}
               class:bg-info={isSize === customSize}
-              class="input input-sm w-1/2"/>
+              class="input input-sm w-1/2 hover:bg-primary"/>
           </div> 
         {/if}
       </div>
 
       <!-- background-repeat -->
       <div class="flex flex-col space-y-2 justify-start rounded-none ">
-        <button class="font-input-mono text-white text-[1.5rem] text-left w-20 hover:w-32 border-b-8 border-accent hover:border-separate transform transition-all duration-500 ease-[backOut]" on:click={() => {showRepeat = !showRepeat; showSize = false; showPosition = false}}>Repeat</button>
+        <button class="font-input-mono text-white text-[1.5rem] text-left w-0 hover:w-full border-b-8 border-accent hover:border-separate transform transition-all duration-500 ease-[backOut]" on:click={() => {showRepeat = !showRepeat; showSize = false; showPosition = false}}>Repeat</button>
         {#if showRepeat}
           <div in:slide out:slide class="flex flex-wrap gap-2">
             <button class:bg-info={isRepeat === 'repeat'} on:click={() => setRepeat(mode, 'repeat')} class="btn btn-xs btn-outline">repeat</button>

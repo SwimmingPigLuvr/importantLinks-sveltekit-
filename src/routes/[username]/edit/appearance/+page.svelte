@@ -2,7 +2,7 @@
   import Fonts from "$lib/components/Fonts.svelte";
   import AuthCheck from "$lib/components/AuthCheck.svelte";
   import LivePreview from "$lib/components/LivePreview.svelte";
-  import { db, user, userData, storage } from "$lib/firebase";
+  import { db, user, userData, storage, userTheme } from "$lib/firebase";
   import type { LinkData } from "$lib/firebase";
   import { setTheme, dataTheme } from "$lib/theme";
   import type { CustomTheme, Gradient, Color, Image, RepeatValue, PositionValue, Border, BorderImage, Fill, Shadow, Title, Effect, TitleFont, Font } from "$lib/theme";
@@ -16,6 +16,8 @@
   import ImageUpload from "$lib/components/ImageUpload.svelte";
   import ColorInput from "$lib/components/ColorInput.svelte";
 
+  let themeHover: boolean[] = [];
+  let customThemeHover: boolean[] = [];
   let sizeNumber: number = 4;
   let unit: string = 'px';
 
@@ -81,6 +83,8 @@
   let border: boolean;
   let shadow: boolean;
 
+  let isLinkAnimationActive: boolean;
+
   let solidLinkFill: boolean;
   let gradientLinkFill: boolean;
   let imageLinkFill: boolean;
@@ -88,6 +92,36 @@
   let solidLinkBorder: boolean;
   let gradientLinkBorder: boolean;
   let imageLinkBorder: boolean;
+
+  async function updateLinkAnimation(animation: string) {
+    const batch = writeBatch(db);
+    saving = true;
+    console.log('updating link animation');
+
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        link: {
+          animation: animation
+        }
+      }
+    }, { merge: true });
+
+    await batch.commit();
+    saving = false;
+    saveSuccess = true;
+  }
+
+  async function toggleLinkAnimation() {
+    const batch = writeBatch(db);
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        link: {
+          active: true
+        }
+      }
+    }, { merge: true });
+    await batch.commit();
+  }
 
   async function updateVisibility(mode: string, isVisible: boolean) {
     const batch = writeBatch(db);
@@ -227,7 +261,9 @@
     borderImage = link.border.image;
   }
 
-  
+  $: if (isLinkAnimationActive) {
+    toggleLinkAnimation;
+  }
 
   $: if ($userData && $userData.userThemes && $userData.userThemes.length > 1) {
     const uniqueThemeName = Object.keys(userThemes[1])[0];
@@ -343,15 +379,64 @@
 
     for (const theme of themes) {
       if (chosenTheme === theme) {
-        batch.set(doc(db, `users/${$user!.uid}`), {
-          customTheme: dataTheme
-        }, { merge: true });
+        setDataTheme(theme);
       }
     }
 
 
     await batch.commit();
     chosenTheme = '';
+  }
+
+  async function setDataTheme(theme: string) {
+    console.log('setting the data theme to ', theme);
+    const batch = writeBatch(db);
+    batch.set(doc(db, `users/${$user!.uid}`), {
+      customTheme: {
+        background: {
+          gradient: {
+            from: {hex: '', opacity: 100},
+            to: {hex: '', opacity: 100}
+          },
+          hex: '',
+        },
+        link: {
+          fill: {
+            gradient: {
+              from: {hex: '', opacity: 100},
+              to: {hex: '', opacity: 100},
+            },
+            hex: '',
+          },
+          border: {
+            gradient: {
+              from: {hex: '', opacity: 100},
+              to: {hex: '', opacity: 100},
+            },
+            hex: '',
+          },
+          shadow: {
+            gradient: {
+              from: {hex: '', opacity: 100},
+              to: {hex: '', opacity: 100},
+            },
+          },
+          title: {
+            effect: {
+              hex: '',
+            },
+            font: {
+              hex: '',
+            }
+          },
+        },
+        font: {
+          hex: '',
+        },
+      }
+    }, { merge: true });
+
+    await batch.commit();
   }
 
   const handleThemeSelect = (selectedTheme: string) => {
@@ -866,66 +951,82 @@
 
 <AuthCheck>
 
-<LivePreview 
-  username={username} 
-  photoURL={photoURL} 
-  bio={bio} links={links} 
-  theme={theme} 
-  customTheme={customTheme}
-/>
+<div class="fixed right-0 w-[40%] transform transition-all duration-1000 ease-in-out">
 
+  <LivePreview 
+    username={username} 
+    photoURL={photoURL} 
+    bio={bio} links={links} 
+    theme={theme} 
+    customTheme={customTheme}
+  />
+</div>
+
+  <!-- optional bg style -->
+  <!-- style="background-image: url('/minecraft.gif'); background-repeat: no-repeat; background-size: 100% 100%; background-attachment: fixed;"  -->
 <!-- main html -->
-<main data-theme="autumn" class="flex flex-col">
+<main 
+  data-theme="{theme}" 
+  class="flex flex-col bg-secondary-content">
 
   <!-- logo -->
   <h1 id="custom" class="px-2 z-10 font-blix text-accent text-[2rem] ">Magic<span class="font-oblique">Hat</span> 🎩🪄</h1>
 
   <!-- hidden fonts -->
-  <h1 id="custom" class="hidden px-2 z-10 font-spooky text-[2rem] ">Magic<span class="font-lithotype">Hat</span> 🎩🪄</h1>
-  <h1 id="custom" class="hidden px-2 z-10 font-fit text-[2rem] ">Magic<span class="font-fit -tracking-[1em]">Hat</span> 🎩🪄</h1>
-  <p class="font-balboa hidden">hehe</p>
-  <p class="font-balboa-black hidden">hehe</p>
-  <p class="font-haunted hidden">hehe</p>
-  <p class="font-herb-bold hidden">hehe</p>
-  <p class="font-herb-condensed hidden">hehe</p>
-  <p class="font-herb-condensed-bold hidden">hehe</p>
-  <p class="font-playwright hidden">hehe</p>
-  <p class="font-tech hidden">hehe</p>
-  <p class="font-ink hidden">hehe</p>
-  <p class="font-tech-thin hidden">hehe</p>
-  <p class="font-gerald hidden">hehe</p>
-  <p class="font-gerald-italic hidden">hehe</p>
-  <p class="font-gerald-black hidden">hehe</p>
-  <p class="font-gerald-black-italic hidden">hehe</p>
-  <p class="font-gerald-thin hidden">hehe</p>
-  <p class="font-gerald-thin-italic hidden">hehe</p>
-  <p class="font-input-mono hidden">hehe</p>
-  <p class="font-typewriter hidden">hehe</p>
-  <p class="font-totally-gothic hidden">hehe</p>
-  <div id="top" class="flex flex-col my-8 mt-20  md:max-w-[62%]">
-    <div class="gradient-overlay relative bg-secondary m-auto  max-w-[95%] py-2 mb-6 flex flex-wrap rounded-tl-[4] w-full">
-    <h2 class="absolute -top-8 -left-4 mx-2 font-legal-heading -tracking-widest text-[1.5rem]">Themes</h2>
+  <div>
+    <h1 id="custom" class="hidden px-2 z-10 font-spooky text-[2rem] ">Magic<span class="font-lithotype">Hat</span> 🎩🪄</h1>
+    <h1 id="custom" class="hidden px-2 z-10 font-fit text-[2rem] ">Magic<span class="font-fit -tracking-[1em]">Hat</span> 🎩🪄</h1>
+    <p class="font-balboa hidden">hehe</p>
+    <p class="font-balboa-black hidden">hehe</p>
+    <p class="font-haunted hidden">hehe</p>
+    <p class="font-herb-bold hidden">hehe</p>
+    <p class="font-herb-condensed hidden">hehe</p>
+    <p class="font-herb-condensed-bold hidden">hehe</p>
+    <p class="font-playwright hidden">hehe</p>
+    <p class="font-tech hidden">hehe</p>
+    <p class="font-ink hidden">hehe</p>
+    <p class="font-tech-thin hidden">hehe</p>
+    <p class="font-gerald hidden">hehe</p>
+    <p class="font-gerald-italic hidden">hehe</p>
+    <p class="font-gerald-black hidden">hehe</p>
+    <p class="font-gerald-black-italic hidden">hehe</p>
+    <p class="font-gerald-thin hidden">hehe</p>
+    <p class="font-gerald-thin-italic hidden">hehe</p>
+    <p class="font-mono hidden">hehe</p>
+    <p class="font-typewriter hidden">hehe</p>
+    <p class="font-totally-gothic hidden">hehe</p>
+  </div>
+
+  <div id="top" class="flex flex-col my-8 mt-14 p-4 md:max-w-[60%]">
+
     <!-- themes -->
-      <div class="flex overflow-auto space-x-2 bg-gradient-to-r from-primary to-secondary pt-4 px-4">
+    <div class="content-section">
+    <h2 class="content-section-heading">Themes</h2>
+      <div class="mx-auto grid-themes">
         <!-- custom -->
         <div class="">
-          <a href="#custom" class="btn bg-opacity-50 hover:bg-opacity-70 rounded-none bg-primary border-dashed border-2 border-black min-w-[160px] min-h-[300px] max-w-[200px] flex flex-col justify-start py-4">
-            <p class="font-blix max-w-[100px] text-[1.5rem] leading-normal m-auto"><span class="">Create </span><span class="font-herb">Custom </span><span class="">Theme </span></p>
+          <a href="#custom" class="btn bg-opacity-50 hover:bg-opacity-70 rounded-none bg-primary border-dashed border-2 border-black w-[150px] h-[225px] sm:w-[100px] sm:h-[150px] md:w-[125px] md:h-[188px] flex flex-col justify-start py-4">
+            <p class="font-blix max-w-[100px] text-[1rem] leading-normal m-auto"><span class="">Create </span><span class="font-herb">Custom </span><span class="">Theme </span></p>
           </a>
-          <h3 class="text-white font-blix bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
+          <h3 class="text-white text-[1.25rem] tracking-[-0.075em] font-change-italic bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
         </div>
 
         <!-- user made themes -->
         {#each userThemes as userTheme, index}
-          <div class="">
+        
+          <button 
+            on:mouseenter={() => customThemeHover[index] = true}
+            on:mouseleave={() => customThemeHover[index] = false}
+            on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
+            class:glow={customThemeHover[index] || userTheme.name === $userData?.theme}
+            class="">
             <button 
+              class:active-theme={userTheme.name === $userData?.theme}
               data-theme={$userData?.theme}
-              on:click|preventDefault={() => handleThemeSelect(userTheme.name)} 
-              style={`color: ${userTheme.font?.hex}; ${userTheme.background?.style === 'image' ? `background-image: url(${userTheme.background?.image?.url}); background-size: ${userTheme.background.image.size}; background-repeat: ${userTheme.background.image.repeat}; background-position: ${userTheme.background.image.position};` : (userTheme.background?.style === 'solid' ? `background-color: ${userTheme.background?.hex}` : '')}`}
-              class={`btn border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4`}>
+              class="btn option-card">
                 <div class={`font-${userTheme.font? userTheme.font?.family : ''} flex flex-col items-center font`}>
                   <!-- pfp -->
-                  <img class="w-[45px] h-[45px]"  src="{photoURL}" alt="pfp">
+                  <img class="w-[33px] h-[33px]"  src="{photoURL}" alt="pfp">
                   <!-- Username -->
                   <p class="text-[0.5rem]">@{username}</p>
                   <!-- bio -->
@@ -936,21 +1037,25 @@
                 <div class={`bg-${userTheme.link? userTheme.link.fill.hex : ''} w-full h-4`}></div>
                 <div class={`bg-${userTheme.link? userTheme.link.fill.hex : ''} w-full h-4`}></div>
             </button>
-            <h3 class="text-white font-blix my-2 text-center">{userTheme.name}</h3>
-          </div> 
+            <h3 class="text-white text-[1.25rem] tracking-[-0.075em] font-change-italic my-2 text-center capitalize-first">{userTheme.name}</h3>
+          </button> 
         {/each}
 
         <!-- prebuilt Themes -->
-        {#each themes as theme}
-          <div class="">
+        {#each themes as theme, index}
+          <button  
+            on:mouseenter={() => themeHover[index] = true}
+            on:mouseleave={() => themeHover[index] = false}
+            on:click|preventDefault={() => handleThemeSelect(theme)} 
+            class:glow={themeHover[index] || theme === $userData?.theme}
+            class="">
             <button 
-              on:click|preventDefault={() => handleThemeSelect(theme)} 
-              class="btn bg-primary border-none min-w-[160px] min-h-[300px] max-w-[200px] {theme} flex flex-col justify-start py-4"
-              class:btn-secondary={theme === chosenTheme}
+              class="btn border-none bg-primary w-[150px] h-[225px] sm:w-[100px] sm:h-[150px] md:w-[125px] md:h-[188px] flex flex-col justify-start py-4"
+              class:active-theme={theme === $userData?.theme}
               data-theme={theme}>
                 <div class="flex flex-col items-center">
                   <!-- pfp -->
-                  <img class="w-[45px] h-[45px]"  src="{$userData?.photoURL}" alt="pfp">
+                  <img class="w-[33px] h-[33px]"  src="{$userData?.photoURL}" alt="pfp">
                   <!-- Username -->
                   <p class="text-[0.5rem]">@{$userData?.username}</p>
                   <!-- bio -->
@@ -961,8 +1066,8 @@
                 <div class="bg-secondary w-full h-4"></div>
                 <div class="bg-secondary w-full h-4"></div>
             </button>
-            <h3 class="text-white font-blix my-2 text-center bg-opacity-0" data-theme={theme}>{theme}</h3>
-          </div>
+            <h3 class="option-title text-white text-[1.25rem] tracking-[-0.075em] font-change-italic my-2 text-center bg-opacity-0 capitalize-first" data-theme={theme}>{theme}</h3>
+          </button>
         {/each}
       </div>
     </div>
@@ -971,16 +1076,16 @@
 
   </div>
 
-    <h2 class="mx-2 font-legal-heading -tracking-widest text-[1.5rem]">Header</h2>
-    <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
+    <div class="content-section">
+      <h2 class="content-section-heading">Header</h2>
       <ImageUpload currentImage={headerImage} mode={'header'}/>
     </div>
     
     <!-- backgrounds -->
-    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Background</h2>
 
     <!-- backgrounds container -->
-    <div class="bg-secondary m-auto mx-6 mb-6 p-6 rounded-2xl">
+    <div class="content-section">
+      <h2 class="content-section-heading">Background</h2>
       
       <!-- bg styles -->
       <div class="flex space-x-2">
@@ -988,27 +1093,35 @@
         <div>
           <button 
             on:click={() => setStyle('background', 'background-solid')} 
-            class="w-[120px] h-[200px] btn bg-accent border-none flex flex-col justify-start"></button>
-          <h3 class="text-white font-input-mono text-center text-md mb-4 mt-2">Solid Color</h3>
+            class="filter grayscale hover:grayscale-0 w-[120px] h-[150px] bg-accent transition transform duration-300 ease-in-out rounded-lg flex"></button>
+          <h3 class="option-title">Solid Color</h3>
         </div>
       <!-- gradient -->
       <div>
         <button 
           on:click={() => setStyle('background', 'background-gradient')}
-          class="w-[120px] h-[200px] btn bg-gradient-to-b from-accent to-primary hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none flex flex-col justify-start py-4"></button>
-        <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Gradient</h3>
+          class="w-[120px] h-[150px] btn bg-gradient-to-b from-accent to-primary hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none flex flex-col justify-start py-4"></button>
+        <h3 class="option-title">Gradient</h3>
       </div>
     
 
 
-      <div>
+      <button>
         <button 
           on:click={() => setStyle('background', 'background-image')}
-          class="w-[120px] h-[200px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
+          class="w-[120px] h-[150px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
           <img src="{$userData?.photoURL}" alt="pfp" class="h-[100%] btn p-0">
         </button>
-        <h3 class="text-white font-input-mono bg-opacity-0 text-center text-md mb-4 mt-2">Image</h3>
-      </div>
+        <h3 class="option-title">Image</h3>
+      </button>
+      <button>
+        <button 
+          on:click={() => setStyle('background', 'background-gif')}
+          class="w-[120px] h-[150px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
+          <img src="/minecraft.gif" alt="pfp" class="h-[100%] btn p-0">
+        </button>
+        <h3 class="option-title">Gif</h3>
+      </button>
 
     </div>
     {#if backgroundColorSelect}
@@ -1026,16 +1139,16 @@
 
 
     <!-- links -->
-    <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Links</h2>
       <!-- main container -->
-      <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl space-y-4">
+      <div class="content-section">
+        <h2 class="content-section-heading">Links</h2>
 
         <!-- Fill controls -->
         <div class="flex flex-col flex-wrap justify-between ">
           <!-- Label / checkbox -->
           <div class="flex space-x-6 items-center ">
             <input type="checkbox" class="toggle" bind:checked={fill} on:change={() => updateVisibility('fill', !fill)} />
-            <h3 class="font-input-mono text-white text-[1.5rem]">Fill</h3>
+            <h3 class="font-mono text-white text-[1.5rem]">Fill</h3>
           </div>
 
           {#if fill}
@@ -1049,11 +1162,11 @@
               out:blur
               class="mt-2 mb-6">
               <label for="Fill Style" class="label">
-                <span class="label-text font-input-mono">Style</span>
+                <span class="label-text font-mono">Style</span>
               </label>
               <div id="Fill Style">
                 <!-- styles -->
-                <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
+                <div class="flex space-x-4 font-mono font-black text-sm -tracking-widest">
                   <!-- solid -->
                   <button 
                     on:click={() => setStyle('fill', 'link-solid')}
@@ -1100,7 +1213,7 @@
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
             <input type="checkbox" class="toggle" bind:checked={border} on:change={() => updateVisibility('border', !border)} />
-            <h3 class="font-input-mono text-white text-[1.5rem]">Border</h3>
+            <h3 class="font-mono text-white text-[1.5rem]">Border</h3>
           </div>
           
           {#if border}
@@ -1119,11 +1232,11 @@
                 out:blur
                 class="mt-2 mb-6">
                 <label for="Fill Style" class="label">
-                  <span class="label-text font-input-mono">Style</span>
+                  <span class="label-text font-mono">Style</span>
                 </label>
                 <div id="Fill Style">
                   <!-- styles -->
-                  <div class="flex space-x-4 font-input-mono font-black text-sm -tracking-widest">
+                  <div class="flex space-x-4 font-mono font-black text-sm -tracking-widest">
                     <!-- solid -->
                     <button 
                       on:click={() => setBorderFillStyle('border-solid')}
@@ -1155,9 +1268,9 @@
             <!-- border size -->
             <div>
               <label for="size input" class="label">
-                <span class="label-text font-input-mono">Size</span>
+                <span class="label-text font-mono">Size</span>
               </label>
-              <div id="size input" class="join font-input-mono">
+              <div id="size input" class="join font-mono">
                 <input on:change={() => setBorderWidth(sizeNumber, unit)} type="number" placeholder="4" class="input w-28" bind:value={sizeNumber}>
                 <div class="dropdown dropdown-hover">
                   <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -1190,11 +1303,11 @@
               out:slide={{duration: 1000, easing: cubicInOut}}
               class="mt-2 mb-6">
               <label for="Border Style" class="label">
-                <span class="label-text font-input-mono">Style</span>
+                <span class="label-text font-mono">Style</span>
               </label>
               <div id="Border Style">
                 <!-- styles -->
-                <div class="flex flex-wrap font-input-mono">
+                <div class="flex flex-wrap font-mono">
                   <!-- solid -->
                   <button 
                     on:click={() => setStyle('border', 'solid')}
@@ -1272,7 +1385,7 @@
           <!-- label / checkbox -->
           <div class="flex space-x-6 items-center ">
             <input type="checkbox" class="toggle" bind:checked={shadow} on:change={() => updateVisibility('shadow', !shadow)} />
-            <h3 class="font-input-mono text-white text-[1.5rem]">Shadow</h3>
+            <h3 class="font-mono text-white text-[1.5rem]">Shadow</h3>
           </div>
           
           {#if shadow}
@@ -1286,11 +1399,11 @@
               out:blur
               class="mt-2 mb-6">
               <label for="Shadow Style" class="label">
-                <span class="label-text font-input-mono">Style</span>
+                <span class="label-text font-mono">Style</span>
               </label>
               <div id="Shadow Style">
                 <!-- styles -->
-                <div class="flex space-x-4 font-input-mono">
+                <div class="flex space-x-4 font-mono">
                   <!-- soft shadow -->
                   <button 
                     on:click={() => setStyle('shadow', 'soft-shadow')}
@@ -1321,7 +1434,7 @@
         <div class="flex flex-wrap flex-col justify-between">
           <!-- label -->
           <div class="flex space-x-6 items-center mt-8">
-            <h3 class="font-input-mono text-white text-[1.5rem]">Link Title</h3>
+            <h3 class="font-mono text-white text-[1.5rem]">Link Title</h3>
           </div>
           <!-- style + color picker div -->
           <div 
@@ -1339,12 +1452,12 @@
               
               <div class="flex flex-col space-x-6 items-start mb-2">
                 <label for="Text Effect" class="label">
-                  <span class="label-text font-input-mono">Text Effect</span>
+                  <span class="label-text font-mono">Text Effect</span>
                 </label>
               </div>
               <div id="Text Effect">
                 <!-- styles -->
-                <div class="flex space-x-4 font-input-mono">
+                <div class="flex space-x-4 font-mono">
                   <!-- glow -->
                   <button 
                   on:click|preventDefault={() => saveTextEffect('glow')} 
@@ -1366,7 +1479,7 @@
         </div> 
 
       <!-- radius control -->
-        <h3 class="font-input-mono text-white my-2 mt-6">Radius</h3>
+        <h3 class="font-mono text-white my-2 mt-6">Radius</h3>
         <div class="flex flex-wrap justify-between">
           <button 
             on:click={() => setRadius('none')} 
@@ -1378,30 +1491,37 @@
             on:click={() => setRadius('full')} 
             class="btn w-1/4 rounded-full mb-4">Full</button>
       </div>
+
+
+        <div class="flex flex-wrap flex-col justify-between">
+          <!-- label / checkbox -->
+          <div class="flex space-x-6 items-center ">
+            <input type="checkbox" class="toggle" bind:checked={isLinkAnimationActive} />
+            <h3 class="font-mono text-white text-[1.5rem]">First Link Animation</h3>
+          </div>
+        </div>
     </div>
   
 
       <!-- fonts -->
-      <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Font</h2>
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="bg-secondary m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
-        
-        <h3 class="font-input-mono text-white my-2">Font</h3>
-        <button on:click|preventDefault={() => toggleFontDropdown()} class="btn group border-neutral-200 shadow shadow-neutral-200 bg-white h-20 flex items-center justify-start space-x-4">
-          <div class="bg-neutral-200 w-12 h-12 rounded-sm items-center justify-center flex">
-            <p class="m-auto font-{font?.family} text-black text-[1.5rem]">Aa</p>
+      <div class="content-section">
+        <h2 class="content-section-heading">Font</h2>
+        <h3 class="font-mono text-white text-xs mb-2">Font</h3>
+        <button on:click|preventDefault={() => toggleFontDropdown()} class="btn w-full group border-neutral-200 shadow shadow-neutral-200 bg-white h-16 flex items-center justify-start space-x-2">
+          <div class="bg-neutral-100 w-10 h-10 rounded-lg items-center justify-center flex">
+            <p class="m-auto font-{font?.family} text-black text-[1rem]">Aa</p>
           </div>
-          <p class="font-{font?.family} group-hover:text-neutral-200 text-[1.5rem] text-black">{font?.family}</p>
+          <p class="font-{font?.family} text-[1rem]">{font?.family}</p>
         </button>
- {#if fontDropdown}
+      {#if fontDropdown}
       <!-- svelte-ignore missing-declaration -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div id="fonts" class="mt-8">
+        <div id="fonts" class="">
           <Fonts />
         </div>
       {/if}
-      <div class="flex space-x-8 mt-4 bg-white">
+      <div class="">
         <ColorInput mode={'font'} currentHex={currentFontHex}/>
       </div>
 
@@ -1415,27 +1535,23 @@
     <div>
 
     </div> 
-  </div>
       
-  <!-- fonts -->
-  <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Save Custom Theme</h2>
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="bg-secondary space-y-4 font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
-
-    
+  <div class="content-section">
+    <h2 class="content-section-heading">Save Custom Theme</h2>
     <label for="Custom Theme Name">Theme Name</label>
     <input type="text" bind:value={name} class="p-4 rounded-md" placeholder="Enter Theme Name">
     <button 
       on:click={() => saveCustomTheme(name, customTheme)}
       class="btn">Save Theme</button>
-
-
   </div> 
 
-  <h2 class="mx-2 p-2 font-input-mono text-[1.5rem] ">Milady</h2>
-  <div class="bg-secondary space-y-4 font-input-mono m-auto mx-6 mb-6 p-6 flex flex-col rounded-2xl">
+  <div class="content-section">
+    <h2 class="content-section-heading">Milady</h2>
     <img src="/icons/custom.png" alt="custom" width="200">
   </div> 
+  
+  </div>
 
 
   {#if showBackUp}
@@ -1456,12 +1572,12 @@
 <div class="fixed z-50 bottom-2 right-2">
   {#if saving}
     <div in:slide class="flex w-full bg-success-content p-1 px-2">
-      <p class="text-lg text-success font-input-mono tracking-widest">saving</p>
+      <p class="text-lg text-success font-mono tracking-widest">saving</p>
     </div> 
   {/if}
   {#if saveSuccess}
     <button on:click={() => saveSuccess = false} in:slide class="flex w-full bg-success-content p-2 px-4">
-      <p class="text-lg text-success font-input-mono tracking-widest">change saved</p>
+      <p class="text-lg text-success font-mono tracking-widest">change saved</p>
     </button>  
   {/if}
 </div>
@@ -1506,9 +1622,39 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-image: linear-gradient(to right, hsl(var(--a)), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), hsl(var(--p))); /* Adjust this gradient as needed */
+  background-image: 
+    linear-gradient(
+      to right, 
+      hsl(var(--p)),
+      rgba(0, 0, 0, 0), 
+      rgba(0, 0, 0, 0), 
+      rgba(0, 0, 0, 0), 
+      rgba(0, 0, 0, 0), 
+      rgba(0, 0, 0, 0), 
+      rgba(0, 0, 0, 0), 
+      rgba(0, 0, 0, 0), 
+      hsl(var(--p))
+    );
   pointer-events: none; /* Ensures the gradient doesn't interfere with interactions */
   z-index: 2; /* Optional, if you have other positioned elements and need layering */
+}
+
+.grid-themes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on small screens */
+    gap: 16px; /* Adjust this value to your preference */
+}
+
+@media screen and (min-width: 600px) { /* Tailwind's sm breakpoint */
+    .grid-themes {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */
+    }
+}
+
+@media screen and (min-width: 768px) { /* Tailwind's md breakpoint */
+    .grid-themes {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */
+    }
 }
   
   </style>

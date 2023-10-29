@@ -129,6 +129,45 @@
   src: url('/fonts/oblique.otf') format('opentype');
 }
 
+@font-face {
+  font-family: 'change';
+  src: url('/fonts/change/changeRegular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-italic';
+  src: url('/fonts/change/changeRegularItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-medium';
+  src: url('/fonts/change/changeMedium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-medium-italic';
+  src: url('/fonts/change/changeMediumItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-semibold';
+  src: url('/fonts/change/changeSemiBold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-semibold-italic';
+  src: url('/fonts/change/changeSemiBoldItalic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-bold';
+  src: url('/fonts/change/changeBold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'change-bold-italic';
+  src: url('/fonts/change/changeBoldItalic.otf') format('opentype');
+}
 
 :root {
 /* BACKGROUNDS */
@@ -184,6 +223,9 @@
   --border-gradient-direction: 0deg;
   --border-gradient-from: #ffffff;
   --border-gradient-to: #ffffff;
+
+  /* misc */
+  /* --photo-url: url('/static/linkDefault.png'); */
 
   transition:
     background-color 1s ease-out,
@@ -389,7 +431,7 @@ html {
 }
 
 .small-preview {
-  width: 30vw;
+  width: 20vw;
   min-width: 190px;
   min-height: 380px;
   max-height: 600px;
@@ -483,4 +525,104 @@ html {
   /* display: inline-block; Required for transform to work on inline elements like links */
   animation: shake 2s infinite;
   animation-delay: 0s;
+}
+
+
+.capitalize-first {
+  text-transform: lowercase;
+}
+
+.capitalize-first::first-letter {
+  text-transform: uppercase;
+}
+
+.content-section { 
+  position: relative;
+  width: 100%;
+  padding: 1.5rem 1rem;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity));
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5rem;
+  border-radius: 1rem;
+  max-width: 600px;
+}
+
+.content-section-heading {
+  position: absolute;
+  top: -2rem;
+  left: -1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  font-family: legal-heading, serif;
+  letter-spacing: -0.1rem;
+  font-size: 1.5rem;
+}
+
+.option-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+  border-style: none;
+  width: 150px;
+  height: 225px;
+}
+
+@media (min-width: 640px) {
+  .option-card {
+      width: 100px;
+      height: 150px;
+  }
+}
+
+@media (min-width: 768px) {
+  .option-card {
+      width: 125px;
+      height: 188px;
+  }
+}
+
+.option-title {
+  color: white;
+  font-size: 1.25rem;
+  letter-spacing: -0.075em;
+  font-family: change-italic, serif;
+  text-align: center;
+  margin: 0.5rem 0 0.5rem 0;
+}
+
+button {
+  transition: box-shadow 1s ease, transform 1s ease;  
+}
+
+.active-theme {
+  box-shadow: 0 0 10px 5px hsl(var(--a));
+  transform: scale(1.08);
+}
+
+.bg-default-link {
+  background-image: url('/linkDefault.png');
+  background-size: 100%;
+  background-blend-mode: overlay;
+}
+
+.background-container {
+  position: relative;
+  background: hsl(var(--p));
+}
+
+.background-container::before {
+  content: "";
+  position: absolute;
+  background-image: var(--photo-url);
+  background-size: cover;
+  filter: blur(5px);
+  opacity: 0.5;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
