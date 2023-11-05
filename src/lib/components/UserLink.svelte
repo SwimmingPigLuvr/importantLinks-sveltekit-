@@ -8,6 +8,7 @@
   export let url = 'foo';
   export let title = 'some cool title';
   export let previewMode: boolean;
+  export let theme: string = '';
 
   let element: HTMLElement;
 
@@ -238,8 +239,6 @@ $: if (link) {
 
     combinedStyle = newStyles.join('; ');
     combinedClass = newClasses.join(' ');
-    console.log('USERLINK_ combinedClass: ', combinedClass);
-    console.log('USERLINK_ combinedStyle: ', combinedStyle);
 }
 
 
@@ -249,29 +248,30 @@ $: if (link) {
 </script>
 
 <a 
+  data-theme="{theme}"
   href="{url}" 
-    bind:this={element}
-    style={`${combinedStyle}`} 
-    class="
-      {combinedClass} 
-      {previewMode ? 'blinktree-preview' : 'blinktree'} ease-[backInOut]
-      {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'}  
-      flex justify-between m-auto items-stretch no-underline
-    ">
+  bind:this={element}
+  style={`${combinedStyle}`} 
+  class="
+    {combinedClass} 
+    {previewMode ? 'blinktree-preview' : 'blinktree'} ease-[backInOut]
+    {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'}  
+    flex justify-between m-auto items-stretch no-underline
+  ">
      
-     <!-- link icon -->
-    <img 
-      src={iconURL} 
-      alt={iconURLalt} 
-      class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {link.radius === 'full' ? 'rounded-full' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
+  <!-- link icon -->
+  <img 
+    src={iconURL} 
+    alt={iconURLalt} 
+    class="{previewMode? 'h-8 w-8' : ''} w-12 h-12 {link.radius === 'full' ? 'rounded-full' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.23rem]'}">
     
-    <!-- Link title -->
-    <p 
-    style={`
-      color: ${link.title.font.hex || `hsl(var(--pc))`} 
-    `}
-    class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect?.effect} {previewMode ? 'text-[0.88rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
-    </p>
+  <!-- Link title -->
+  <p 
+  style={`
+    color: ${link.title.font.hex || `hsl(var(--pc))`} 
+  `}
+  class='text-{link.title.font.hex} font-{font.family} {link?.title?.effect?.effect} {previewMode ? 'text-[0.88rem] -translate-x-[1rem]' : 'text-[1.5rem] -translate-x-[1.6rem]'} m-auto'>{title}
+  </p>
 </a>
 
 

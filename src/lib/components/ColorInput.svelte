@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { db, user, storage, userData } from "$lib/firebase";
   import { doc, writeBatch } from "firebase/firestore";
-  import { backOut, cubicInOut } from "svelte/easing";
+  import { backIn, backOut, cubicInOut } from "svelte/easing";
   import { slide, blur, fly, fade } from "svelte/transition";
 
 
@@ -378,6 +378,16 @@
         direction = degreeValue;
     }
 
+    export function parseOpacity(opacity: number) {
+        if (opacity === 100) {
+            return 'FF';
+        } else if (opacity < 10) {
+            return '0' + opacity;
+        } else {
+            return opacity.toString();
+        }
+    }
+
 </script>
     {#if !isGradient}
 
@@ -403,12 +413,12 @@
                 style="width: 2.3rem; height: 2.3rem; " 
                 bind:value={hex} 
                 on:change={() => updateColor(mode, hex)}
-                class="relative"
+                class="relative hover:cursor-pointer"
               >
               <!-- text hex input -->
               <input 
                 type="text" 
-                placeholder="#12345" 
+                placeholder="#FFF000" 
                 bind:value={hex} 
                 on:change={() => updateColor(mode, hex)} 
                 class="input text-left w-[8rem] h-[2.3rem] rounded-none font-mono tracking-widest">
@@ -450,10 +460,10 @@
     <container 
         in:slide={{ duration: 1000, easing: cubicInOut }}
         out:slide={{ duration: 1000, easing: cubicInOut }}
-        class="flex-col flex space-y-4 my-4">
+        class="flex-col flex space-y-4 mt-8">
       <div class="flex space-x-4">
-        <button class:bg-success={style === 'background-gradient'} on:click={() => setStyle(mode, 'background-gradient')} class="btn btn-outline">Linear</button>
-        <button class:bg-success={style === 'background-radial-gradient'} on:click={() => setStyle(mode, 'background-radial-gradient')} class="btn btn-outline">Radial</button>
+        <button class:bg-success={style === 'background-gradient'} on:click={() => setStyle(mode, 'background-gradient')} class="btn btn-sm btn-outline">Linear</button>
+        <button class:bg-success={style === 'background-radial-gradient'} on:click={() => setStyle(mode, 'background-radial-gradient')} class="btn btn-sm btn-outline">Radial</button>
       </div>
 
       <!-- colors -->
@@ -470,42 +480,41 @@
                         <label for="From" class="label">
                             <span class="label-text font-input-mono text-[1rem]">From</span>
                         </label>
-                        <div id="From" class="flex flex-col">
-                            <div
-                                style={`border: 2px solid ${from.hex}`}
-                                class="flex relative">
-
+                        <div 
+                            id="From" 
+                            style={`border: 10px double ${from.hex ? `${from.hex}${parseOpacity(from.opacity)}` : `hsl(var(--a))`};`}
+                            class="flex flex-col relative w-[13rem] sm:w-[8rem]">
                                 <!-- from input -->
                                 <input 
                                     type="color" 
                                     id="colorInput"
-                                    style={`width: 3.1rem; height: 3rem; background-color: ${from.hex ?? `hsl(var(--a))`};`}
+                                    style={`width: 100%; height: 2.3rem; background-color: ${from.hex ? `${from.hex}${parseOpacity(from.opacity)}` : `hsl(var(--a))`};`}
                                     bind:value={from.hex} 
                                     on:change={() => updateColor(`${mode} from`, from.hex)}
-                                    class="relative">
+                                    class="relative hover:cursor-pointer">
                                 <input 
                                     type="text" 
-                                    placeholder="#12345" 
+                                    placeholder="#FFF000" 
                                     bind:value={from.hex} 
                                     on:change={() => updateColor(`${mode} from`, from.hex)} 
-                                    class="input text-center w-[13rem] rounded-none font-input-mono tracking-widest">
+                                    class="input text-center w-full h-[3rem] rounded-none text-xl font-mono text-white tracking-widest">
 
                                 <!-- remove color to revert back to theme color -->
                                 {#if from.hex !== ''}
                                     <button
-                                        in:fly={{y: 10, duration: 200, easing: backOut}} 
+                                        in:fly={{y: 10, duration: 400, easing: backOut, delay: 1500}} 
                                         out:blur={{amount: 100}}
                                         on:mouseenter={() => showRemoveFromHex = true}
                                         on:mouseleave={() => showRemoveFromHex = false}
                                         on:click={() => {updateColor(`${mode} from`, '')}} 
-                                        class="absolute -top-2 -right-2 btn btn-xs font-input-mono">
+                                        class="absolute -top-2 -right-2 btn btn-xs font-change-bold tracking">
                                             ❌
                                     </button>
                                     {#if showRemoveFromHex}
                                         <p 
-                                            in:fade
-                                            out:fade
-                                            class="absolute -top-10 -right-4 p-2 px-4 text-xs bg-primary font-input-mono text-primary-content">remove first color?</p>
+                                            in:fly={{y: -10, duration: 200, easing: backOut}}
+                                            out:fly={{y: -10, duration: 200, easing: backIn}}
+                                            class="absolute -top-12 -right-4 p-2 px-4 text-sm bg-warning font-change-medium-italic text-warning-content">remove first color?</p>
                                     {/if}
                                 {/if}
                             </div>
@@ -519,7 +528,15 @@
                         </label>
                         <div class="tooltip tooltip-accent tooltip-left" data-tip={`🤓: "changing opacity might cause background to reflect diffently in preview than it will on your site"`}>
                             <label class="input-group">
-                                <input type="number" min="0" max="100" id="opacity" bind:value={from.opacity} on:change={() => updateOpacity(`${mode} from`, from.opacity)} class="input input-bordered" />
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    max="100" 
+                                    id="opacity" 
+                                    bind:value={from.opacity} 
+                                    on:change={() => updateOpacity(`${mode} from`, from.opacity)} 
+                                    class="input input-bordered h-[2.3rem] w-1/3" 
+                                />
                                 <span>%</span>
                             </label>
                         </div>
@@ -555,7 +572,7 @@
                                     class="">
                                 <input 
                                     type="text" 
-                                    placeholder="#12345" 
+                                    placeholder="#FFF000" 
                                     bind:value={to.hex} 
                                     on:change={() => updateColor(`${mode} to`, to.hex)} 
                                     class="input text-center w-[13rem] rounded-none font-input-mono tracking-widest">
@@ -597,7 +614,6 @@
             </div>
         </div>
 
-      </div>
 
       <!-- gradient direction -->
       <div class="flex flex-col justify-start">

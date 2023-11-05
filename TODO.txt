@@ -3378,3 +3378,88 @@ async function changeDataTheme
 
 
 wow that was a lot of good shit. my website looks so nice and yummy
+
+changes:
+let's change the underline on the image settings hover in the image upload component
+o
+
+
+
+
+
+
+monday october 30 todo
+
+figure out how to solve the hover image settings problem
+maybe we can force size to open after position? but it works normally if the user is going the opposite way
+
+today's focus: 
+    fix ui
+
+        links
+            need better gaps between fill / border / shadow
+            let's reorder the entire link ui in edit/appearance
+            let the text overflow in the links? 
+            set a width then make sure the link height is flexible so the text doesn't overflwo through it
+
+            what options would i want to choose first?
+            what options would the user want to choose first?
+
+                radius
+                fill style?
+                color?
+
+
+        colorInput.svelte
+            needs to be cointained in a smaller more cohesive div.
+            the user should be able to see everything right away and not have to dig through it
+
+        change save animation
+            look at more examples online
+            let it leave after a 2.5s timer
+
+        loading animation?
+        custom 404 page
+
+        live preview bg should be the background image that a user uploads?
+        well if they have a cool picture then that will work but if it's jsut a noraml headshot pfp it would be weird
+        it can be background.image ?? pfp ?? defaultLink.png
+
+
+        next todo is to use the custom button css to create the image style buttons
+        let's make a custom button container class to so i don't have to keep rewriting everything
+        
+        also make sure to use the setting i made from before
+
+
+
+halloween 2023
+
+fix the width on customThemes
+    the widths are great
+        but
+            let's change the sizes to how we did the custom buttons
+                they are percentage based so that way they work very very well in their given sizes
+fix the userlink size to let it grow if the link title is too long
+
+
+the livepreview is slowing down the appearance page
+    let's figure that out.
+        i think it has to do all the way down to the userlinks and the fact that they have to check the db for little style chagnes. when those values should just be passed in from the appearance page maybe i think perhaps
+
+styles
+    the color themes should have a different div
+        a: because there are way too many
+        b: to show they are different
+
+    let's fix this width issue
+
+
+let users follow each other?
+let users message each other or comment on links and media
+
+add transition for when user makes a change. maybe make it cool
+
+
+fix the livepreview
+it's all out of whack

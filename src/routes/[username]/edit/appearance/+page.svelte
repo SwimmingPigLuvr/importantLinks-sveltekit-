@@ -16,7 +16,7 @@
   import ImageUpload from "$lib/components/ImageUpload.svelte";
   import ColorInput from "$lib/components/ColorInput.svelte";
 
-  let themeHover: boolean[] = [];
+  let themeHover: string = '';
   let customThemeHover: boolean[] = [];
   let sizeNumber: number = 4;
   let unit: string = 'px';
@@ -259,6 +259,10 @@
     backgroundImage = background.image;
     linkImage = link.fill.image;
     borderImage = link.border.image;
+  }
+
+  $: if (themeHover !== '') {
+    theme = themeHover;
   }
 
   $: if (isLinkAnimationActive) {
@@ -539,8 +543,11 @@
     "garden",
     "retro",
     "business",
+    "acid",
     "autumn",
+    "corporate",
     "emerald",
+    "cyberpunk",
     "cmyk",
     "dracula",
     "halloween",
@@ -548,7 +555,6 @@
     "wireframe",
     "cupcake",
     "bumblebee",
-    "corporate",
     "synthwave",
     "valentine",
     "lofi",
@@ -557,9 +563,7 @@
     "black",
     "aqua",
     "night",
-    "acid",
     "forest",
-    "cyberpunk",
     "lemonade",
     "red",
   ];
@@ -1002,10 +1006,10 @@
     <!-- themes -->
     <div class="content-section">
     <h2 class="content-section-heading">Themes</h2>
-      <div class="mx-auto grid-themes">
+      <div class="mx-auto option-parent mb-8 gap-4">
         <!-- custom -->
         <div class="">
-          <a href="#custom" class="btn bg-opacity-50 hover:bg-opacity-70 rounded-none bg-primary border-dashed border-2 border-black w-[150px] h-[225px] sm:w-[100px] sm:h-[150px] md:w-[125px] md:h-[188px] flex flex-col justify-start py-4">
+          <a href="#custom" class="chunky-card btn bg-opacity-100 hover:bg-opacity-70 bg-primary border-dashed border-8 border-secondary transform transition-all duration-1000 ease-[backOut] flex flex-col justify-start">
             <p class="font-blix max-w-[100px] text-[1rem] leading-normal m-auto"><span class="">Create </span><span class="font-herb">Custom </span><span class="">Theme </span></p>
           </a>
           <h3 class="text-white text-[1.25rem] tracking-[-0.075em] font-change-italic bg-opacity-0 text-center text-md mb-4 mt-2">Custom</h3>
@@ -1023,7 +1027,7 @@
             <button 
               class:active-theme={userTheme.name === $userData?.theme}
               data-theme={$userData?.theme}
-              class="btn option-card">
+              class="btn chunky-card bg-lime-500">
                 <div class={`font-${userTheme.font? userTheme.font?.family : ''} flex flex-col items-center font`}>
                   <!-- pfp -->
                   <img class="w-[33px] h-[33px]"  src="{photoURL}" alt="pfp">
@@ -1040,36 +1044,33 @@
             <h3 class="text-white text-[1.25rem] tracking-[-0.075em] font-change-italic my-2 text-center capitalize-first">{userTheme.name}</h3>
           </button> 
         {/each}
-
-        <!-- prebuilt Themes -->
+      </div>
+      <!-- color Themes -->
+      <div class="mx-auto relative option-micro-parent">
+        <h3 class="font-mono absolute -top-6 left-0">Color Themes</h3>
         {#each themes as theme, index}
           <button  
-            on:mouseenter={() => themeHover[index] = true}
-            on:mouseleave={() => themeHover[index] = false}
+            on:mouseenter={() => handleThemeSelect(theme)}
+            on:mouseleave={() => themeHover = ''}
             on:click|preventDefault={() => handleThemeSelect(theme)} 
             class:glow={themeHover[index] || theme === $userData?.theme}
-            class="">
-            <button 
-              class="btn border-none bg-primary w-[150px] h-[225px] sm:w-[100px] sm:h-[150px] md:w-[125px] md:h-[188px] flex flex-col justify-start py-4"
-              class:active-theme={theme === $userData?.theme}
-              data-theme={theme}>
-                <div class="flex flex-col items-center">
-                  <!-- pfp -->
-                  <img class="w-[33px] h-[33px]"  src="{$userData?.photoURL}" alt="pfp">
-                  <!-- Username -->
-                  <p class="text-[0.5rem]">@{$userData?.username}</p>
-                  <!-- bio -->
-                  <p class="text-[0.33rem]">{$userData?.bio}</p>
-                </div>
-                <!-- links -->
-                <div class="bg-secondary w-full h-4"></div>
-                <div class="bg-secondary w-full h-4"></div>
-                <div class="bg-secondary w-full h-4"></div>
-            </button>
-            <h3 class="option-title text-white text-[1.25rem] tracking-[-0.075em] font-change-italic my-2 text-center bg-opacity-0 capitalize-first" data-theme={theme}>{theme}</h3>
+            class:active-theme={theme === $userData?.theme}
+            class="group w-1/3 border-primary border-8 border-double"
+            data-theme={theme}>
+            <h3 class="option-micro-title text-center bg-opacity-0 capitalize-first" data-theme={theme}>{theme}</h3>
+            <!-- shapes -->
+            <div>
+              <!-- yin yang -->
+              <div class="translate-x-1 transform transition-all duration-500 ease-[backOut] yin-yang group-hover:-translate-y-4 group-hover:rotate-[54deg]"></div>
+            </div>
+              <!-- links -->
+              <!-- <div class="hard-shadow bg-secondary w-full h-8"></div> -->
+              <!-- <div class="bg-accent w-full h-4"></div> -->
+              <!-- <div class="bg-primary w-full h-8"></div> -->
           </button>
         {/each}
       </div>
+
     </div>
 
   <div class="my-4">
@@ -1088,19 +1089,19 @@
       <h2 class="content-section-heading">Background</h2>
       
       <!-- bg styles -->
-      <div class="flex space-x-2">
+      <div class="flex space-x-2 overflow-auto">
         <!-- solid color -->
         <div>
           <button 
             on:click={() => setStyle('background', 'background-solid')} 
-            class="filter grayscale hover:grayscale-0 w-[120px] h-[150px] bg-accent transition transform duration-300 ease-in-out rounded-lg flex"></button>
+            class="chunky-card filter grayscale border-white border-1 hover:grayscale-0 bg-accent transition transform duration-300 ease-in-out rounded-lg flex"></button>
           <h3 class="option-title">Solid Color</h3>
         </div>
       <!-- gradient -->
       <div>
         <button 
           on:click={() => setStyle('background', 'background-gradient')}
-          class="w-[120px] h-[150px] btn bg-gradient-to-b from-accent to-primary hover:bg-gradient-to-tl transform transition-colors duration-1000 ease-in-out border-none flex flex-col justify-start py-4"></button>
+          class="chunky-card filter grayscale btn bg-gradient-to-b from-accent to-primary hover:grayscale-0 transform transition-colors duration-1000 ease-in-out border-white flex flex-col justify-start py-4"></button>
         <h3 class="option-title">Gradient</h3>
       </div>
     
@@ -1109,15 +1110,15 @@
       <button>
         <button 
           on:click={() => setStyle('background', 'background-image')}
-          class="w-[120px] h-[150px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
-          <img src="{$userData?.photoURL}" alt="pfp" class="h-[100%] btn p-0">
+          class="chunky-card filter grayscale hover:grayscale-0 flex flex-col justify-start">
+          <img src="{$userData?.photoURL}" alt="pfp" class="h-[100%] w-[100%] btn p-0">
         </button>
         <h3 class="option-title">Image</h3>
       </button>
       <button>
         <button 
           on:click={() => setStyle('background', 'background-gif')}
-          class="w-[120px] h-[150px] filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
+          class="chunky-card filter grayscale hover:grayscale-0 border-none flex flex-col justify-start">
           <img src="/minecraft.gif" alt="pfp" class="h-[100%] btn p-0">
         </button>
         <h3 class="option-title">Gif</h3>
@@ -1143,6 +1144,25 @@
       <div class="content-section">
         <h2 class="content-section-heading">Links</h2>
 
+        <!-- radius control -->
+        <div class="mb-8 flex flex-col space-y-2">
+          <h3 class="font-mono text-white">Radius</h3>
+          <div class="custom-button-container">
+            <button 
+              class:glow={link?.radius === 'none'}
+              on:click={() => setRadius('none')} 
+              class="custom-button b2 rounded-none"></button>
+            <button 
+              class:glow={link?.radius === 'half'}
+              on:click={() => setRadius('half')} 
+              class="custom-button b2 rounded-[0.5rem]"></button>
+            <button 
+              class:glow={link?.radius === 'full'}
+              on:click={() => setRadius('full')} 
+              class="custom-button b2 rounded-full"></button>
+          </div>
+        </div>
+
         <!-- Fill controls -->
         <div class="flex flex-col flex-wrap justify-between ">
           <!-- Label / checkbox -->
@@ -1166,27 +1186,27 @@
               </label>
               <div id="Fill Style">
                 <!-- styles -->
-                <div class="flex space-x-4 font-mono font-black text-sm -tracking-widest">
+                <div class="custom-button-container">
                   <!-- solid -->
                   <button 
                     on:click={() => setStyle('fill', 'link-solid')}
                     class:grayscale-0={link?.fill?.style === 'link-solid'}
-                    class="filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent p-2 btn rounded-md btn-primary w-1/5 transform transition duration-300 ease-in-out">solid</button>
+                    class="custom-button custom-button-xl filter grayscale hover:grayscale-0 hover:border-4 border-[0.1rem] border-accent text-center px-4 font-change-italic -tracking-widest rounded-md bg-primary transform transition duration-300 ease-in-out align-baseline"><span>solid</span></button>
                   <!-- gradient -->
                   <button 
                     on:click={() => setStyle('fill', 'link-gradient')}
                     class:grayscale-0={link?.fill?.style === 'link-gradient' || link?.fill?.style === 'radial gradient'}
-                    class="filter grayscale hover:grayscale-0 p-2 btn rounded-md btn-accent bg-gradient-to-tr from-accent via-secondary to-primary hover:border-4 w-1/5">gradient</button>
+                    class="custom-button custom-button-xl filter grayscale hover:grayscale-0 rounded-md bg-gradient-to-tr from-accent via-secondary to-primary border-accent hover:border-4 text-center px-4 font-change-italic -tracking-widest">gradient</button>
                   <!-- image -->
                   <button 
                     on:click={() => setStyle('fill', 'link-image')}
                     class:grayscale-0={link?.fill?.style === 'link-image'}
-                    class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/icons/trash.jpeg')] bg-cover bg-top text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">image</button>
+                    class="custom-button custom-button-xl filter grayscale hover:grayscale-0 hover:border-4 px-4 bg-[url('/icons/trash.jpeg')] bg-contain border-accent bg-top text-white font-change-italic rounded-md -tracking-widest transform transition duration-300 ease-in-out">image</button>
                   <!-- custom fill -->
                   <button 
                     on:click={() => setStyle('fill', 'link-gif')}
                     class:grayscale-0={link?.fill?.style === 'link-gif'}
-                    class="filter grayscale hover:grayscale-0 hover:border-4 p-2 btn bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md btn-accent w-1/5 transform transition duration-300 ease-in-out">gif</button>
+                    class="custom-button custom-button-xl filter grayscale hover:grayscale-0 border-accent hover:border-4 px-4 bg-[url('/minecraft.gif')] bg-cover bg-bottom text-white rounded-md transform transition duration-300 ease-in-out font-change-italic -tracking-widest">gif</button>
                 </div>
               </div>
             </div>
@@ -1478,19 +1498,7 @@
 
         </div> 
 
-      <!-- radius control -->
-        <h3 class="font-mono text-white my-2 mt-6">Radius</h3>
-        <div class="flex flex-wrap justify-between">
-          <button 
-            on:click={() => setRadius('none')} 
-            class="btn w-1/3 rounded-none mb-4">None</button>
-          <button 
-            on:click={() => setRadius('half')} 
-            class="btn w-1/3 rounded-[0.5rem] mb-4">Half</button>
-          <button 
-            on:click={() => setRadius('full')} 
-            class="btn w-1/4 rounded-full mb-4">Full</button>
-      </div>
+      
 
 
         <div class="flex flex-wrap flex-col justify-between">
@@ -1639,23 +1647,7 @@
   z-index: 2; /* Optional, if you have other positioned elements and need layering */
 }
 
-.grid-themes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on small screens */
-    gap: 16px; /* Adjust this value to your preference */
-}
 
-@media screen and (min-width: 600px) { /* Tailwind's sm breakpoint */
-    .grid-themes {
-        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */
-    }
-}
-
-@media screen and (min-width: 768px) { /* Tailwind's md breakpoint */
-    .grid-themes {
-        grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */
-    }
-}
   
   </style>
 

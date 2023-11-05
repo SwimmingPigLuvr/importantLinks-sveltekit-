@@ -90,8 +90,6 @@
     newClasses = [];
     newClasses.push(background?.style ?? 'no background style?');
     combinedClass = newClasses.join(' ');
-    console.log('LIVEPREVIEW_ newClasses: ', newClasses);
-    console.log('LIVEPREVIEW_ combined class: ', combinedClass);
 
     // background-solid
     rootStyle.setProperty('--background-color', background?.hex || 'hsl(var(--s))');
@@ -181,7 +179,8 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
 <!-- <div class="bg-white w-screen h-screen"></div> -->
         
 <div 
-    style="--photo-url: url({photoURL});"
+    data-theme="{theme}"
+    style="--photo-url: url({background?.image?.url ?? photoURL});"
     class={`${showPreview? 'visible' : 'hidden'} background-container sm:flex justify-center items-center h-screen z-40 transition-all transform duration-1000 ease-in-out`}
     >
     <!-- phone div -->
@@ -224,6 +223,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
                 url={link.url}
                 customTheme={customTheme}
                 previewMode={previewMode}
+                theme={theme}
               />
             </li>
           {/each}
@@ -257,7 +257,7 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
               </div>
             </div>
             <!-- theme -->
-            <p>theme: {theme}</p>
+            <!-- <p>theme: {theme}</p> -->
             <p>background: {background}</p>
 
             <!-- styles -->

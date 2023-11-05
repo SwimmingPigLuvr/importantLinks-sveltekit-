@@ -286,19 +286,19 @@ html {
 
 
 
-.glow {
-  color: #fff;
+/* .glow {
+  color: hsl(var(--p));
   -webkit-animation: glow 1s ease-in-out infinite alternate;
   -moz-animation: glow 1s ease-in-out infinite alternate;
   animation: glow 1s ease-in-out infinite alternate;
-}
+} */
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+    text-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white, 0 0 40px white, 0 0 50px white, 0 0 60px white, 0 0 70px white;
   }
   to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+    text-shadow: 0 0 20px hsl(var(--a)), 0 0 30px hsl(var(--a)), 0 0 40px hsl(var(--a)), 0 0 50px hsl(var(--a)), 0 0 60px hsl(var(--a)), 0 0 70px hsl(var(--a)), 0 0 80px hsl(var(--a));
   }
 }
 
@@ -560,27 +560,35 @@ html {
   font-size: 1.5rem;
 }
 
+.option-parent {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around; /* Ensures even spacing */
+  width: 100%;
+}
+
 .option-card {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 1rem;
   border-style: none;
-  width: 150px;
-  height: 225px;
+  width: 100%; /* Full width on small screens */
+  max-width: 150px; /* Maximum width */
+  height: auto; /* Height adjusts to content */
+  flex: 1; /* Allows cards to grow */
 }
 
 @media (min-width: 640px) {
   .option-card {
-      width: 100px;
-      height: 150px;
+    width: calc(50% - 1rem); /* Two cards per row, accounting for padding */
   }
 }
 
 @media (min-width: 768px) {
   .option-card {
-      width: 125px;
-      height: 188px;
+    width: calc(33.33% - 1rem); /* Three cards per row, accounting for padding */
   }
 }
 
@@ -591,6 +599,47 @@ html {
   font-family: change-italic, serif;
   text-align: center;
   margin: 0.5rem 0 0.5rem 0;
+}
+
+.option-micro-card {
+  background-color: hsl(var(--pc));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0rem;
+  width: 33%;
+  height: 150px;
+}
+
+@media (min-width: 640px) {
+  .option-card {
+      width: 50%;
+      height: 100px;
+  }
+}
+
+@media (min-width: 768px) {
+  .option-card {
+      width: 33%;
+      height: 188px;
+  }
+}
+
+.option-micro-parent {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%; 
+}
+
+.option-micro-title {
+  color: hsl(var(--p));
+  font-size: 1.5rem;
+  letter-spacing: -0.075em;
+  font-family: change-italic, serif;
+  text-align: center;
+  margin: auto;
 }
 
 button {
@@ -617,7 +666,9 @@ button {
   content: "";
   position: absolute;
   background-image: var(--photo-url);
-  background-size: cover;
+  background-size: var(--background-size);
+  background-position: var(--background-position);
+  background-repeat: var(--background-repeat);
   filter: blur(5px);
   opacity: 0.5;
   z-index: -1;
@@ -625,4 +676,81 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+.custom-button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.custom-button {
+  width: 47.5%;
+  height: 30px;
+}
+
+.custom-button-xl {
+  @extend .custom-button;
+  height: 50px
+}
+
+.b2 {
+  @extend .custom-button;
+    background-color: hsl(var(--b2));
+}
+
+@media (min-width: 640px) {
+  .custom-button {
+      width: 32%;
+  }
+  .custom-button-xl {
+    width: 47.5%;
+  }
+}
+
+.username-clamp {
+  font-size: clamp(0.5rem, 2vw, 2rem); /* Adjust min-size, preferred-size, and max-size as needed */
+}
+
+.yin-yang {
+  width: 50px;
+  box-sizing: content-box;
+  height: 25px;
+  background: hsl(var(--p));
+  border-color: hsl(var(--a));
+  border-style: solid;
+  border-width: 2px 2px 26px 2px;
+  border-radius: 100%;
+  position: relative;
+}
+.yin-yang:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  background: hsl(var(--p));
+  border: 9.4px solid hsl(var(--a));
+  border-radius: 100%;
+  width: 6.25px;
+  height: 6.25px;
+  box-sizing: content-box;
+}
+.yin-yang:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: hsl(var(--a));
+  border: 9.4px solid hsl(var(--p));
+  border-radius: 100%;
+  width: 6.25px;
+  height: 6.25px;
+  box-sizing: content-box;
+}
+
+.chunky-card {
+  width: 150px;
+  height: 200px;
 }
