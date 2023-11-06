@@ -245,6 +245,7 @@ main {
 
 .background-gradient {
   background: linear-gradient(var(--border-gradient-direction), var(--border-gradient-from), var(--border-gradient-to));
+  transition: 3s ease-in-out
 }
 
 .background-image {

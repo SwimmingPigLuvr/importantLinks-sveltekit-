@@ -970,7 +970,7 @@
   <!-- style="background-image: url('/minecraft.gif'); background-repeat: no-repeat; background-size: 100% 100%; background-attachment: fixed;"  -->
 <!-- main html -->
 <main 
-  data-theme="{theme}" 
+  data-theme="luxury" 
   class="flex flex-col bg-secondary-content">
 
   <!-- logo -->

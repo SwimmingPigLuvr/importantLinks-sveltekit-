@@ -280,6 +280,17 @@ class="md:invisible z-50 fixed bottom-6 left-1/2 text-info-content -translate-x-
 
 <style>
 
+* {
+  transition: 
+    background-color 0.5s ease-in-out, 
+    color 0.5s ease-in-out, 
+    border-color 0.8s ease-in, 
+    background-image 1s ease-in-out,
+    background-position 1s ease-in-out,
+    background-size 1s ease-in-out,
+    background-repeat 1s ease-in-out,
+}
+
 
 
 

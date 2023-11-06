@@ -3463,3 +3463,17 @@ add transition for when user makes a change. maybe make it cool
 
 fix the livepreview
 it's all out of whack
+
+the main page is still using red as the default theme
+
+right now i can get the transitions to work on the live preview but not the linear gradient.
+
+
+i think for the userlink component i can just use the tailwind transition-all as a shotgun approach 
+then i can figure out the singular ones that aren't working after that
+
+
+
+i think i'd have peace of mind once i figure out how to make the livepreview proportional
+
+that should be my mango

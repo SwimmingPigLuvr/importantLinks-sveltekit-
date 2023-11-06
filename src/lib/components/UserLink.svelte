@@ -1,6 +1,6 @@
 <script lang="ts">
   import { hexToRgb, type CustomTheme } from "$lib/theme";
-  import { backInOut } from "svelte/easing";
+  import { backInOut, backOut } from "svelte/easing";
 
   export let customTheme: CustomTheme;
   export let iconURL = 'https://miladymaker.net/images/milady3.jpg';
@@ -256,7 +256,7 @@ $: if (link) {
     {combinedClass} 
     {previewMode ? 'blinktree-preview' : 'blinktree'} ease-[backInOut]
     {link.radius === 'full' ? 'rounded-full' : link.radius === 'half' ? 'rounded-[0.5rem]' : link.radius === 'none' ? 'rounded-none' : 'rounded-[0.5rem]'}  
-    flex justify-between m-auto items-stretch no-underline
+    flex justify-between m-auto items-stretch no-underline transform transition-all ease-[backOut]
   ">
      
   <!-- link icon -->
